@@ -121,7 +121,7 @@
         themeManager.init();
         
         // Register for AI selection changed (very noisy)
-        AIEventAdapter.getInstance().addEventListener(AIEvent.ART_SELECTION_CHANGED, function(event) {
+        csInterface.addEventListener("com.adobe.csxs.events.SelectionChanged", function(ret) {
             csInterface.evalScript("getActionsFromSelection()", function(ret) {
                 var r = JSON.parse(ret);
                 
