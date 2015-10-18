@@ -1,0 +1,10 @@
+*.opensdf
+*.sdf
+.vs/
+BlocksAIPlugin/x64/
+BlocksAIPlugin/x86/
+*.aps
+*.user
+
+x64/
+x86/

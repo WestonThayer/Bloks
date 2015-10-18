@@ -1,6 +1,3 @@
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
-/*global $, window, location, CSInterface, SystemPath, themeManager*/
-
 (function () {
     'use strict';
 
@@ -122,26 +119,29 @@
         
         // Register for AI selection changed (very noisy)
         csInterface.addEventListener("com.adobe.csxs.events.SelectionChanged", function(ret) {
-            csInterface.evalScript("getActionsFromSelection()", function(ret) {
-                var r = JSON.parse(ret);
-                
-                if (r.action === 0) {
-                    showNoUI();
-                }
-                else if (r.action === 1) {
-                    showEditGroupUI(r.blok);
-                }
-                else if (r.action === 2) {
-                    showEditChildUI(r.blok);
-                }
-                else if (r.action === 3) {
-                    showCreateGroupUI();
-                }
-                else { showNoUI();}
-            });
-            
-            // This does bad things for the undo stack
-            csInterface.evalScript("runBlokLayoutFromSelection()");
+            // Only listen for our plugin's events
+            if (ret.extensionId === "microsoft.design.bloks") {
+                csInterface.evalScript("getActionsFromSelection()", function(ret) {
+                    var r = JSON.parse(ret);
+
+                    if (r.action === 0) {
+                        showNoUI();
+                    }
+                    else if (r.action === 1) {
+                        showEditGroupUI(r.blok);
+                    }
+                    else if (r.action === 2) {
+                        showEditChildUI(r.blok);
+                    }
+                    else if (r.action === 3) {
+                        showCreateGroupUI();
+                    }
+                    else { showNoUI();}
+                });
+
+                // This does bad things for the undo stack
+                csInterface.evalScript("runBlokLayoutFromSelection()");
+            }
         });
                 
         $("#create-group-btn").click(function () {
@@ -191,7 +191,9 @@
             location.reload(); 
         });
     }
-        
+    
+    
+    // Execution starts here
     init();
 
 }());
