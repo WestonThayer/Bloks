@@ -1,200 +1,132 @@
 (function () {
     'use strict';
-
-    var csInterface = new CSInterface();
     
-    function getGroupBlokObjectPayloadFromUI() {
-        var blokObject = {
-            type: "container",
-
-            // child properties
-            fixedWidth: undefined,
-            fixedHeight: undefined,
-            flex: undefined, // same as flex-grow
-            alignSelf: undefined,
-
-            // container properties
-            flexDirection: "row", // orientation
-            justifyContent: "flex-start", // spacing (only allow flex-start and space-between)
-            alignItems: "flex-start", // alignment
-            flexWrap: "nowrap", // wrapping
+    var BlokVm = (function() {        
+        function BlokVm() {
+            this.title = ko.observable("Not set");
+            this.isContainerSettingsVisible = ko.observable(false);
+            this.isCreateButtonVisible = ko.observable(false);
             
-            // both
-            layoutWidth: undefined,
-            layoutHeight: undefined
-        };
-
-        if ($("#orientation-vertical-btn").is(":checked")) {
-            blokObject.flexDirection = "column";
+            // Blok settings
+            this.fixedWidth = undefined;
+            this.fixedHeight = undefined;
+            this.flex = undefined;
+            this.alignSelf = undefined;
+            
+            // BlokContainer settings
+            this.flexDirection = ko.observable(0);
+            this.justifyContent = ko.observable(0);
+            this.alignItems = ko.observable(0);
+            this.flexWrap = ko.observable(0);
         }
-
-        if ($("#spacing-space-between-btn").is(":checked")) {
-            blokObject.justifyContent = "space-between";
-        }
-
-        if ($("#alignment-center-btn").is(":checked")) {
-            blokObject.alignItems = "center";
-        }
-        else if ($("#alignment-flex-end-btn").is(":checked")) {
-            blokObject.alignItems = "flex-end";
-        }
-        else if ($("#alignment-stretch-btn").is(":checked")) {
-            blokObject.alignItems = "stretch";
-        }
-
-        var payload = JSON.stringify(blokObject);
         
-        return payload;
-    }
+        return BlokVm;
+    })();
     
-    function showNoUI() {
-        $("#title").text("No options");
+    /** Function container for dealing with Blok JSX API */
+    var BlokScripts = (function() {
+        var csInterface = new CSInterface();
         
-        $("#create-group-items").hide();
-        $("#edit-child-items").hide();
-    }
-    
-    function showCreateGroupUI() {
-        $("#title").text("Create layout group");
+        // TODO: how does this handle exceptions? We should crash too
         
-        $("#create-group-items").show();
-        $("#edit-child-items").hide();
-        
-        $("#create-group-btn").show();
-        $("#edit-group-btn").hide();
-    }
-    
-    function showEditGroupUI(currentBlok) {
-        $("#title").text("Edit layout group");
-        
-        $("#create-group-items").show();
-        $("#edit-child-items").hide();
-        
-        $("#create-group-btn").show();
-        $("#edit-group-btn").hide();
-        
-        $("#create-group-btn").hide();
-        $("#edit-group-btn").show();
-        
-        // Make UI match blok object
-        
-        if (currentBlok.flexDirection === "row") {
-            $("#orientation-horizontal-btn").prop("checked", true);
-        }
-        else if (currentBlok.flexDirection === "column") {
-            $("#orientation-vertical-btn").prop("checked", true);
-        }
-        
-        if (currentBlok.justifyContent === "flex-start") {
-            $("#spacing-flex-start-btn").prop("checked", true);
-        }
-        else if (currentBlok.justifyContent === "space-between") {
-            $("#spacing-space-between-btn").prop("checked", true);
-        }
-        
-        if (currentBlok.alignItems === "flex-start") {
-            $("#alignment-flex-start-btn").prop("checked", true);
-        }
-        else if (currentBlok.alignItems === "center") {
-            $("#alignment-center-btn").prop("checked", true);
-        }
-        else if (currentBlok.alignItems === "flex-end") {
-            $("#alignment-flex-end-btn").prop("checked", true);
-        }
-        else if (currentBlok.alignItems === "stretch") {
-            $("#alignment-stretch-btn").prop("checked", true);
-        }
-    }
-    
-    function showEditChildUI(currentBlok) {
-        $("#title").text("No options");
-        
-        $("#create-group-items").hide();
-        $("#edit-child-items").show();
-    }
-    
-    function init() {
-                
-        themeManager.init();
-        
-        // Register for AI selection changed (very noisy)
-        csInterface.addEventListener("com.adobe.csxs.events.SelectionChanged", function(ret) {
-            // Only listen for our plugin's events
-            if (ret.extensionId === "microsoft.design.bloks") {
-                csInterface.evalScript("getActionsFromSelection()", function(ret) {
-                    var r = JSON.parse(ret);
-
-                    if (r.action === 0) {
-                        showNoUI();
+        return {
+            /** Register a callback for whenever Illustrator's SELECTION_CHANGED event fires (a lot) */
+            onSelectionChanged: function(cb) {
+                csInterface.addEventListener("com.adobe.csxs.events.SelectionChanged", function(ret) {
+                    // Only listen for our plugin's events, we could be hearing others
+                    if (ret.extensionId === "microsoft.design.bloks") {
+                        cb();
                     }
-                    else if (r.action === 1) {
-                        showEditGroupUI(r.blok);
-                    }
-                    else if (r.action === 2) {
-                        showEditChildUI(r.blok);
-                    }
-                    else if (r.action === 3) {
-                        showCreateGroupUI();
-                    }
-                    else { showNoUI();}
                 });
-
-                // This does bad things for the undo stack
-                csInterface.evalScript("runBlokLayoutFromSelection()");
+            },
+            getActionsFromSelection: function(cb) {                
+                csInterface.evalScript("loader(7).getActionsFromSelection()", function(ret) {
+                    var result = JSON.parse(ret);
+                    cb(result);
+                });
+            },
+            createBlokContainerFromSelection: function(settingsStr, cb) {
+                csInterface.evalScript("loader(7).createBlokContainerFromSelection(" + settingsStr + ")", function(ret) {
+                    if (cb) {
+                        cb();
+                    }
+                });
+            },
+            updateSelectedBlokContainer: function(settingsStr, cb) {
+                csInterface.evalScript("loader(7).updateSelectedBlokContainer(" + settingsStr + ")", function(ret) {
+                    if (cb) {
+                        cb();
+                    }
+                });
             }
-        });
-                
-        $("#create-group-btn").click(function () {
-            var payload = getGroupBlokObjectPayloadFromUI();
-            
-            csInterface.evalScript("createBlokLayoutGroupFromSelection(" + payload + ")");
-        });
-        
-        $("#edit-group-btn").click(function() {
-            var payload = getGroupBlokObjectPayloadFromUI();
-            
-            csInterface.evalScript("updateBlokFromSelection(" + payload + ")");
-        });
-        
-        $("#edit-child-btn").click(function() {
-            var blokObject = {
-                type: "child",
-
-                // child properties
-                fixedWidth: undefined,
-                fixedHeight: undefined,
-                flex: undefined, // same as flex-grow
-                alignSelf: undefined,
-
-                // container properties
-                flexDirection: undefined, // orientation
-                justifyContent: undefined, // spacing (only allow flex-start and space-between)
-                alignItems: undefined, // alignment
-                flexWrap: undefined, // wrapping
-                
-                // both
-                layoutWidth: undefined,
-                layoutHeight: undefined
-            };
-            
-            var payload = JSON.stringify(blokObject);
-            
-            csInterface.evalScript("updateBlokFromSelection(" + payload + ")");
-        });
-        
-        // Helps with debugging
-        $("#reload-btn").click(function () {
-            /*var event = new CSEvent("com.adobe.csxs.events.SilentTransformRequestedEvent", "APPLICATION", "ILST", "microsoft.design.bloks");
-            event.data = "need to put a matrix here...";
-            csInterface.dispatchEvent(event);*/
-            
-            location.reload(); 
-        });
-    }
+        };
+    })();
+    
+    
     
     
     // Execution starts here
-    init();
+    themeManager.init();
+    
+    var viewModel = new BlokVm();
+    ko.applyBindings(viewModel);
+    
+    BlokScripts.onSelectionChanged(function() {
+        BlokScripts.getActionsFromSelection(function(result) {
+            if (result.action === 0) {
+                viewModel.title("No Options");
+                viewModel.isContainerSettingsVisible(false);
+            }
+            else if (result.action === 1) {
+                // Container sel
+                alert("container");
+            }
+            else if (result.action === 2) {
+                // child sel
+                alert("child");
+            }
+            else if (result.action === 3) {
+                // Create group
+                viewModel.title("Blok Group");
+                viewModel.isContainerSettingsVisible(true);
+                viewModel.isCreateButtonVisible(true);
+                viewModel.flexDirection(0);
+                viewModel.justifyContent(0);
+                viewModel.alignItems(0);
+            }
+            else {
+                throw new Error("Unexpected action value: " + result);
+            }
+        });
+    });
+    
+    // On-the-fly updates
+    
+    function handleBlokContainerPropertyChanged(newValue) {
+        BlokScripts.updateSelectedBlokContainer(ko.toJSON(viewModel));
+    }
+    
+    viewModel.flexDirection.subscribe(handleBlokContainerPropertyChanged);
+    viewModel.justifyContent.subscribe(handleBlokContainerPropertyChanged);
+    viewModel.alignItems.subscribe(handleBlokContainerPropertyChanged);
+    
+    
+    // Group creation
+    $("#create-btn").click(function() {
+        viewModel.isCreateButtonVisible(false);
+        BlokScripts.createBlokContainerFromSelection(ko.toJSON(viewModel));
+    });
+    
+    
+    
+    // Helps with debugging
+    $("#reload-btn").click(function () {
+        /*var event = new CSEvent("com.adobe.csxs.events.SilentTransformRequestedEvent", "APPLICATION", "ILST", "microsoft.design.bloks");
+        event.data = "need to put a matrix here...";
+        csInterface.dispatchEvent(event);*/
+        
+        location.reload(); 
+    });
 
 }());
     

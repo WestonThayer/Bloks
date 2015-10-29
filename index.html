@@ -11,83 +11,83 @@
 
     <body class="hostElt">
 
-        <div id="content">        
+        <div id="content">
             
-            <h1 id="title">Not set</h1>
+            <h1 data-bind="text: title"></h1>
             
-            <div id="create-group-items">
-                <div id="orientation">
+            <div data-bind="visible: isContainerSettingsVisible">
+                <div id="flex-direction">
                     <h2>Orientation</h2>
 
                     <div class="topcoat-button-bar">
                         <label class="topcoat-button-bar__item">
-                            <input id="orientation-vertical-btn" type="radio" name="container-orientation-grp">
+                            <input type="radio" name="flex-direction-grp" data-bind="checked: flexDirection, checkedValue: 1">
                             <button class="topcoat-button-bar__button hostFontSize">Vertical</button>
                         </label>
                         <label class="topcoat-button-bar__item">
-                            <input id="orientation-horizontal-btn" type="radio" name="container-orientation-grp" checked="true">
+                            <input type="radio" name="flex-direction-grp" data-bind="checked: flexDirection, checkedValue: 0">
                             <button class="topcoat-button-bar__button hostFontSize">Horizontal</button>
                         </label>
                     </div>
                 </div>
 
-                <div id="spacing">
+                <div id="justify-content">
                     <h2>Spacing</h2>
 
                     <div class="topcoat-button-bar">
                         <label class="topcoat-button-bar__item">
-                            <input id="spacing-flex-start-btn" type="radio" name="container-spacing-grp" checked="true">
+                            <input type="radio" name="justify-content-grp" data-bind="checked: justifyContent, checkedValue: 0">
                             <button class="topcoat-button-bar__button hostFontSize">Tight</button>
                         </label>
                         <label class="topcoat-button-bar__item">
-                            <input id="spacing-space-between-btn" type="radio" name="container-spacing-grp">
+                            <input type="radio" name="justify-content-grp" data-bind="checked: justifyContent, checkedValue: 1">
                             <button class="topcoat-button-bar__button hostFontSize">Distributed</button>
                         </label>
                     </div>
                 </div>
 
-                <div id="alignment">
+                <div id="align-items">
                     <h2>Alignment</h2>
 
                     <div class="topcoat-button-bar">
                         <label class="topcoat-button-bar__item">
-                            <input id="alignment-flex-start-btn" type="radio" name="container-alignment-grp" checked="true">
+                            <input type="radio" name="align-items-grp" data-bind="checked: alignItems, checkedValue: 0">
                             <button class="topcoat-button-bar__button hostFontSize">Start</button>
                         </label>
                         <label class="topcoat-button-bar__item">
-                            <input id="alignment-center-btn" type="radio" name="container-alignment-grp">
+                            <input type="radio" name="align-items-grp" data-bind="checked: alignItems, checkedValue: 1">
                             <button class="topcoat-button-bar__button hostFontSize">Center</button>
                         </label>
                         <label class="topcoat-button-bar__item">
-                            <input id="alignment-flex-end-btn" type="radio" name="container-alignment-grp">
+                            <input type="radio" name="align-items-grp" data-bind="checked: alignItems, checkedValue: 2">
                             <button class="topcoat-button-bar__button hostFontSize">End</button>
                         </label>
                         <label class="topcoat-button-bar__item">
-                            <input id="alignment-stretch-btn" type="radio" name="container-alignment-grp">
+                            <input type="radio" name="align-items-grp" data-bind="checked: alignItems, checkedValue: 3">
                             <button class="topcoat-button-bar__button hostFontSize">Stretch</button>
                         </label>
                     </div>
                 </div>
 
-                <button id="create-group-btn" class="topcoat-button--large hostFontSize">Create</button>
-                <button id="edit-group-btn" class="topcoat-button--large hostFontSize">Update</button>
+                <!-- TODO: add flex-wrap -->
+                
+                
             </div>
             
-            <div id="edit-child-items">
-                <button id="edit-child-btn" class="topcoat-button--large hostFontSize">Update Child</button>
-            </div>
+            <button id="create-btn" class="topcoat-button--large hostFontSize" data-bind="visible: isCreateButtonVisible">Create</button>
             
+            
+            <br />
+            <!-- Debug only -->
             <button id="reload-btn" class="topcoat-button--large hostFontSize">Reload</button>
             
         </div>
         
         <script src="js/libs/CSInterface.js"></script>
         <script src="js/libs/jquery-2.0.2.min.js"></script>
-
-        <script src="js/themeManager.js"></script>
+        <script src="js/libs/themeManager.js"></script>
+        <script src="js/libs/knockout.js"></script>
         
         <script src="js/main.js"></script>
-
-            
     </body>
 </html>

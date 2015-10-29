@@ -1,1 +1,4 @@
 .debug
+node_modules/
+todo.txt
+*.jsx
