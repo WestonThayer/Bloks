@@ -130,31 +130,8 @@ class Blok {
 
     /** Return a css-layout node */
     public computeCssNode(): any {
-        let container = this.getContainer();
-
         let w = this.getFixedWidth();
         let h = this.getFixedHeight();
-
-        // What if we forced the consumer to make these sorts of decisions?
-        /*if (container) {
-            // Clear a dim if we're stretching
-            if (container.getAlignItems() === Css.Alignments.STRETCH ||
-                this.getAlignSelf() === Css.Alignments.STRETCH) {
-                switch (container.getFlexDirection()) {
-                    case Css.FlexDirections.ROW:
-                        h = undefined;
-                        break;
-                    case Css.FlexDirections.COLUMN:
-                        w = undefined;
-                        break;
-                    default:
-                        throw new Error("Unknown FlexDirections value: " + container.getFlexDirection());
-                }
-            }
-        }
-        else {
-            // it's possible that this was called from a BlokContainer, which might not have a parent
-        }*/
 
         let cssNode: any = {
             style: {

@@ -121,6 +121,24 @@ class BlokContainer extends Blok {
     public /*override*/ computeCssNode(): any {
         let cssNode = super.computeCssNode();
 
+        // If we're asking items to stretch, it's only fair to give ourselves a
+        // non-zero dimension
+        if (this.getAlignItems() === Css.Alignments.STRETCH) {
+            let r = this.getRect();
+
+            if (cssNode.style.height === undefined &&
+                this.getFlexDirection() === Css.FlexDirections.ROW) {
+                cssNode.style.height = r.getHeight();
+            }
+            else if (cssNode.style.width === undefined &&
+                this.getFlexDirection() === Css.FlexDirections.COLUMN) {
+                cssNode.style.width = r.getWidth();
+            }
+            else {
+                throw new Error("Unknown FlexDirections value: " + this.getFlexDirection());
+            }
+        }
+
         cssNode.style.flexDirection = Css.enumStringToCssString(Css.FlexDirections[this.getFlexDirection()]);
         cssNode.style.justifyContent = Css.enumStringToCssString(Css.Justifications[this.getJustifyContent()]);
         cssNode.style.alignItems = Css.enumStringToCssString(Css.Alignments[this.getAlignItems()]);
@@ -132,6 +150,21 @@ class BlokContainer extends Blok {
 
         blokChildren.forEach((blok) => {
             let childCssNode = blok.computeCssNode();
+
+            // Clear a dim if we're stretching
+            if (this.getAlignItems() === Css.Alignments.STRETCH ||
+                blok.getAlignSelf() === Css.Alignments.STRETCH) {
+                if (this.getFlexDirection() === Css.FlexDirections.ROW) {
+                    childCssNode.style.height = undefined;
+                }
+                else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
+                    childCssNode.style.width = undefined;
+                }
+                else {
+                    throw new Error("Unknown FlexDirections value: " + this.getFlexDirection());
+                }
+            }
+
             cssNode.children.push(childCssNode);
         });
 

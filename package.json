@@ -7,7 +7,6 @@
   "scripts": {
     "build-jsx": "browserify jsx/ts/index.ts -p [ tsify ] > jsx/hostscript.jsx",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test-blok-layout": "browserify jsx/ts/test/blok-layout.ts -p [ tsify ] > jsx/ts/test/blok-layout.jsx",
     "test-blok-container-layout": "browserify jsx/ts/test/blok-container-layout.ts -p [ tsify ] > jsx/ts/test/blok-container-layout.jsx"
   },
   "author": "Weston Thayer <me@westonthayer.com>",

@@ -7,6 +7,7 @@
 import Assert = require("./assert");
 import TestFramework = require("./test-framework");
 import Blok = require("../blok");
+import BlokUserSettings = require("../blok-user-settings");
 import BlokContainer = require("../blok-container");
 import BlokContainerUserSettings = require("../blok-container-user-settings");
 import BlokAdapter = require("../blok-adapter");
@@ -57,6 +58,63 @@ function testOneDeepRow() {
 
     Assert.areEqual(cssNode.children[0].style.width, 100);
     Assert.areEqual(cssNode.children[0].style.height, 100);
+    Assert.areEqual(cssNode.children[0].style.flex, undefined);
+
+    Assert.areEqual(cssNode.children[1].style.width, 50);
+    Assert.areEqual(cssNode.children[1].style.height, 200);
+    Assert.areEqual(cssNode.children[1].style.flex, undefined);
+
+    // Now layout
+    blokContainer.invalidate();
+
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 150, 200])));
+}
+
+/** Container set to stretch */
+function testOneDeepRowStretch() {
+    let pageItem = app.activeDocument.pageItems[0];
+
+    let settings = new BlokContainerUserSettings();
+    settings.alignItems = Css.Alignments.STRETCH;
+
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem, settings);
+
+    let cssNode = blokContainer.computeCssNode();
+
+    Assert.areEqual(cssNode.style.alignItems, "stretch");
+
+    Assert.areEqual(cssNode.children.length, 2);
+
+    Assert.areEqual(cssNode.children[0].style.width, 100);
+    Assert.areEqual(cssNode.children[0].style.height, undefined);
+    Assert.areEqual(cssNode.children[0].style.flex, undefined);
+
+    Assert.areEqual(cssNode.children[1].style.width, 50);
+    Assert.areEqual(cssNode.children[1].style.height, undefined);
+    Assert.areEqual(cssNode.children[1].style.flex, undefined);
+
+    // Now layout
+    blokContainer.invalidate();
+
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 150, 200])));
+}
+
+/** Container not set to stretch, but a child is */
+function testOneDeepRowChildStretch() {
+    let pageItem = app.activeDocument.pageItems[0];
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem);
+
+    let childPageItem = pageItem.pageItems[1];
+    let childSettings = new BlokUserSettings();
+    childSettings.alignSelf = Css.Alignments.STRETCH;
+    BlokAdapter.getBlok(childPageItem, childSettings);
+
+    let cssNode = blokContainer.computeCssNode();
+
+    Assert.areEqual(cssNode.children.length, 2);
+
+    Assert.areEqual(cssNode.children[0].style.width, 100);
+    Assert.areEqual(cssNode.children[0].style.height, undefined);
     Assert.areEqual(cssNode.children[0].style.flex, undefined);
 
     Assert.areEqual(cssNode.children[1].style.width, 50);
@@ -123,7 +181,9 @@ function testTwoDeepMixed() {
 }
 
 //TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRow);
+//TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowStretch);
+TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowChildStretch);
 //TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepColumn);
-TestFramework.run("blok-container-layout-one-deep-3.ai", testOneDeepRowSpaceBetween);
+//TestFramework.run("blok-container-layout-one-deep-3.ai", testOneDeepRowSpaceBetween);
 //TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepRow);
 //TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepMixed);
