@@ -44,7 +44,7 @@ class Blok {
     /** The visible position and size, relative to the parent BlokContainer */
     public getRect(): Rect {
         let actualArtboard = new Rect(Blok.getPageItemBounds(this._pageItem));
-        let actualContainerArtboard = this.getContainer().getRect();
+        let actualContainerArtboard = new Rect(Blok.getPageItemBounds(this.getContainer()._pageItem));
 
         // Translate to coordinates relative to container
         let relativeX = actualArtboard.getX() - actualContainerArtboard.getX();

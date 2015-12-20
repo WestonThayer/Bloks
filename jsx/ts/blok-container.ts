@@ -82,7 +82,7 @@ class BlokContainer extends Blok {
         let container = this.getContainer();
 
         if (container) {
-            let actualContainerArtboard = container.getRect();
+            let actualContainerArtboard = new Rect(Blok.getPageItemBounds(this.getContainer()._pageItem));
 
             // Translate to coordinates relative to container
             let relativeX = actualArtboard.getX() - actualContainerArtboard.getX();

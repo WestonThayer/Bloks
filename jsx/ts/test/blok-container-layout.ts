@@ -180,10 +180,21 @@ function testTwoDeepMixed() {
     Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 150, 250])));
 }
 
+function testTwoDeepRowAlt() {
+    let pageItem = app.activeDocument.pageItems[0];
+
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem);
+
+    blokContainer.invalidate();
+
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([144, 71, 332, 231])));
+}
+
 //TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRow);
 //TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowStretch);
-TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowChildStretch);
+//TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowChildStretch);
 //TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepColumn);
 //TestFramework.run("blok-container-layout-one-deep-3.ai", testOneDeepRowSpaceBetween);
 //TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepRow);
 //TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepMixed);
+TestFramework.run("blok-container-layout-two-deep-alt.ai", testTwoDeepRowAlt);
