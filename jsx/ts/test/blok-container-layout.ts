@@ -190,6 +190,32 @@ function testTwoDeepRowAlt() {
     Assert.isTrue(blokContainer.getRect().equals(new Rect([144, 71, 332, 231])));
 }
 
+function testNestedGroups() {
+    // Find the groups, from the inner-most to outer-most
+    let firstGroupItem = app.activeDocument.pageItems[0].pageItems[1].pageItems[1];
+    let secondGroupItem = app.activeDocument.pageItems[0].pageItems[1];
+    let thirdGroupItem = app.activeDocument.pageItems[0];
+
+    // Inner-most is laid out with defaults
+    let firstBlokContainer = BlokAdapter.getBlokContainer(firstGroupItem);
+    firstBlokContainer.invalidate();
+
+    // Next will have flex-end
+    let secondSettings = new BlokContainerUserSettings();
+    secondSettings.alignItems = Css.Alignments.FLEX_END;
+    let secondBlokContainer = BlokAdapter.getBlokContainer(secondGroupItem, secondSettings);
+    secondBlokContainer.invalidate();
+
+    // Last will have vertical layout and center alignment
+    let thirdSettings = new BlokContainerUserSettings();
+    thirdSettings.flexDirection = Css.FlexDirections.COLUMN;
+    thirdSettings.alignItems = Css.Alignments.CENTER;
+    let thirdBlokContainer = BlokAdapter.getBlokContainer(thirdGroupItem, thirdSettings);
+    thirdBlokContainer.invalidate();
+
+    Assert.isTrue(thirdBlokContainer.getRect().equals(new Rect([144, 71, 332, 266])));
+}
+
 //TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRow);
 //TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowStretch);
 //TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowChildStretch);
@@ -197,4 +223,5 @@ function testTwoDeepRowAlt() {
 //TestFramework.run("blok-container-layout-one-deep-3.ai", testOneDeepRowSpaceBetween);
 //TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepRow);
 //TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepMixed);
-TestFramework.run("blok-container-layout-two-deep-alt.ai", testTwoDeepRowAlt);
+//TestFramework.run("blok-container-layout-two-deep-alt.ai", testTwoDeepRowAlt);
+TestFramework.run("blok-container-layout-nested-groups.ai", testNestedGroups);
