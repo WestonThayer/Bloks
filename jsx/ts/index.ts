@@ -25,7 +25,7 @@ function raiseException(ex) {
     var xLib = new ExternalObject("lib:\PlugPlugExternalObject");
     var eventObj = new CSXSEvent();
     eventObj.type = "microsoft.design.bloks.JsxExceptionRaised";
-    eventObj.data = ex.toString();
+    eventObj.data = JSON2.stringify(ex);
     eventObj.dispatch();
 }
 
