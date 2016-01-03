@@ -88,12 +88,33 @@ export function createBlokContainerFromSelection(settings: BlokContainerUserSett
         let sel = app.activeDocument.selection;
 
         if (sel.length > 1) {
+            // Find the correct Z order, since adding a new group will put it on top
+            // The Illustrator behavior is to insert the group where the pageItem who
+            // has the highest zOrderPosition was
+            let z = 1;
+
+            sel.forEach((pageItem) => {
+                if (pageItem.zOrderPosition > z) {
+                    z = pageItem.zOrderPosition;
+                }
+            });
+
+            z -= sel.length - 1;
+
+            // Add the new group at the hightest z position
             let groupPageItem = app.activeDocument.groupItems.add();
             groupPageItem.name = "<BlokGroup>";
 
             sel.forEach((pageItem) => {
                 pageItem.move(groupPageItem, ElementPlacement.PLACEATEND);
             });
+
+            // Now fix the z order
+            groupPageItem.zOrder(ZOrderMethod.SENDTOBACK);
+
+            for (var i = 1; i < z; i++) {
+                groupPageItem.zOrder(ZOrderMethod.BRINGFORWARD);
+            }
 
             let blokContainer = BlokAdapter.getBlokContainer(groupPageItem, settings);
             blokContainer.invalidate();

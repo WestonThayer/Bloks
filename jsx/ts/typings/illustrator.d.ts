@@ -4,3 +4,4 @@ declare var SaveOptions: any;
 declare var ElementPlacement: any;
 declare var ExternalObject: any;
 declare var CSXSEvent: any;
+declare var ZOrderMethod: any;
