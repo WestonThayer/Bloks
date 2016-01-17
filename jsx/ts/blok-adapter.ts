@@ -78,9 +78,11 @@ export function setSavedProperty<T>(pageItem: any, name: string, value: T): void
         props = JSON2.parse(tag.value);
     }
 
-    props[name] = value;
+    if (props[name] !== value) {
+        props[name] = value;
 
-    tag.value = JSON2.stringify(props);
+        tag.value = JSON2.stringify(props);
+    }
 }
 
 /**
