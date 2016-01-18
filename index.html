@@ -15,6 +15,39 @@
             
             <h1 data-bind="text: title"></h1>
             
+            <div data-bind="visible: isChildSettingsVisible">
+                <div id="flex">
+                    <h2>Flex, coming soon</h2>
+                </div>
+
+                <div id="align-self">
+                    <h2>Personal alignment, coming soon</h2>
+
+                    <div class="topcoat-button-bar">
+                        <label class="topcoat-button-bar__item">
+                            <input type="radio" name="align-self-grp" data-bind="checked: alignSelf, checkedValue: undefined" />
+                            <span class="topcoat-button-bar__button hostFontSize">Not set</span>
+                        </label>
+                        <label class="topcoat-button-bar__item">
+                            <input type="radio" name="align-self-grp" data-bind="checked: alignSelf, checkedValue: 0" />
+                            <span class="topcoat-button-bar__button hostFontSize">Start</span>
+                        </label>
+                        <label class="topcoat-button-bar__item">
+                            <input type="radio" name="align-self-grp" data-bind="checked: alignSelf, checkedValue: 1" />
+                            <span class="topcoat-button-bar__button hostFontSize">Center</span>
+                        </label>
+                        <label class="topcoat-button-bar__item">
+                            <input type="radio" name="align-self-grp" data-bind="checked: alignSelf, checkedValue: 2" />
+                            <span class="topcoat-button-bar__button hostFontSize">End</span>
+                        </label>
+                        <label class="topcoat-button-bar__item">
+                            <input type="radio" name="align-self-grp" data-bind="checked: alignSelf, checkedValue: 3" />
+                            <span class="topcoat-button-bar__button hostFontSize">Stretch</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
             <div data-bind="visible: isContainerSettingsVisible">
                 <div id="flex-direction">
                     <h2>Orientation</h2>

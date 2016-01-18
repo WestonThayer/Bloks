@@ -5,13 +5,14 @@
         function BlokVm() {
             this.title = ko.observable("Not set");
             this.isContainerSettingsVisible = ko.observable(false);
+            this.isChildSettingsVisible = ko.observable(false);
             this.isCreateButtonVisible = ko.observable(false);
             
             // Blok settings
             this.fixedWidth = undefined;
             this.fixedHeight = undefined;
             this.flex = undefined;
-            this.alignSelf = undefined;
+            this.alignSelf = ko.observable(undefined);
             
             // BlokContainer settings
             this.flexDirection = ko.observable(0);
@@ -19,6 +20,17 @@
             this.alignItems = ko.observable(0);
             this.flexWrap = ko.observable(0);
         }
+        
+        BlokVm.prototype.equals = function(settings) {
+            return this.fixedWidth === settings.fixedWidth &&
+                this.fixedHeight === settings.fixedHeight &&
+                this.flex === settings.flex &&
+                this.alignSelf === settings.alignSelf &&
+                this.flexDirection() === settings.flexDirection &&
+                this.justifyContent() === settings.justifyContent &&
+                this.alignItems() === settings.alignItems &&
+                this.flexWrap() === settings.flexWrap;
+        };
         
         return BlokVm;
     })();
@@ -34,6 +46,12 @@
             onException: function(cb) {
                 csInterface.addEventListener("microsoft.design.bloks.JsxExceptionRaised", function(ret) {
                     cb(ret.data);
+                });
+            },
+            /** Register a callback for whenever Illustrator is about to undo an action. Will fire before SELECTION_CHANGED */
+            onPreUndo: function(cb) {
+                csInterface.addEventListener("com.adobe.csxs.events.PreUndo", function(ret) {
+                    cb();
                 });
             },
             /** Register a callback for whenever Illustrator's SELECTION_CHANGED event fires (a lot) */
@@ -64,6 +82,9 @@
                         cb();
                     }
                 });
+            },
+            checkSelectionForRelayout: function() {
+                csInterface.evalScript("loader(7).checkSelectionForRelayout()");
             }
         };
     })();
@@ -74,31 +95,57 @@
     // Execution starts here
     try {
         BlokScripts.onException(function(ret) {
-            alert("JSX crashed: " + JSON.stringify(ret));
+            alert("JSX crashed. FileName: " + ret.fileName + ", Line: " + ret.line + ", Name: " + ret.name + ", Message: " + ret.message);
         });
 
         themeManager.init();
 
         var viewModel = new BlokVm();
         ko.applyBindings(viewModel);
+        
+        // Global which tracks whether a selection changed event is caused by an undo
+        var isUndo = false;
+        
+        BlokScripts.onPreUndo(function() {
+            isUndo = true;
+        });
 
         BlokScripts.onSelectionChanged(function() {
+            if (!isUndo) {
+                BlokScripts.checkSelectionForRelayout();
+            }
+            
+            isUndo = false;
+            
             BlokScripts.getActionsFromSelection(function(result) {
                 if (result.action === 0) {
                     viewModel.title("No Options");
+                    viewModel.isChildSettingsVisible(false);
                     viewModel.isContainerSettingsVisible(false);
+                    viewModel.isCreateButtonVisible(false);
                 }
                 else if (result.action === 1) {
                     // Container sel
-                    alert("container");
+                    viewModel.title("Blok Group");
+                    viewModel.isChildSettingsVisible(false);
+                    viewModel.isContainerSettingsVisible(true);
+                    viewModel.isCreateButtonVisible(false);
+
+                    viewModel.flexDirection(result.blok.flexDirection);
+                    viewModel.justifyContent(result.blok.justifyContent);
+                    viewModel.alignItems(result.blok.alignItems);
                 }
                 else if (result.action === 2) {
                     // child sel
-                    alert("child");
+                    viewModel.title("Blok Item");
+                    viewModel.isChildSettingsVisible(true);
+                    viewModel.isContainerSettingsVisible(false);
+                    viewModel.isCreateButtonVisible(false);
                 }
                 else if (result.action === 3) {
                     // Create group
                     viewModel.title("Blok Group");
+                    viewModel.isChildSettingsVisible(false);
                     viewModel.isContainerSettingsVisible(true);
                     viewModel.isCreateButtonVisible(true);
                     viewModel.flexDirection(0);
@@ -114,7 +161,11 @@
         // On-the-fly updates
 
         function handleBlokContainerPropertyChanged(newValue) {
-            BlokScripts.updateSelectedBlokContainer(ko.toJSON(viewModel));
+            BlokScripts.getActionsFromSelection(function(result) {
+                if (result.action === 1 && !viewModel.equals(result.blok)) {
+                    BlokScripts.updateSelectedBlokContainer(ko.toJSON(viewModel));
+                }
+            });
         }
 
         viewModel.flexDirection.subscribe(handleBlokContainerPropertyChanged);
@@ -132,11 +183,7 @@
 
         // Helps with debugging
         $("#reload-btn").click(function () {
-            /*var event = new CSEvent("com.adobe.csxs.events.SilentTransformRequestedEvent", "APPLICATION", "ILST", "microsoft.design.bloks");
-            event.data = "need to put a matrix here...";
-            csInterface.dispatchEvent(event);*/
-
-            location.reload(); 
+            location.reload();
         });
     }
     catch (ex) {

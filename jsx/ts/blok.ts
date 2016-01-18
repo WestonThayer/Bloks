@@ -149,6 +149,66 @@ class Blok {
         return cssNode;
     }
 
+    /**
+     * Check the art's actual dimensions against fixedWidth and fixedHeight. If
+     * they don't match and a resize is allowed, then update the Blok's size to match
+     * and ask the parent BlokContainer to re-layout.
+     */
+    public checkForRelayout(): void {
+        let rect = this.getRect();
+
+        let isWidthInvalid = this.getFixedWidth() !== rect.getWidth();
+        let isHeightInvalid = this.getFixedHeight() !== rect.getHeight();
+        let shouldRevertWidth = false;
+        let shouldRevertHeight = false;
+
+        let container = this.getContainer();
+        let containerRect = container.getRect();
+
+        if (this.getAlignSelf() === Css.Alignments.STRETCH ||
+            container.getAlignItems() === Css.Alignments.STRETCH) {
+            if (container.getFlexDirection() === Css.FlexDirections.ROW) {
+                if (rect.getHeight() < containerRect.getHeight()) {
+                    // When stretching row, you can't shrink a child Blok's height
+                    shouldRevertHeight = true;
+                }
+            }
+            else if (container.getFlexDirection() === Css.FlexDirections.COLUMN) {
+                if (rect.getWidth() < containerRect.getWidth()) {
+                    // Ditto for col
+                    shouldRevertWidth = true;
+                }
+            }
+            else {
+                throw new Error("Unknown flex-direction!");
+            }
+        }
+
+        if (shouldRevertWidth || shouldRevertHeight) {
+            // Correct the user by undoing their change
+            app.undo();
+
+            // This gets a little sad if user is decreasing both
+            // width and height. They'd probably expect that we just
+            // fix the dimension that we don't allow them to change.
+            // However, this will cause a wonky undo stack (their change,
+            // then our fix of it). They'll probably learn to scale a single
+            // side.
+        }
+        else if (isWidthInvalid || isHeightInvalid) {
+            if (isWidthInvalid) {
+                this.setFixedWidth(rect.getWidth());
+            }
+
+            if (isHeightInvalid) {
+                this.setFixedHeight(rect.getHeight());
+            }
+
+            // We allow resizing in both dimensions
+            container.invalidate();
+        }
+    }
+
     /** A reference to the parent BlokContainer */
     protected getContainer(): BlokContainer {
         let container = undefined;

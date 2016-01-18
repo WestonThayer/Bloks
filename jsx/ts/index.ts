@@ -29,6 +29,24 @@ function raiseException(ex) {
     eventObj.dispatch();
 }
 
+export function checkSelectionForRelayout(): void {
+    try {
+        let sel = app.activeDocument.selection;
+
+        if (sel.length === 1) {
+            let pageItem = sel[0];
+
+            if (BlokAdapter.isBlokAttached(pageItem)) {
+                let blok = BlokAdapter.getBlok(pageItem);
+                blok.checkForRelayout();
+            }
+        }
+    }
+    catch (ex) {
+        raiseException(ex);
+    }
+}
+
 /**
  * 
  * @param settings
