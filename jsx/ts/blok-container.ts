@@ -149,8 +149,9 @@ class BlokContainer extends Blok {
             let childCssNode = blok.computeCssNode();
 
             // Clear a dim if we're stretching
-            if (this.getAlignItems() === Css.Alignments.STRETCH ||
-                blok.getAlignSelf() === Css.Alignments.STRETCH) {
+            if (!(blok instanceof BlokContainer) &&
+                (this.getAlignItems() === Css.Alignments.STRETCH ||
+                    blok.getAlignSelf() === Css.Alignments.STRETCH)) {
                 if (this.getFlexDirection() === Css.FlexDirections.ROW) {
                     childCssNode.style.height = undefined;
                 }
