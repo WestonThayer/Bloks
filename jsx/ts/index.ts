@@ -40,6 +40,10 @@ export function checkSelectionForRelayout(): void {
                 let blok = BlokAdapter.getBlok(pageItem);
                 blok.checkForRelayout();
             }
+            else if (BlokAdapter.isBlokContainerAttached(pageItem)) {
+                let blokContainer = BlokAdapter.getBlokContainer(pageItem);
+                blokContainer.checkForRelayout();
+            }
         }
     }
     catch (ex) {

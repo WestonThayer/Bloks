@@ -122,7 +122,7 @@ class BlokContainer extends Blok {
         let cssNode = super.computeCssNode();
 
         // If we're asking items to stretch, it's only fair to give ourselves a
-        // non-zero dimension
+        // non-zero dimension (if we don't already have one)
         if (this.getAlignItems() === Css.Alignments.STRETCH) {
             let r = this.getRect();
 
@@ -133,9 +133,6 @@ class BlokContainer extends Blok {
             else if (cssNode.style.width === undefined &&
                 this.getFlexDirection() === Css.FlexDirections.COLUMN) {
                 cssNode.style.width = r.getWidth();
-            }
-            else {
-                throw new Error("Unknown FlexDirections value: " + this.getFlexDirection());
             }
         }
 
@@ -177,6 +174,58 @@ class BlokContainer extends Blok {
         cssLayout(rootNode);
 
         this.layout(undefined, rootNode);
+    }
+
+    public /*override*/ checkForRelayout(): void {
+        let rect = this.getRect();
+
+        let isWidthInvalid = this.getFixedWidth() !== rect.getWidth();
+        let isHeightInvalid = this.getFixedHeight() !== rect.getHeight();
+        let shouldRevertWidth = isWidthInvalid;
+        let shouldRevertHeight = isHeightInvalid;
+
+        if (this.getAlignItems() === Css.Alignments.STRETCH) {
+            if (this.getFlexDirection() === Css.FlexDirections.ROW) {
+                shouldRevertHeight = false;
+            }
+            else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
+                shouldRevertWidth = false;
+            }
+            else {
+                throw new Error("Unknown flex-direction!");
+            }
+        }
+        else if (this.getJustifyContent() === Css.Justifications.SPACE_BETWEEN) {
+            if (this.getFlexDirection() === Css.FlexDirections.ROW) {
+                shouldRevertWidth = false;
+            }
+            else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
+                shouldRevertHeight = false;
+            }
+            else {
+                throw new Error("Unknown flex-direction!");
+            }
+        }
+        else if (this.getFlex() === Css.FlexWraps.WRAP) {
+            throw new Error("Not implemented for wrapping");
+        }
+
+        if (shouldRevertWidth || shouldRevertHeight) {
+            // Correct the user by undoing their change
+            app.undo();
+        }
+        else if (isWidthInvalid || isHeightInvalid) {
+            if (isWidthInvalid) {
+                this.setFixedWidth(rect.getWidth());
+            }
+
+            if (isHeightInvalid) {
+                this.setFixedHeight(rect.getHeight());
+            }
+
+            // We allow resizing in both dimensions
+            this.invalidate();
+        }
     }
 
     /** A (possible) reference to the parent BlokContainer */
@@ -246,6 +295,11 @@ class BlokContainer extends Blok {
             // Layout ourselves
             super.layout(desired, undefined);
         }
+
+        // Record our post-layout dimensions as fixed
+        let rect = this.getRect();
+        this.setFixedWidth(rect.getWidth());
+        this.setFixedHeight(rect.getHeight());
     }
 }
 

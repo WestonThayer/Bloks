@@ -38,6 +38,9 @@ function getBlokTagType(pageItem: any): string {
 /**
  * Checks to see if a Blok is already attached to the given pageItem.
  *
+ * Note: this doesn't care about OOP inheritance. Will not return true
+ * for a descendent of Blok.
+ *
  * @param pageItem - item to check
  */
 export function isBlokAttached(pageItem: any): boolean {
