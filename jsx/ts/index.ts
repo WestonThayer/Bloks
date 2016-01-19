@@ -133,7 +133,7 @@ export function createBlokContainerFromSelection(settings: BlokContainerUserSett
             z -= sel.length - 1;
 
             // Add the new group at the hightest z position
-            let groupPageItem = app.activeDocument.groupItems.add();
+            let groupPageItem = par.groupItems.add();
             groupPageItem.name = "<BlokGroup>";
 
             sel.forEach((pageItem) => {
