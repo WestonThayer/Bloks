@@ -8,6 +8,7 @@ import Css = require("./css");
 import BlokContainerUserSettings = require("./blok-container-user-settings");
 import Rect = require("./rect");
 import BlokAdapter = require("./blok-adapter");
+import Utils = require("./utils");
 
 var JSON2 = require("JSON2");
 require("./shim/myshims");
@@ -309,7 +310,7 @@ class BlokContainer extends Blok {
         if (prevRect.getWidth() === 0) {
             prevRect.setWidth(this.getCachedWidth());
         }
-        else if (prevRect.getWidth() !== this.getCachedWidth()) {
+        else if (!Utils.nearlyEqual(prevRect.getWidth(), this.getCachedWidth())) {
             throw new Error("Cached width [" + this.getCachedWidth() +
                 "] is out of sync with fixed width [" + prevRect.getWidth() + "]!");
         }
@@ -317,14 +318,14 @@ class BlokContainer extends Blok {
         if (prevRect.getHeight() === 0) {
             prevRect.setHeight(this.getCachedHeight());
         }
-        else if (prevRect.getHeight() !== this.getCachedHeight()) {
+        else if (!Utils.nearlyEqual(prevRect.getHeight(), this.getCachedHeight())) {
             throw new Error("Cached height [" + this.getCachedHeight() +
                 "] is out of sync with fixed height [" + prevRect.getHeight() + "]!");
         }
 
         // Now check to see if our current dims don't match
-        let isWidthInvalid = prevRect.getWidth() !== curRect.getWidth();
-        let isHeightInvalid = prevRect.getHeight() !== curRect.getHeight();
+        let isWidthInvalid = !Utils.nearlyEqual(prevRect.getWidth(), curRect.getWidth());
+        let isHeightInvalid = !Utils.nearlyEqual(prevRect.getHeight(), curRect.getHeight());
 
         if ((shouldRevertWidthChange && isWidthInvalid) ||
             (shouldRevertHeightChange && isHeightInvalid)) {
@@ -433,12 +434,14 @@ class BlokContainer extends Blok {
         this.setCachedHeight(rect.getHeight());
 
         // Assert some facts
-        if (this.getFixedWidth() !== undefined && this.getFixedWidth() !== rect.getWidth()) {
+        if (this.getFixedWidth() !== undefined &&
+            !Utils.nearlyEqual(this.getFixedWidth(), rect.getWidth())) {
             throw new Error("BlokContainer layout failed to make fixedWidth [" +
                 this.getFixedWidth() + "] match actual width [" + rect.getWidth() + "]!");
         }
 
-        if (this.getFixedHeight() !== undefined && this.getFixedHeight() !== rect.getHeight()) {
+        if (this.getFixedHeight() !== undefined &&
+            !Utils.nearlyEqual(this.getFixedHeight(), rect.getHeight())) {
             throw new Error("BlokContainer layout failed to make fixedHeight [" +
                 this.getFixedHeight() + "] match actual width [" + rect.getHeight() + "]!");
         }

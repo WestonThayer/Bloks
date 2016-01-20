@@ -8,6 +8,7 @@ import Css = require("./css");
 import BlokUserSettings = require("./blok-user-settings");
 import BlokContainer = require("./blok-container");
 import BlokAdapter = require("./blok-adapter");
+import Utils = require("./utils");
 
 /**
  * Wraps an Illustrator pageItem to add the capabilities needed for layout.
@@ -157,8 +158,8 @@ class Blok {
     public checkForRelayout(): void {
         let rect = this.getRect();
 
-        let isWidthInvalid = this.getFixedWidth() !== rect.getWidth();
-        let isHeightInvalid = this.getFixedHeight() !== rect.getHeight();
+        let isWidthInvalid = !Utils.nearlyEqual(this.getFixedWidth(), rect.getWidth());
+        let isHeightInvalid = !Utils.nearlyEqual(this.getFixedHeight(), rect.getHeight());
         let shouldRevertWidth = false;
         let shouldRevertHeight = false;
 
