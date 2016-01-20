@@ -168,10 +168,8 @@ class Blok {
         if (this.getAlignSelf() === Css.Alignments.STRETCH ||
             container.getAlignItems() === Css.Alignments.STRETCH) {
             if (container.getFlexDirection() === Css.FlexDirections.ROW) {
-                if (rect.getHeight() < containerRect.getHeight()) {
-                    // When stretching row, you can't shrink a child Blok's height
-                    shouldRevertHeight = true;
-                }
+                // Has to be adjusted at the BlokContainer level
+                shouldRevertHeight = true;
             }
             else if (container.getFlexDirection() === Css.FlexDirections.COLUMN) {
                 if (rect.getWidth() < containerRect.getWidth()) {
@@ -221,6 +219,19 @@ class Blok {
         }
 
         return container;
+    }
+
+    /** A reference to the BlokContainer at the root of this tree */
+    protected getRootContainer(): BlokContainer {
+        let par: Blok = this.getContainer();
+        let blok: Blok = par;
+
+        while (par) {
+            blok = par;
+            par = blok.getContainer();
+        }
+
+        return <BlokContainer>blok;
     }
 
     /**
