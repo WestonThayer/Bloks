@@ -266,7 +266,14 @@ class Blok {
         transformMatrix = app.concatenateTranslationMatrix(transformMatrix, aiDeltaX, aiDeltaY);
 
         // Apply
-        this._pageItem.transform(transformMatrix);
+        this._pageItem.transform(
+            transformMatrix,
+            true /*changePositions*/,
+            false /*changeFillPatterns*/,
+            false /*changeFillGradients*/,
+            false /*changeStrokePattern*/,
+            0.0 /*changeLineWidth - this one is weird. If you say 5, it multiplies the current stroke width by 5... */
+        );
     }
 
     /** Retrieve a property from the pageItem's tags. */

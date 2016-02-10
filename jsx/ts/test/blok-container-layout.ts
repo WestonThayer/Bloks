@@ -216,6 +216,16 @@ function testNestedGroups() {
     Assert.isTrue(thirdBlokContainer.getRect().equals(new Rect([144, 71, 332, 266])));
 }
 
+function testStrokes() {
+    let pageItem = app.activeDocument.pageItems[0];
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem);
+
+    // Now layout
+    blokContainer.invalidate();
+
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 190, 120])));
+}
+
 //TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRow);
 //TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowStretch);
 //TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowChildStretch);
@@ -224,4 +234,5 @@ function testNestedGroups() {
 //TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepRow);
 //TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepMixed);
 //TestFramework.run("blok-container-layout-two-deep-alt.ai", testTwoDeepRowAlt);
-TestFramework.run("blok-container-layout-nested-groups.ai", testNestedGroups);
+//TestFramework.run("blok-container-layout-nested-groups.ai", testNestedGroups);
+TestFramework.run("blok-container-layout-strokes.ai", testStrokes);

@@ -443,7 +443,7 @@ class BlokContainer extends Blok {
         if (this.getFixedHeight() !== undefined &&
             !Utils.nearlyEqual(this.getFixedHeight(), rect.getHeight())) {
             throw new Error("BlokContainer layout failed to make fixedHeight [" +
-                this.getFixedHeight() + "] match actual width [" + rect.getHeight() + "]!");
+                this.getFixedHeight() + "] match actual height [" + rect.getHeight() + "]!");
         }
     }
 
