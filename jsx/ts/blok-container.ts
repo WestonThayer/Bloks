@@ -236,6 +236,12 @@ class BlokContainer extends Blok {
     }
 
     public /*override*/ checkForRelayout(): void {
+        // Short circut for new child count
+        if (this.getCachedChildCount() !== this._pageItem.pageItems.length) {
+            this.invalidate();
+            return;
+        }
+
         let prevRect = new Rect([0, 0, 0, 0]);
         let curRect = this.getRect();
         let shouldRevertWidthChange = true; // Whether to revert a potential change
@@ -374,6 +380,9 @@ class BlokContainer extends Blok {
 
     /** Get our current set of Blok children */
     protected getChildren(): Blok[] {
+        // Update cache
+        this.setCachedChildCount(this._pageItem.pageItems.length);
+
         // sync the order of our children with the reverse z-order or the pageItems
         let sortedChildren: Blok[] = [];
 
@@ -471,6 +480,19 @@ class BlokContainer extends Blok {
         }
 
         this.setSavedProperty<number>("cachedHeight", value);
+    }
+
+    /** Optional positive number for the number of Bloks this BlokContainer has */
+    private getCachedChildCount(): number {
+        return this.getSavedProperty<number>("cachedChildCount");
+    }
+    /** Optional positive number for the number of Bloks this BlokContainer has */
+    private setCachedChildCount(value: number): void {
+        if (value !== undefined && value < 0) {
+            throw new RangeError("Cannot set a negative cached height!");
+        }
+
+        this.setSavedProperty<number>("cachedChildCount", value);
     }
 }
 
