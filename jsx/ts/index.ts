@@ -29,6 +29,15 @@ function raiseException(ex) {
     eventObj.dispatch();
 }
 
+/** Checks to see if a pageItem is the only thing in Isolation Mode. */
+function isDirectlyIsolated(pageItem): boolean {
+    if (pageItem && pageItem.parent.name === "Isolation Mode") {
+        return true;
+    }
+    
+    return false;
+}
+
 export function checkSelectionForRelayout(): void {
     try {
         let sel = app.activeDocument.selection;
@@ -37,8 +46,10 @@ export function checkSelectionForRelayout(): void {
             let pageItem = sel[0];
 
             if (BlokAdapter.isBlokAttached(pageItem)) {
-                let blok = BlokAdapter.getBlok(pageItem);
-                blok.checkForRelayout();
+                if (!isDirectlyIsolated(pageItem)) {
+                    let blok = BlokAdapter.getBlok(pageItem);
+                    blok.checkForRelayout();
+                }
             }
             else if (BlokAdapter.isBlokContainerAttached(pageItem)) {
                 let blokContainer = BlokAdapter.getBlokContainer(pageItem);
@@ -59,8 +70,10 @@ export function relayoutSelection(): void {
             let pageItem = sel[0];
 
             if (BlokAdapter.isBlokAttached(pageItem)) {
-                let blok = BlokAdapter.getBlok(pageItem);
-                blok.invalidate();
+                if (!isDirectlyIsolated(pageItem)) {
+                    let blok = BlokAdapter.getBlok(pageItem);
+                    blok.invalidate();
+                }
             }
             else if (BlokAdapter.isBlokContainerAttached(pageItem)) {
                 let blokContainer = BlokAdapter.getBlokContainer(pageItem);
@@ -188,7 +201,8 @@ export function createBlokContainerFromSelection(settings: BlokContainerUserSett
  * @returns a JSON string with two properties:
  *     action: number - a single option of what Bloks can do
  *         0 - no operations available. Either there's nothing selected,
- *             or there's just a single non-Blok object selected
+ *             or there's just a single non-Blok object selected, or
+ *             a Blok child could be in Isolation Mode
  *         1 - a Blok container is selected, we can modify it
  *         2 - a Blok child is selected, we can modify it
  *         3 - multiple objects are selected, we can create a Blok container
@@ -210,10 +224,12 @@ export function getActionsFromSelection(): { action: number, blok: any } {
             let pageItem = selection[0];
 
             if (BlokAdapter.isBlokAttached(pageItem)) {
-                let blok = BlokAdapter.getBlok(pageItem);
+                if (!isDirectlyIsolated(pageItem)) {
+                    let blok = BlokAdapter.getBlok(pageItem);
 
-                ret.action = 2;
-                ret.blok = blok.getUserSettings();
+                    ret.action = 2;
+                    ret.blok = blok.getUserSettings();
+                }
             }
             else if (BlokAdapter.isBlokContainerAttached(pageItem)) {
                 let blokContainer = BlokAdapter.getBlokContainer(pageItem);
