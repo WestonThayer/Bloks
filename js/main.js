@@ -7,6 +7,7 @@
             this.isContainerSettingsVisible = ko.observable(false);
             this.isChildSettingsVisible = ko.observable(false);
             this.isCreateButtonVisible = ko.observable(false);
+            this.isLayoutButtonVisible = ko.observable(false);
             
             // Blok settings
             this.fixedWidth = undefined;
@@ -85,6 +86,9 @@
             },
             checkSelectionForRelayout: function() {
                 csInterface.evalScript("loader(7).checkSelectionForRelayout()");
+            },
+            relayoutSelection: function() {
+                csInterface.evalScript("loader(7).relayoutSelection()");
             }
         };
     })();
@@ -123,6 +127,7 @@
                     viewModel.isChildSettingsVisible(false);
                     viewModel.isContainerSettingsVisible(false);
                     viewModel.isCreateButtonVisible(false);
+                    viewModel.isLayoutButtonVisible(false);
                 }
                 else if (result.action === 1) {
                     // Container sel
@@ -130,6 +135,7 @@
                     viewModel.isChildSettingsVisible(false);
                     viewModel.isContainerSettingsVisible(true);
                     viewModel.isCreateButtonVisible(false);
+                    viewModel.isLayoutButtonVisible(true);
 
                     viewModel.flexDirection(result.blok.flexDirection);
                     viewModel.justifyContent(result.blok.justifyContent);
@@ -141,6 +147,7 @@
                     viewModel.isChildSettingsVisible(true);
                     viewModel.isContainerSettingsVisible(false);
                     viewModel.isCreateButtonVisible(false);
+                    viewModel.isLayoutButtonVisible(true);
                 }
                 else if (result.action === 3) {
                     // Create group
@@ -148,6 +155,7 @@
                     viewModel.isChildSettingsVisible(false);
                     viewModel.isContainerSettingsVisible(true);
                     viewModel.isCreateButtonVisible(true);
+                    viewModel.isLayoutButtonVisible(false);
                     viewModel.flexDirection(0);
                     viewModel.justifyContent(0);
                     viewModel.alignItems(0);
@@ -177,6 +185,11 @@
         $("#create-btn").click(function() {
             viewModel.isCreateButtonVisible(false);
             BlokScripts.createBlokContainerFromSelection(ko.toJSON(viewModel));
+        });
+        
+        // Force a layout
+        $("#layout-btn").click(function() {
+            BlokScripts.relayoutSelection();
         });
 
 

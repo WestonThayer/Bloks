@@ -225,7 +225,7 @@ class BlokContainer extends Blok {
     }
 
     /** Trigger a layout */
-    public invalidate(): void {
+    public /*override*/ invalidate(): void {
         // Start at the root of our layout tree
         let root = this.getRootContainer();
 

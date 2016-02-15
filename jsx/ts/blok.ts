@@ -150,6 +150,11 @@ class Blok {
         return cssNode;
     }
 
+    /** Trigger a layout of our container */
+    public invalidate(): void {
+        this.getContainer().invalidate();
+    }
+
     /**
      * Check the art's actual dimensions against fixedWidth and fixedHeight. If
      * they don't match and a resize is allowed, then update the Blok's size to match
