@@ -10,8 +10,17 @@ import Css = require("./css");
 
 var JSON2 = require("JSON2");
 
+/** Checks to see if a pageItem is the only thing in Isolation Mode. */
+function isDirectlyIsolated(pageItem): boolean {
+    if (pageItem && pageItem.parent.name === "Isolation Mode") {
+        return true;
+    }
+
+    return false;
+}
+
 /** Try to get the Blok tag from a pageItem */
-function retrieveBlokTag(pageItem: any): { name: string, value: string } {
+function retrieveBlokTag(pageItem: any): { name: string, value: string, remove: any } {
     let blokTag: any = undefined;
 
     try {
@@ -94,9 +103,28 @@ export function setSavedProperty<T>(pageItem: any, name: string, value: T): void
  * @param pageItem - art to wrap
  * @param settings - optional user settings to apply. If fixedWidth or fixedHeight is undefined,
  *                   we'll use the art's current dims
- * @returns either a brand new Blok attached to the pageItem, or a cached copy
+ * @returns either a brand new Blok attached to the pageItem, or a cached copy, or undefined
+ *          if the parent isn't a BlokContainer, or undefined if the pageItem is the only thing
+ *          in Isolation Mode.
  */
 export function getBlok(pageItem: any, settings?: BlokUserSettings): Blok {
+    if (isDirectlyIsolated(pageItem)) {
+        // Isolation Mode means that the parent just can't be a BlokContainer, so we can't fufill the request
+        return undefined;
+    }
+
+    if (!isBlokContainerAttached(pageItem.parent)) {
+        // If somehow we got unparented from a BlokContainer, the pageItem is not a Blok anymore.
+        // Remove it's tag and don't fulfill the request.
+        let blokTag = retrieveBlokTag(pageItem);
+
+        if (blokTag) {
+            blokTag.remove();
+        }
+
+        return undefined;
+    }
+
     setSavedProperty<string>(pageItem, "type", "Blok");
 
     let blok = new Blok(pageItem);

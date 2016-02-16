@@ -29,15 +29,6 @@ function raiseException(ex) {
     eventObj.dispatch();
 }
 
-/** Checks to see if a pageItem is the only thing in Isolation Mode. */
-function isDirectlyIsolated(pageItem): boolean {
-    if (pageItem && pageItem.parent.name === "Isolation Mode") {
-        return true;
-    }
-    
-    return false;
-}
-
 export function checkSelectionForRelayout(): void {
     try {
         let sel = app.activeDocument.selection;
@@ -46,8 +37,9 @@ export function checkSelectionForRelayout(): void {
             let pageItem = sel[0];
 
             if (BlokAdapter.isBlokAttached(pageItem)) {
-                if (!isDirectlyIsolated(pageItem)) {
-                    let blok = BlokAdapter.getBlok(pageItem);
+                let blok = BlokAdapter.getBlok(pageItem);
+
+                if (blok) {
                     blok.checkForRelayout();
                 }
             }
@@ -70,8 +62,9 @@ export function relayoutSelection(): void {
             let pageItem = sel[0];
 
             if (BlokAdapter.isBlokAttached(pageItem)) {
-                if (!isDirectlyIsolated(pageItem)) {
-                    let blok = BlokAdapter.getBlok(pageItem);
+                let blok = BlokAdapter.getBlok(pageItem);
+
+                if (blok) {
                     blok.invalidate();
                 }
             }
@@ -224,9 +217,9 @@ export function getActionsFromSelection(): { action: number, blok: any } {
             let pageItem = selection[0];
 
             if (BlokAdapter.isBlokAttached(pageItem)) {
-                if (!isDirectlyIsolated(pageItem)) {
-                    let blok = BlokAdapter.getBlok(pageItem);
+                let blok = BlokAdapter.getBlok(pageItem);
 
+                if (blok) {
                     ret.action = 2;
                     ret.blok = blok.getUserSettings();
                 }
