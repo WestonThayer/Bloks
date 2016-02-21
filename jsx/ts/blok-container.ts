@@ -395,8 +395,10 @@ class BlokContainer extends Blok {
                 throw new Error("We have non-Blok children?");
             }*/
 
-            // Check to see if this is a group
-            if (pageItem.pageItems) {
+            // Check to see if this is a BlokContainer. We'll convert a normal groupItem if it has
+            // a specific name. This is mostly to keep test files easy to create
+            if (pageItem.name === "<BlokGroup>" ||
+                (pageItem.pageItems && BlokAdapter.isBlokContainerAttached(pageItem))) {
                 sortedChildren.push(BlokAdapter.getBlokContainer(pageItem));
             }
             else {
