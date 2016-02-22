@@ -333,6 +333,16 @@ class BlokContainer extends Blok {
         let isWidthInvalid = !Utils.nearlyEqual(prevRect.getWidth(), curRect.getWidth());
         let isHeightInvalid = !Utils.nearlyEqual(prevRect.getHeight(), curRect.getHeight());
 
+        // Try to detect if this could be due to "Align to Pixel Grid" setting. It would be
+        // wonderful to use the PageItem.pixelAligned API, but it's rarely correct
+        if (isWidthInvalid && Math.round(prevRect.getWidth()) === curRect.getWidth()) {
+            isWidthInvalid = false;
+        }
+
+        if (isHeightInvalid && Math.round(prevRect.getHeight()) === curRect.getHeight()) {
+            isHeightInvalid = false;
+        }
+
         if ((shouldRevertWidthChange && isWidthInvalid) ||
             (shouldRevertHeightChange && isHeightInvalid)) {
             // Correct the user by undoing their change
