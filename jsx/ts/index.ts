@@ -29,6 +29,9 @@ function raiseException(ex) {
     eventObj.dispatch();
 }
 
+// Global variables
+var bloksToBeInvalidated = []; // A cache of Bloks to call invalidate() on when its possible to do so
+
 export function checkSelectionForRelayout(): void {
     try {
         let sel = app.activeDocument.selection;
@@ -36,16 +39,54 @@ export function checkSelectionForRelayout(): void {
         if (sel.length === 1) {
             let pageItem = sel[0];
 
-            if (BlokAdapter.isBlokAttached(pageItem)) {
-                let blok = BlokAdapter.getBlok(pageItem);
+            if (pageItem) { // can be undefined when text ranges are selected
+                if (BlokAdapter.isBlokAttached(pageItem)) {
+                    let blok = BlokAdapter.getBlok(pageItem);
 
-                if (blok) {
-                    blok.checkForRelayout();
+                    if (blok) {
+                        blok.checkForRelayout();
+                    }
+                }
+                else if (BlokAdapter.isBlokContainerAttached(pageItem)) {
+                    let blokContainer = BlokAdapter.getBlokContainer(pageItem);
+                    blokContainer.checkForRelayout();
+                }
+                else if (pageItem.parent && pageItem.parent.parent && pageItem.parent.parent.name === "Symbol Editing Mode") {
+                    // We're editing a Symbol. Special cases to make this important scenario work
+                    let symName = pageItem.parent.name;
+
+                    // Use the document's list of symbols to find the Bloks that wrap the symbol
+                    for (let i = 0; i < app.activeDocument.symbolItems.length; i++) {
+                        let symItem = app.activeDocument.symbolItems[i];
+
+                        if (symItem.symbol.name === symName && BlokAdapter.isBlokAttached(symItem)) {
+                            let blok = BlokAdapter.getBlok(symItem);
+                            let symRect = new Rect(pageItem.visibleBounds);
+
+                            // Update the fixedWidth/Height of the Blok to whatever the Symbol is
+                            blok.setFixedWidth(symRect.getWidth());
+                            blok.setFixedHeight(symRect.getHeight());
+
+                            // Illustrator will refuse to run layout because we're in Symbol Editing Mode, so make a
+                            // list of Bloks to invalidate the next chance we get
+                            bloksToBeInvalidated.push(blok);
+                        }
+                    }
                 }
             }
-            else if (BlokAdapter.isBlokContainerAttached(pageItem)) {
-                let blokContainer = BlokAdapter.getBlokContainer(pageItem);
-                blokContainer.checkForRelayout();
+        }
+        else {
+            // Ensure we're not in any sort of mode where invalidation would fail
+            if (app.activeDocument.activeLayer.name !== "Isolation Mode" &&
+                (app.activeDocument.activeLayer.parent &&
+                    app.activeDocument.activeLayer.parent.name !== "Symbol Editing Mode")) {
+
+                bloksToBeInvalidated.forEach((blok) => {
+                    blok.invalidate();
+                });
+
+                // Clear the list
+                bloksToBeInvalidated.splice(0, bloksToBeInvalidated.length);
             }
         }
     }
@@ -216,22 +257,24 @@ export function getActionsFromSelection(): { action: number, blok: any } {
         else if (selection.length === 1) {
             let pageItem = selection[0];
 
-            if (BlokAdapter.isBlokAttached(pageItem)) {
-                let blok = BlokAdapter.getBlok(pageItem);
+            if (pageItem) { // can be undefined for text ranges
+                if (BlokAdapter.isBlokAttached(pageItem)) {
+                    let blok = BlokAdapter.getBlok(pageItem);
 
-                if (blok) {
-                    ret.action = 2;
-                    ret.blok = blok.getUserSettings();
+                    if (blok) {
+                        ret.action = 2;
+                        ret.blok = blok.getUserSettings();
+                    }
                 }
-            }
-            else if (BlokAdapter.isBlokContainerAttached(pageItem)) {
-                let blokContainer = BlokAdapter.getBlokContainer(pageItem);
+                else if (BlokAdapter.isBlokContainerAttached(pageItem)) {
+                    let blokContainer = BlokAdapter.getBlokContainer(pageItem);
 
-                ret.action = 1;
-                ret.blok = blokContainer.getUserSettings();
-            }
-            else {
-                // Can't do anything with just a single non-Blok item
+                    ret.action = 1;
+                    ret.blok = blokContainer.getUserSettings();
+                }
+                else {
+                    // Can't do anything with just a single non-Blok item
+                }
             }
         }
         else {
