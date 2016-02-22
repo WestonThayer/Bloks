@@ -26,7 +26,7 @@
             return this.fixedWidth === settings.fixedWidth &&
                 this.fixedHeight === settings.fixedHeight &&
                 this.flex === settings.flex &&
-                this.alignSelf === settings.alignSelf &&
+                this.alignSelf() === settings.alignSelf &&
                 this.flexDirection() === settings.flexDirection &&
                 this.justifyContent() === settings.justifyContent &&
                 this.alignItems() === settings.alignItems &&
