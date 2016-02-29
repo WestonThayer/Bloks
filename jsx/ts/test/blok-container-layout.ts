@@ -226,13 +226,69 @@ function testStrokes() {
     Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 190, 120])));
 }
 
-//TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRow);
-//TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowStretch);
-//TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowChildStretch);
-//TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepColumn);
-//TestFramework.run("blok-container-layout-one-deep-3.ai", testOneDeepRowSpaceBetween);
-//TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepRow);
-//TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepMixed);
-//TestFramework.run("blok-container-layout-two-deep-alt.ai", testTwoDeepRowAlt);
-//TestFramework.run("blok-container-layout-nested-groups.ai", testNestedGroups);
+function testTextFrameArea() {
+    let pageItem = app.activeDocument.pageItems[0];
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem);
+
+    // Now layout
+    blokContainer.invalidate();
+
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 294, 200])));
+
+    let textFrameBlok = BlokAdapter.getBlok(pageItem.pageItems[0]);
+    Assert.isTrue(textFrameBlok.getRect().equals(new Rect([150, 0, 294, 65])));
+}
+
+function testTextFrameAreaStretch() {
+    let pageItem = app.activeDocument.pageItems[0];
+    let settings = new BlokContainerUserSettings();
+    settings.alignItems = Css.Alignments.STRETCH;
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem, settings);
+
+    // Now layout
+    blokContainer.invalidate();
+
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 294, 200])));
+
+    let textFrameBlok = BlokAdapter.getBlok(pageItem.pageItems[0]);
+    Assert.isTrue(textFrameBlok.getRect().equals(new Rect([150, 0, 294, 200])));
+
+    // Now switch to flex-start and make sure its not still stretched
+    settings.alignItems = Css.Alignments.FLEX_START;
+    blokContainer = BlokAdapter.getBlokContainer(pageItem, settings);
+    blokContainer.invalidate();
+
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 294, 200])));
+    textFrameBlok = BlokAdapter.getBlok(pageItem.pageItems[0]);
+    Assert.isTrue(textFrameBlok.getRect().equals(new Rect([150, 0, 294, 65])));
+}
+
+function testTextFrameAreaMiddle() {
+    let pageItem = app.activeDocument.pageItems[0];
+    let textFrame = pageItem.pageItems[0];
+    textFrame.zOrder(ZOrderMethod.SENDBACKWARD);
+
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem);
+
+    // Now layout
+    blokContainer.invalidate();
+
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 294, 200])));
+
+    let textFrameBlok = BlokAdapter.getBlok(pageItem.pageItems[1]);
+    Assert.isTrue(textFrameBlok.getRect().equals(new Rect([100, 0, 244, 65])));
+}
+
+TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRow);
+TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowStretch);
+TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowChildStretch);
+TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepColumn);
+TestFramework.run("blok-container-layout-one-deep-3.ai", testOneDeepRowSpaceBetween);
+TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepRow);
+TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepMixed);
+TestFramework.run("blok-container-layout-two-deep-alt.ai", testTwoDeepRowAlt);
+TestFramework.run("blok-container-layout-nested-groups.ai", testNestedGroups);
 TestFramework.run("blok-container-layout-strokes.ai", testStrokes);
+TestFramework.run("blok-container-layout-one-deep-textframearea.ai", testTextFrameArea);
+TestFramework.run("blok-container-layout-one-deep-textframearea.ai", testTextFrameAreaStretch);
+TestFramework.run("blok-container-layout-one-deep-textframearea.ai", testTextFrameAreaMiddle);

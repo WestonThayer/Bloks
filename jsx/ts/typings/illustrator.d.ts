@@ -5,3 +5,5 @@ declare var ElementPlacement: any;
 declare var ExternalObject: any;
 declare var CSXSEvent: any;
 declare var ZOrderMethod: any;
+declare var TextType: any;
+declare var Transformation: any;
