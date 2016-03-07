@@ -88,32 +88,6 @@ class Blok {
         this.layout(value, undefined);
     }
 
-    /** Optional positive number for width */
-    public getFixedWidth(): number {
-        return this.getSavedProperty<number>("fixedWidth");
-    }
-    /** Optional positive number for width */
-    public setFixedWidth(value: number): void {
-        if (value !== undefined && value < 0) {
-            throw new RangeError("Cannot set a negative width!");
-        }
-
-        this.setSavedProperty<number>("fixedWidth", value);
-    }
-
-    /** Optional positive number for height */
-    public getFixedHeight(): number {
-        return this.getSavedProperty<number>("fixedHeight");
-    }
-    /** Optional positive number for width */
-    public setFixedHeight(value: number): void {
-        if (value !== undefined && value < 0) {
-            throw new RangeError("Cannot set a negative height!");
-        }
-
-        this.setSavedProperty<number>("fixedHeight", value);
-    }
-
     /** Optional >= 0 number for CSS flex-grow */
     public getFlex(): number {
         return this.getSavedProperty<number>("flex");
@@ -139,9 +113,7 @@ class Blok {
     /** Create a settings object reflecting our current state */
     public getUserSettings(): BlokUserSettings {
         let settings = new BlokUserSettings();
-
-        settings.fixedWidth = this.getFixedWidth();
-        settings.fixedHeight = this.getFixedHeight();
+        
         settings.flex = this.getFlex();
         settings.alignSelf = this.getAlignSelf();
 
@@ -150,16 +122,19 @@ class Blok {
 
     /** Make our current state match the given user settings */
     public setUserSettings(value: BlokUserSettings): void {
-        this.setFixedWidth(value.fixedWidth);
-        this.setFixedHeight(value.fixedHeight);
         this.setFlex(value.flex);
         this.setAlignSelf(value.alignSelf);
     }
 
     /** Return a css-layout node */
     public computeCssNode(): any {
-        let w = this.getFixedWidth();
-        let h = this.getFixedHeight();
+        let r = this.getRect();
+
+        let w = r.getWidth();
+        let h = r.getHeight();
+
+        this.setCachedWidth(w);
+        this.setCachedHeight(h);
 
         let cssNode: any = {
             style: {
@@ -183,60 +158,17 @@ class Blok {
     }
 
     /**
-     * Check the art's actual dimensions against fixedWidth and fixedHeight. If
-     * they don't match and a resize is allowed, then update the Blok's size to match
-     * and ask the parent BlokContainer to re-layout.
+     * Check the art's actual dimensions against cachedWidth and cachedHeight. If
+     * they don't match, then ask the parent BlokContainer to re-layout.
      */
     public checkForRelayout(): void {
         let rect = this.getRect();
 
-        let isWidthInvalid = !Utils.nearlyEqual(this.getFixedWidth(), rect.getWidth());
-        let isHeightInvalid = !Utils.nearlyEqual(this.getFixedHeight(), rect.getHeight());
-        let shouldRevertWidth = false;
-        let shouldRevertHeight = false;
+        let isWidthInvalid = !Utils.nearlyEqual(this.getCachedWidth(), rect.getWidth());
+        let isHeightInvalid = !Utils.nearlyEqual(this.getCachedHeight(), rect.getHeight());
 
-        let container = this.getContainer();
-        let containerRect = container.getRect();
-
-        if (this.getAlignSelf() === Css.Alignments.STRETCH ||
-            container.getAlignItems() === Css.Alignments.STRETCH) {
-            if (container.getFlexDirection() === Css.FlexDirections.ROW) {
-                // Has to be adjusted at the BlokContainer level
-                shouldRevertHeight = true;
-            }
-            else if (container.getFlexDirection() === Css.FlexDirections.COLUMN) {
-                if (rect.getWidth() < containerRect.getWidth()) {
-                    // Ditto for col
-                    shouldRevertWidth = true;
-                }
-            }
-            else {
-                throw new Error("Unknown flex-direction!");
-            }
-        }
-
-        if (shouldRevertWidth || shouldRevertHeight) {
-            // Correct the user by undoing their change
-            app.undo();
-
-            // This gets a little sad if user is decreasing both
-            // width and height. They'd probably expect that we just
-            // fix the dimension that we don't allow them to change.
-            // However, this will cause a wonky undo stack (their change,
-            // then our fix of it). They'll probably learn to scale a single
-            // side.
-        }
-        else if (isWidthInvalid || isHeightInvalid) {
-            if (isWidthInvalid) {
-                this.setFixedWidth(rect.getWidth());
-            }
-
-            if (isHeightInvalid) {
-                this.setFixedHeight(rect.getHeight());
-            }
-
-            // We allow resizing in both dimensions
-            container.invalidate();
+        if (isWidthInvalid || isHeightInvalid) {
+            this.getContainer().invalidate();
         }
     }
 
@@ -344,7 +276,7 @@ class Blok {
             // Track selection state
             let wasSelected = this._pageItem.selected;
 
-            // Track all BlokSettings so we don't lose things like fixedWidth/fixedHeight
+            // Track all BlokSettings so we don't lose things
             let settings = this.getUserSettings();
 
             newAreaText.name = this._pageItem.name;
@@ -381,6 +313,32 @@ class Blok {
                 Transformation.TOPLEFT /*transformAbout*/
             );
         }
+    }
+
+    /** Optional positive number for width. Use as a cache, not used in layout */
+    protected getCachedWidth(): number {
+        return this.getSavedProperty<number>("cachedWidth");
+    }
+    /** Optional positive number for width. Use as a cache, not used in layout */
+    protected setCachedWidth(value: number): void {
+        if (value !== undefined && value < 0) {
+            throw new RangeError("Cannot set a negative cached width!");
+        }
+
+        this.setSavedProperty<number>("cachedWidth", value);
+    }
+
+    /** Optional positive number for height. Use as a cache, not used in layout */
+    protected getCachedHeight(): number {
+        return this.getSavedProperty<number>("cachedHeight");
+    }
+    /** Optional positive number for width. Use as a cache, not used in layout */
+    protected setCachedHeight(value: number): void {
+        if (value !== undefined && value < 0) {
+            throw new RangeError("Cannot set a negative cached height!");
+        }
+
+        this.setSavedProperty<number>("cachedHeight", value);
     }
 
     /** Retrieve a property from the pageItem's tags. */

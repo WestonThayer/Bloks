@@ -133,17 +133,6 @@ export function getBlok(pageItem: any, settings?: BlokUserSettings): Blok {
         blok.setUserSettings(settings);
     }
 
-    // Record the initial dimensions if none were provided
-    let r = blok.getRect();
-
-    if (blok.getFixedWidth() === undefined) {
-        blok.setFixedWidth(r.getWidth());
-    }
-
-    if (blok.getFixedHeight() === undefined) {
-        blok.setFixedHeight(r.getHeight());
-    }
-
     return blok;
 }
 

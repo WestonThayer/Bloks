@@ -5,8 +5,6 @@
  * can set on a Blok.
  */
 class BlokUserSettings {
-    public fixedWidth: number;
-    public fixedHeight: number;
     public flex: number;
     public alignSelf: number;
 

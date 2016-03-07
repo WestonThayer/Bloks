@@ -121,35 +121,19 @@ class BlokContainer extends Blok {
     /** Return a pre-layout css-layout node for this BlokContainer and all child Bloks */
     public /*override*/ computeCssNode(): any {
         let cssNode = super.computeCssNode();
-        let preRect = this.getRect();
 
         // Handle BlokContainer-specific fixed width/height rules
+        let w = cssNode.style.width;
+        let h = cssNode.style.height;
+        cssNode.style.width = undefined;
+        cssNode.style.height = undefined;
 
         if (this.getAlignItems() === Css.Alignments.STRETCH) {
             if (this.getFlexDirection() === Css.FlexDirections.ROW) {
-                if (cssNode.style.height === undefined) {
-                    cssNode.style.height = preRect.getHeight();
-                    this.setFixedHeight(preRect.getHeight());
-                }
+                cssNode.style.height = h;
             }
             else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
-                if (cssNode.style.width === undefined) {
-                    cssNode.style.width = preRect.getWidth();
-                    this.setFixedWidth(preRect.getWidth());
-                }
-            }
-            else {
-                throw new Error("Unknown flexDirection!");
-            }
-        }
-        else {
-            if (this.getFlexDirection() === Css.FlexDirections.ROW) {
-                cssNode.style.height = undefined;
-                this.setFixedHeight(undefined);
-            }
-            else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
-                cssNode.style.width = undefined;
-                this.setFixedWidth(undefined);
+                cssNode.style.width = w;
             }
             else {
                 throw new Error("Unknown flexDirection!");
@@ -158,29 +142,10 @@ class BlokContainer extends Blok {
 
         if (this.getJustifyContent() === Css.Justifications.SPACE_BETWEEN) {
             if (this.getFlexDirection() === Css.FlexDirections.ROW) {
-                if (cssNode.style.width === undefined) {
-                    cssNode.style.width = preRect.getWidth();
-                    this.setFixedWidth(preRect.getWidth());
-                }
+                cssNode.style.width = w;
             }
             else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
-                if (cssNode.style.height === undefined) {
-                    cssNode.style.height = preRect.getHeight();
-                    this.setFixedHeight(preRect.getHeight());
-                }
-            }
-            else {
-                throw new Error("Unknown flexDirection!");
-            }
-        }
-        else {
-            if (this.getFlexDirection() === Css.FlexDirections.ROW) {
-                cssNode.style.width = undefined;
-                this.setFixedWidth(undefined);
-            }
-            else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
-                cssNode.style.height = undefined;
-                this.setFixedHeight(undefined);
+                cssNode.style.height = h;
             }
             else {
                 throw new Error("Unknown flexDirection!");
@@ -242,127 +207,12 @@ class BlokContainer extends Blok {
             return;
         }
 
-        let prevRect = new Rect([0, 0, 0, 0]);
-        let curRect = this.getRect();
-        let shouldRevertWidthChange = true; // Whether to revert a potential change
-        let shouldRevertHeightChange = true;
-        let shouldUpdateFixedWidth = false;
-        let shouldUpdateFixedHeight = false;
+        let rect = this.getRect();
+        let isWidthInvalid = !Utils.nearlyEqual(this.getCachedWidth(), rect.getWidth());
+        let isHeightInvalid = !Utils.nearlyEqual(this.getCachedHeight(), rect.getHeight());
 
-        // Pull out any fixed dimensions, where we require them, into our prevRect
-
-        if (this.getAlignItems() === Css.Alignments.STRETCH) {
-            if (this.getFlexDirection() === Css.FlexDirections.ROW) {
-                let fixedHeight = this.getFixedHeight();
-
-                if (!fixedHeight) {
-                    throw new Error("A BlokContainer with flexDirection=row and " +
-                        "alignItems=stretch MUST have a fixedHeight set!");
-                }
-
-                prevRect.setHeight(fixedHeight);
-                shouldRevertHeightChange = false;
-            }
-            else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
-                let fixedWidth = this.getFixedWidth();
-
-                if (!fixedWidth) {
-                    throw new Error("A BlokContainer with flexDirection=col and " +
-                        "alignItems=stretch MUST have a fixedWidth set!");
-                }
-
-                prevRect.setWidth(fixedWidth);
-                shouldRevertWidthChange = false;
-            }
-            else {
-                throw new Error("Unknown flex-direction!");
-            }
-        }
-
-        if (this.getJustifyContent() === Css.Justifications.SPACE_BETWEEN) {
-            if (this.getFlexDirection() === Css.FlexDirections.ROW) {
-                let fixedWidth = this.getFixedWidth();
-
-                if (!fixedWidth) {
-                    throw new Error("A BlokContainer with flexDirection=row and " +
-                        "justification=space-between MUST have a fixedWidth set!");
-                }
-
-                prevRect.setWidth(fixedWidth);
-                shouldRevertWidthChange = false;
-            }
-            else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
-                let fixedHeight = this.getFixedHeight();
-
-                if (!fixedHeight) {
-                    throw new Error("A BlokContainer with flexDirection=row and " +
-                        "justification=space-between MUST have a fixedHeight set!");
-                }
-
-                prevRect.setHeight(fixedHeight);
-                shouldRevertHeightChange = false;
-            }
-            else {
-                throw new Error("Unknown flex-direction!");
-            }
-        }
-
-        if (this.getFlexWrap() === Css.FlexWraps.WRAP) {
-            throw new Error("Not implemented for wrapping");
-        }
-
-        // Attempt to fill in any missing prevRect dimension from our cache
-
-        if (prevRect.getWidth() === 0) {
-            prevRect.setWidth(this.getCachedWidth());
-        }
-        else if (!Utils.nearlyEqual(prevRect.getWidth(), this.getCachedWidth())) {
-            throw new Error("Cached width [" + this.getCachedWidth() +
-                "] is out of sync with fixed width [" + prevRect.getWidth() + "]!");
-        }
-
-        if (prevRect.getHeight() === 0) {
-            prevRect.setHeight(this.getCachedHeight());
-        }
-        else if (!Utils.nearlyEqual(prevRect.getHeight(), this.getCachedHeight())) {
-            throw new Error("Cached height [" + this.getCachedHeight() +
-                "] is out of sync with fixed height [" + prevRect.getHeight() + "]!");
-        }
-
-        // Now check to see if our current dims don't match
-        let isWidthInvalid = !Utils.nearlyEqual(prevRect.getWidth(), curRect.getWidth());
-        let isHeightInvalid = !Utils.nearlyEqual(prevRect.getHeight(), curRect.getHeight());
-
-        // Try to detect if this could be due to "Align to Pixel Grid" setting. It would be
-        // wonderful to use the PageItem.pixelAligned API, but it's rarely correct
-        if (isWidthInvalid && Math.round(prevRect.getWidth()) === curRect.getWidth()) {
-            isWidthInvalid = false;
-        }
-
-        if (isHeightInvalid && Math.round(prevRect.getHeight()) === curRect.getHeight()) {
-            isHeightInvalid = false;
-        }
-
-        if ((shouldRevertWidthChange && isWidthInvalid) ||
-            (shouldRevertHeightChange && isHeightInvalid)) {
-            // Correct the user by undoing their change
-            app.undo();
-        }
-        else {
-            // If the user is performing a valid resize, let them by updating
-            // fixed width/height
-
-            if (isWidthInvalid && !shouldRevertWidthChange) {
-                this.setFixedWidth(curRect.getWidth());
-            }
-
-            if (isHeightInvalid && !shouldRevertHeightChange) {
-                this.setFixedHeight(curRect.getHeight());
-            }
-
-            if (isWidthInvalid || isHeightInvalid) {
-                this.invalidate();
-            }
+        if (isWidthInvalid || isHeightInvalid) {
+            this.invalidate();
         }
     }
 
@@ -448,50 +298,6 @@ class BlokContainer extends Blok {
             // Layout ourselves
             super.layout(desired, undefined);
         }
-
-        // Cache our post-layout dimensions
-        let rect = this.getRect();
-        this.setCachedWidth(rect.getWidth());
-        this.setCachedHeight(rect.getHeight());
-
-        // Assert some facts
-        if (this.getFixedWidth() !== undefined &&
-            !Utils.nearlyEqual(this.getFixedWidth(), rect.getWidth())) {
-            throw new Error("BlokContainer layout failed to make fixedWidth [" +
-                this.getFixedWidth() + "] match actual width [" + rect.getWidth() + "]!");
-        }
-
-        if (this.getFixedHeight() !== undefined &&
-            !Utils.nearlyEqual(this.getFixedHeight(), rect.getHeight())) {
-            throw new Error("BlokContainer layout failed to make fixedHeight [" +
-                this.getFixedHeight() + "] match actual height [" + rect.getHeight() + "]!");
-        }
-    }
-
-    /** Optional positive number for width. Use as a cache, not used in layout */
-    private getCachedWidth(): number {
-        return this.getSavedProperty<number>("cachedWidth");
-    }
-    /** Optional positive number for width. Use as a cache, not used in layout */
-    private setCachedWidth(value: number): void {
-        if (value !== undefined && value < 0) {
-            throw new RangeError("Cannot set a negative cached width!");
-        }
-
-        this.setSavedProperty<number>("cachedWidth", value);
-    }
-
-    /** Optional positive number for height. Use as a cache, not used in layout */
-    private getCachedHeight(): number {
-        return this.getSavedProperty<number>("cachedHeight");
-    }
-    /** Optional positive number for width. Use as a cache, not used in layout */
-    private setCachedHeight(value: number): void {
-        if (value !== undefined && value < 0) {
-            throw new RangeError("Cannot set a negative cached height!");
-        }
-
-        this.setSavedProperty<number>("cachedHeight", value);
     }
 
     /** Optional positive number for the number of Bloks this BlokContainer has */

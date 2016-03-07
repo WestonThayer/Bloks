@@ -19,6 +19,7 @@ BloksAIPlugin::BloksAIPlugin(SPPluginRef pluginRef) : Plugin(pluginRef)
 {
 	fRegisterSelectionChangedHandle = NULL;
 	fRegisterUndoHandle = NULL;
+	fRegisterRulerHandle = NULL;
 	strncpy(fPluginName, kBloksAIPluginName, kMaxStringLength);
 }
 
@@ -55,6 +56,16 @@ ASErr BloksAIPlugin::StartupPlugin(SPInterfaceMessage *message)
 			"Bloks",
 			kAIUndoCommandPreNotifierStr,
 			&fRegisterUndoHandle);
+	}
+
+	if (!error)
+	{
+		// Register for show/hide rulers
+		error = sAINotifier->AddNotifier(
+			fPluginRef,
+			"Bloks",
+			kAIShowHideRulersCommandPreNotifierStr,
+			&fRegisterRulerHandle);
 	}
 
 	sAIUser->MessageAlert(ai::UnicodeString("Hello from BloksAIPlugin!"));
@@ -121,6 +132,29 @@ ASErr BloksAIPlugin::Notify(AINotifierMessage* message)
 			"ILST",
 			"microsoft.design.bloks",
 			"preundo"
+		};
+
+		result = plug.DispatchEvent(&ev);
+
+		if (result != csxs::event::kEventErrorCode_Success)
+		{
+			error = 1;
+		}
+
+		plug.Unload();
+	}
+	else if (message->notifier == fRegisterRulerHandle)
+	{
+		csxs::event::EventErrorCode result = csxs::event::kEventErrorCode_Success;
+		SDKPlugPlug plug;
+		plug.Load(sAIFolders);
+
+		csxs::event::Event ev = {
+			"com.adobe.csxs.events.PreShowHideRulers",
+			csxs::event::kEventScope_Application,
+			"ILST",
+			"microsoft.design.bloks",
+			"preshowhiderulers"
 		};
 
 		result = plug.DispatchEvent(&ev);

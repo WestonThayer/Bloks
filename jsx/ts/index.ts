@@ -61,11 +61,6 @@ export function checkSelectionForRelayout(): void {
 
                         if (symItem.symbol.name === symName && BlokAdapter.isBlokAttached(symItem)) {
                             let blok = BlokAdapter.getBlok(symItem);
-                            let symRect = new Rect(pageItem.visibleBounds);
-
-                            // Update the fixedWidth/Height of the Blok to whatever the Symbol is
-                            blok.setFixedWidth(symRect.getWidth());
-                            blok.setFixedHeight(symRect.getHeight());
 
                             // Illustrator will refuse to run layout because we're in Symbol Editing Mode, so make a
                             // list of Bloks to invalidate the next chance we get

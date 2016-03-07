@@ -53,6 +53,7 @@ protected:
 private:
 	AINotifierHandle fRegisterSelectionChangedHandle;
 	AINotifierHandle fRegisterUndoHandle;
+	AINotifierHandle fRegisterRulerHandle;
 };
 
 #endif

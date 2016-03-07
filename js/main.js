@@ -10,8 +10,6 @@
             this.isLayoutButtonVisible = ko.observable(false);
             
             // Blok settings
-            this.fixedWidth = undefined;
-            this.fixedHeight = undefined;
             this.flex = undefined;
             this.alignSelf = ko.observable(undefined);
             
@@ -23,9 +21,7 @@
         }
         
         BlokVm.prototype.equals = function(settings) {
-            return this.fixedWidth === settings.fixedWidth &&
-                this.fixedHeight === settings.fixedHeight &&
-                this.flex === settings.flex &&
+            return this.flex === settings.flex &&
                 this.alignSelf() === settings.alignSelf &&
                 this.flexDirection() === settings.flexDirection &&
                 this.justifyContent() === settings.justifyContent &&
@@ -52,6 +48,12 @@
             /** Register a callback for whenever Illustrator is about to undo an action. Will fire before SELECTION_CHANGED */
             onPreUndo: function(cb) {
                 csInterface.addEventListener("com.adobe.csxs.events.PreUndo", function(ret) {
+                    cb();
+                });
+            },
+            /** Register a callback for whenever Illustrator is about to show or hide the rulers. */
+            onPreShowHideRulers: function(cb) {
+                csInterface.addEventListener("com.adobe.csxs.events.PreShowHideRulers", function(ret) {
                     cb();
                 });
             },
@@ -110,8 +112,28 @@
         // Global which tracks whether a selection changed event is caused by an undo
         var isUndo = false;
         
+        // Global which tracks when the last time a ruler was shown/hidden
+        var lastRulerTime = new Date();
+        
         BlokScripts.onPreUndo(function() {
             isUndo = true;
+        });
+        
+        BlokScripts.onPreShowHideRulers(function() {
+            var endTime = new Date();
+            var diff = endTime - lastRulerTime;
+            lastRulerTime = endTime;
+            
+            // We allow the user to use <CTRL + R> to trigger a relayout
+            // since clicking our UI is inconvenient. Illustrator doesn't let us
+            // register for keyboard shortcuts, so we listen instead for the show/hide
+            // ruler menu command. Since invoking that command shows the ruler, it's probably
+            // typical that you would want to hit <CTRL + R> 2x quickly to just toggle the ruler
+            // yet still get the relayout behavior. So, we check to see if it's been "quickly"
+            // toggled to avoid the overhead of another layout pass.
+            if (diff > 1000) {                
+                BlokScripts.relayoutSelection();
+            }
         });
 
         BlokScripts.onSelectionChanged(function() {

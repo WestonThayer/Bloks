@@ -27,8 +27,6 @@ function testOneDeepRow() {
     let blokContainer = BlokAdapter.getBlokContainer(pageItem);
 
     Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 250, 200])));
-    Assert.areEqual(blokContainer.getFixedWidth(), undefined);
-    Assert.areEqual(blokContainer.getFixedHeight(), undefined);
     Assert.areEqual(blokContainer.getFlex(), undefined);
     Assert.areEqual(blokContainer.getAlignSelf(), undefined);
     Assert.areEqual(blokContainer.getFlexDirection(), Css.FlexDirections.ROW);
@@ -252,15 +250,6 @@ function testTextFrameAreaStretch() {
 
     let textFrameBlok = BlokAdapter.getBlok(pageItem.pageItems[0]);
     Assert.isTrue(textFrameBlok.getRect().equals(new Rect([150, 0, 294, 200])));
-
-    // Now switch to flex-start and make sure its not still stretched
-    settings.alignItems = Css.Alignments.FLEX_START;
-    blokContainer = BlokAdapter.getBlokContainer(pageItem, settings);
-    blokContainer.invalidate();
-
-    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 294, 200])));
-    textFrameBlok = BlokAdapter.getBlok(pageItem.pageItems[0]);
-    Assert.isTrue(textFrameBlok.getRect().equals(new Rect([150, 0, 294, 65])));
 }
 
 function testTextFrameAreaMiddle() {
