@@ -104,10 +104,10 @@ ASErr BloksAIPlugin::Notify(AINotifierMessage* message)
 		plug.Load(sAIFolders);
 
 		csxs::event::Event ev = {
-			"com.adobe.csxs.events.SelectionChanged",
+			"com.westonthayer.bloks.events.SelectionChanged",
 			csxs::event::kEventScope_Application,
 			"ILST",
-			"microsoft.design.bloks",
+			"com.westonthayer.bloks",
 			"selectionchanged"
 		};
 
@@ -127,10 +127,10 @@ ASErr BloksAIPlugin::Notify(AINotifierMessage* message)
 		plug.Load(sAIFolders);
 
 		csxs::event::Event ev = {
-			"com.adobe.csxs.events.PreUndo",
+			"com.westonthayer.bloks.events.PreUndo",
 			csxs::event::kEventScope_Application,
 			"ILST",
-			"microsoft.design.bloks",
+			"com.westonthayer.bloks",
 			"preundo"
 		};
 
@@ -150,10 +150,10 @@ ASErr BloksAIPlugin::Notify(AINotifierMessage* message)
 		plug.Load(sAIFolders);
 
 		csxs::event::Event ev = {
-			"com.adobe.csxs.events.PreShowHideRulers",
+			"com.westonthayer.bloks.events.PreShowHideRulers",
 			csxs::event::kEventScope_Application,
 			"ILST",
-			"microsoft.design.bloks",
+			"com.westonthayer.bloks",
 			"preshowhiderulers"
 		};
 

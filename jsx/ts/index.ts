@@ -24,7 +24,7 @@ var JSON2: any = require("JSON2");
 function raiseException(ex) {
     var xLib = new ExternalObject("lib:\PlugPlugExternalObject");
     var eventObj = new CSXSEvent();
-    eventObj.type = "microsoft.design.bloks.JsxExceptionRaised";
+    eventObj.type = "com.westonthayer.bloks.events.JsxExceptionRaised";
     eventObj.data = JSON2.stringify(ex);
     eventObj.dispatch();
 }

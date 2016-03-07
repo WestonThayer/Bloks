@@ -45,27 +45,27 @@
         return {
             /** Register a callback for when there's an exception from JSX */
             onException: function(cb) {
-                csInterface.addEventListener("microsoft.design.bloks.JsxExceptionRaised", function(ret) {
+                csInterface.addEventListener("com.westonthayer.bloks.events.JsxExceptionRaised", function(ret) {
                     cb(ret.data);
                 });
             },
             /** Register a callback for whenever Illustrator is about to undo an action. Will fire before SELECTION_CHANGED */
             onPreUndo: function(cb) {
-                csInterface.addEventListener("com.adobe.csxs.events.PreUndo", function(ret) {
+                csInterface.addEventListener("com.westonthayer.bloks.events.PreUndo", function(ret) {
                     cb();
                 });
             },
             /** Register a callback for whenever Illustrator is about to show or hide the rulers. */
             onPreShowHideRulers: function(cb) {
-                csInterface.addEventListener("com.adobe.csxs.events.PreShowHideRulers", function(ret) {
+                csInterface.addEventListener("com.westonthayer.bloks.events.PreShowHideRulers", function(ret) {
                     cb();
                 });
             },
             /** Register a callback for whenever Illustrator's SELECTION_CHANGED event fires (a lot) */
             onSelectionChanged: function(cb) {
-                csInterface.addEventListener("com.adobe.csxs.events.SelectionChanged", function(ret) {
+                csInterface.addEventListener("com.westonthayer.bloks.events.SelectionChanged", function(ret) {
                     // Only listen for our plugin's events, we could be hearing others
-                    if (ret.extensionId === "microsoft.design.bloks") {
+                    if (ret.extensionId === "com.westonthayer.bloks") {
                         cb();
                     }
                 });

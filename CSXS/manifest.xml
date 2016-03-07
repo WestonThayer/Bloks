@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ExtensionManifest Version="6.0" ExtensionBundleId="microsoft.design.bloks" ExtensionBundleVersion="1.0"
+<ExtensionManifest Version="6.0" ExtensionBundleId="com.westonthayer.bloks" ExtensionBundleVersion="1.0"
 		ExtensionBundleName="Bloks" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<ExtensionList>
-		<Extension Id="microsoft.design.bloks" Version="6.1.0" />
+		<Extension Id="com.westonthayer.bloks" Version="6.1.0" />
 	</ExtensionList>
 	<ExecutionEnvironment>
 		<HostList>
@@ -17,7 +17,7 @@
 		</RequiredRuntimeList>
 	</ExecutionEnvironment>
 	<DispatchInfoList>
-		<Extension Id="microsoft.design.bloks">
+		<Extension Id="com.westonthayer.bloks">
 			<DispatchInfo >
 				<Resources>
                     <MainPath>./index.html</MainPath>

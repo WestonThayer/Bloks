@@ -1,8 +1,8 @@
 {
-  "name": "microsoft.design.bloks",
+  "name": "com.westonthayer.bloks",
   "private": true,
   "version": "1.0.0",
-  "description": "bloks for AI",
+  "description": "Bloks for AI",
   "main": "index.js",
   "scripts": {
     "build-jsx": "browserify jsx/ts/index.ts -p [ tsify ] > jsx/hostscript.jsx",
@@ -10,7 +10,7 @@
     "build-jsx-tests": "browserify jsx/ts/test/blok-container-layout.ts -p [ tsify ] > jsx/ts/test/blok-container-layout.jsx"
   },
   "author": "Weston Thayer <me@westonthayer.com>",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "devDependencies": {
     "JSON2": "^0.1.0",
     "browserify": "^11.2.0",
