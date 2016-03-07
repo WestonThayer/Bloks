@@ -130,7 +130,8 @@ export function updateSelectedBlok(settings: BlokUserSettings): void {
                 throw new Error("We're not updating a Blok!");
             }
 
-            BlokAdapter.getBlok(pageItem, settings);
+            let blok = BlokAdapter.getBlok(pageItem, settings);
+            blok.invalidate();
         }
         else {
             throw new Error("Can only update one Blok at a time!");
@@ -266,6 +267,10 @@ export function getActionsFromSelection(): { action: number, blok: any } {
 
                     ret.action = 1;
                     ret.blok = blokContainer.getUserSettings();
+
+                    if (pageItem.parent && BlokAdapter.isBlokContainerAttached(pageItem.parent)) {
+                        ret.blok.isAlsoChild = true;
+                    }
                 }
                 else {
                     // Can't do anything with just a single non-Blok item

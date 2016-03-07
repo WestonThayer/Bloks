@@ -20,9 +20,13 @@
             this.flexWrap = ko.observable(0);
         }
         
-        BlokVm.prototype.equals = function(settings) {
+        BlokVm.prototype.blokEquals = function(settings) {
             return this.flex === settings.flex &&
-                this.alignSelf() === settings.alignSelf &&
+                this.alignSelf() === settings.alignSelf;
+        };
+        
+        BlokVm.prototype.blokContainerEquals = function(settings) {
+            return this.blokEquals(settings) &&
                 this.flexDirection() === settings.flexDirection &&
                 this.justifyContent() === settings.justifyContent &&
                 this.alignItems() === settings.alignItems &&
@@ -74,6 +78,13 @@
             },
             createBlokContainerFromSelection: function(settingsStr, cb) {
                 csInterface.evalScript("loader(7).createBlokContainerFromSelection(" + settingsStr + ")", function(ret) {
+                    if (cb) {
+                        cb();
+                    }
+                });
+            },
+            updateSelectedBlok: function(settingsStr, cb) {
+                csInterface.evalScript("loader(7).updateSelectedBlok(" + settingsStr + ")", function(ret) {
                     if (cb) {
                         cb();
                     }
@@ -154,7 +165,15 @@
                 else if (result.action === 1) {
                     // Container sel
                     viewModel.title("Blok Group");
-                    viewModel.isChildSettingsVisible(false);
+                    
+                    if (result.blok.isAlsoChild) {
+                        viewModel.isChildSettingsVisible(true);
+                        viewModel.alignSelf(result.blok.alignSelf);
+                    }
+                    else {
+                        viewModel.isChildSettingsVisible(false);
+                    }
+                    
                     viewModel.isContainerSettingsVisible(true);
                     viewModel.isCreateButtonVisible(false);
                     viewModel.isLayoutButtonVisible(true);
@@ -170,6 +189,8 @@
                     viewModel.isContainerSettingsVisible(false);
                     viewModel.isCreateButtonVisible(false);
                     viewModel.isLayoutButtonVisible(true);
+                    
+                    viewMode.alignSelf(result.blok.alignSelf);
                 }
                 else if (result.action === 3) {
                     // Create group
@@ -189,10 +210,20 @@
         });
 
         // On-the-fly updates
+        
+        function handleBlokPropertyChanged(newValue) {
+            BlokScripts.getActionsFromSelection(function(result) {
+                if (result.action === 2 && !viewModel.blokEquals(result.blok)) {
+                    BlokScripts.updateSelectedBlok(ko.toJSON(viewModel));
+                }
+            });
+        }
+        
+        viewModel.alignSelf.subscribe(handleBlokPropertyChanged);
 
         function handleBlokContainerPropertyChanged(newValue) {
             BlokScripts.getActionsFromSelection(function(result) {
-                if (result.action === 1 && !viewModel.equals(result.blok)) {
+                if (result.action === 1 && !viewModel.blokContainerEquals(result.blok)) {
                     BlokScripts.updateSelectedBlokContainer(ko.toJSON(viewModel));
                 }
             });
