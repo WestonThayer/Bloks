@@ -76,8 +76,24 @@ export function checkSelectionForRelayout(): void {
                 (app.activeDocument.activeLayer.parent &&
                     app.activeDocument.activeLayer.parent.name !== "Symbol Editing Mode")) {
 
-                bloksToBeInvalidated.forEach((blok) => {
-                    blok.invalidate();
+                // Don't call invalidate on Bloks that share the same root BlokContainer since
+                // that's wasted work
+                let roots = [];
+
+                bloksToBeInvalidated.forEach((blok: Blok) => {
+                    let root = blok.getRootContainer();
+                    let alreadyInvalid = false;
+
+                    roots.forEach((r: Blok) => {
+                        if (r === root) {
+                            alreadyInvalid = true;
+                        }
+                    });
+
+                    if (!alreadyInvalid) {
+                        roots.push(root);
+                        blok.invalidate();
+                    }
                 });
 
                 // Clear the list

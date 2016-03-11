@@ -187,7 +187,7 @@ class Blok {
     }
 
     /** A reference to the BlokContainer at the root of this tree */
-    protected getRootContainer(): BlokContainer {
+    public getRootContainer(): BlokContainer {
         let par: Blok = this.getContainer();
         let blok: Blok = par;
 

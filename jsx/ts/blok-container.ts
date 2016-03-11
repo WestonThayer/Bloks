@@ -228,7 +228,7 @@ class BlokContainer extends Blok {
         return container;
     }
 
-    protected /*override*/ getRootContainer(): BlokContainer {
+    public /*override*/ getRootContainer(): BlokContainer {
         let container = super.getRootContainer();
 
         if (!container) {
