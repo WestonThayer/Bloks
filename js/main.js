@@ -216,11 +216,17 @@
                 if (result.action === 2 && !viewModel.blokEquals(result.blok)) {
                     BlokScripts.updateSelectedBlok(ko.toJSON(viewModel));
                 }
+                else if (result.action === 1 &&
+                         result.blok.isAlsoChild &&
+                         !viewModel.blokContainerEquals(result.blok)) {
+                    BlokScripts.updateSelectedBlokContainer(ko.toJSON(viewModel));
+                }
             });
         }
         
         viewModel.alignSelf.subscribe(handleBlokPropertyChanged);
 
+        
         function handleBlokContainerPropertyChanged(newValue) {
             BlokScripts.getActionsFromSelection(function(result) {
                 if (result.action === 1 && !viewModel.blokContainerEquals(result.blok)) {

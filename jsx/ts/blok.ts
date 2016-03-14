@@ -145,7 +145,7 @@ class Blok {
         };
         
         // Have to set it here, css-layout gets confused if it's set and not needed
-        if (this.getAlignSelf()) {
+        if (this.getAlignSelf() !== undefined) {
             cssNode.style.alignSelf = Css.enumStringToCssString(Css.Alignments[this.getAlignSelf()]);
         }
 

@@ -37,8 +37,9 @@ gulp.task("build-jsx", function() {
                 // Append some debugging helpers
                 contents += "\n\n//loader(7).checkSelectionForRelayout();"
                 contents += "\n//loader(7).relayoutSelection();"
-                contents += "\n//loader(7).updateSelectedBlokContainer({ flexDirection: 0, justifyContent: 0, alignItems: 0, flexWrap: 0});"
-                contents += "\n//loader(7).createBlokContainerFromSelection({ flexDirection: 0, justifyContent: 0, alignItems: 0, flexWrap: 0});"
+                contents += "\n//loader(7).updateSelectedBlokContainer({ flexDirection: 0, justifyContent: 0, alignItems: 0, flexWrap: 0 });"
+                contents += "\n//loader(7).createBlokContainerFromSelection({ flexDirection: 0, justifyContent: 0, alignItems: 0, flexWrap: 0 });"
+                contents += "\n//loader(7).updateSelectedBlok({ flex: undefined, alignSelf: 0 });"
                 
                 file.contents = new Buffer(contents);
             }
