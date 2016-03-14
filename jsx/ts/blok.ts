@@ -315,6 +315,17 @@ class Blok {
         }
     }
 
+    /**
+     * Compare this Blok to another for equality.
+     *
+     * @param value - another Blok
+     *
+     * @returns true if the Bloks refer to the same art object
+     */
+    public equals(value: Blok): boolean {
+        return this._pageItem === value._pageItem;
+    }
+
     /** Optional positive number for width. Use as a cache, not used in layout */
     protected getCachedWidth(): number {
         return this.getSavedProperty<number>("cachedWidth");

@@ -84,8 +84,8 @@ export function checkSelectionForRelayout(): void {
                     let root = blok.getRootContainer();
                     let alreadyInvalid = false;
 
-                    roots.forEach((r: Blok) => {
-                        if (r === root) {
+                    roots.forEach((r: BlokContainer) => {
+                        if (r.equals(root)) {
                             alreadyInvalid = true;
                         }
                     });
