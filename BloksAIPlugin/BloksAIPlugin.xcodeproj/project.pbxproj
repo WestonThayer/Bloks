@@ -1,0 +1,376 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2AF5F7490CF5EF100091D961 /* AppContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AF5F7430CF5EF100091D961 /* AppContext.cpp */; };
+		2AF5F74A0CF5EF100091D961 /* IllustratorSDK.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AF5F7440CF5EF100091D961 /* IllustratorSDK.cpp */; };
+		2AF5F74B0CF5EF100091D961 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AF5F7450CF5EF100091D961 /* Main.cpp */; };
+		2AF5F74C0CF5EF100091D961 /* Plugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AF5F7460CF5EF100091D961 /* Plugin.cpp */; };
+		2AF5F74D0CF5EF100091D961 /* SDKAboutPluginsHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AF5F7470CF5EF100091D961 /* SDKAboutPluginsHelper.cpp */; };
+		2AF5F74E0CF5EF100091D961 /* Suites.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AF5F7480CF5EF100091D961 /* Suites.cpp */; };
+		2AF5F7520CF5EF2B0091D961 /* IAIUnicodeString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AF5F7500CF5EF2B0091D961 /* IAIUnicodeString.cpp */; };
+		2AF5F7580CF5EF4D0091D961 /* BloksAIPluginID.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AF5F7530CF5EF4D0091D961 /* BloksAIPluginID.h */; };
+		2AF5F7590CF5EF4D0091D961 /* BloksAIPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AF5F7540CF5EF4D0091D961 /* BloksAIPlugin.cpp */; };
+		2AF5F75A0CF5EF4D0091D961 /* BloksAIPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AF5F7550CF5EF4D0091D961 /* BloksAIPlugin.h */; };
+		2AF5F75B0CF5EF4D0091D961 /* BloksAIPluginSuites.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AF5F7560CF5EF4D0091D961 /* BloksAIPluginSuites.cpp */; };
+		2AF5F75C0CF5EF4D0091D961 /* BloksAIPluginSuites.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AF5F7570CF5EF4D0091D961 /* BloksAIPluginSuites.h */; };
+		F938CB070B8B9CE60039754D /* BloksAIPlugin.r in Rez */ = {isa = PBXBuildFile; fileRef = F938CB060B8B9CE60039754D /* BloksAIPlugin.r */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2AF5F7430CF5EF100091D961 /* AppContext.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = AppContext.cpp; path = Vendor/common/source/AppContext.cpp; sourceTree = SOURCE_ROOT; };
+		2AF5F7440CF5EF100091D961 /* IllustratorSDK.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = IllustratorSDK.cpp; path = Vendor/common/source/IllustratorSDK.cpp; sourceTree = SOURCE_ROOT; };
+		2AF5F7450CF5EF100091D961 /* Main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Main.cpp; path = Vendor/common/source/Main.cpp; sourceTree = SOURCE_ROOT; };
+		2AF5F7460CF5EF100091D961 /* Plugin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin.cpp; path = Vendor/common/source/Plugin.cpp; sourceTree = SOURCE_ROOT; };
+		2AF5F7470CF5EF100091D961 /* SDKAboutPluginsHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = SDKAboutPluginsHelper.cpp; path = Vendor/common/source/SDKAboutPluginsHelper.cpp; sourceTree = SOURCE_ROOT; };
+		2AF5F7480CF5EF100091D961 /* Suites.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Suites.cpp; path = Vendor/common/source/Suites.cpp; sourceTree = SOURCE_ROOT; };
+		2AF5F7500CF5EF2B0091D961 /* IAIUnicodeString.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = IAIUnicodeString.cpp; path = Vendor/illustratorapi/illustrator/IAIUnicodeString.cpp; sourceTree = SOURCE_ROOT; };
+		2AF5F7530CF5EF4D0091D961 /* BloksAIPluginID.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BloksAIPluginID.h; path = BloksAIPlugin/BloksAIPluginID.h; sourceTree = "<group>"; };
+		2AF5F7540CF5EF4D0091D961 /* BloksAIPlugin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = BloksAIPlugin.cpp; path = BloksAIPlugin/BloksAIPlugin.cpp; sourceTree = "<group>"; };
+		2AF5F7550CF5EF4D0091D961 /* BloksAIPlugin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BloksAIPlugin.h; path = BloksAIPlugin/BloksAIPlugin.h; sourceTree = "<group>"; };
+		2AF5F7560CF5EF4D0091D961 /* BloksAIPluginSuites.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = BloksAIPluginSuites.cpp; path = BloksAIPlugin/BloksAIPluginSuites.cpp; sourceTree = "<group>"; };
+		2AF5F7570CF5EF4D0091D961 /* BloksAIPluginSuites.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BloksAIPluginSuites.h; path = BloksAIPlugin/BloksAIPluginSuites.h; sourceTree = "<group>"; };
+		6EE2BA530A40BB2600CC7CE2 /* BloksAIPlugin.aip */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BloksAIPlugin.aip; sourceTree = BUILT_PRODUCTS_DIR; };
+		F938CB060B8B9CE60039754D /* BloksAIPlugin.r */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.rez; name = BloksAIPlugin.r; path = BloksAIPlugin/BloksAIPlugin.r; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		508817D209F0C9AD0071BF1A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		508817C209F0C9740071BF1A = {
+			isa = PBXGroup;
+			children = (
+				508817F509F0CAB50071BF1A /* Sources */,
+				6EE2BA590A40BDD300CC7CE2 /* Resources */,
+				508817D509F0C9AD0071BF1A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		508817D509F0C9AD0071BF1A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6EE2BA530A40BB2600CC7CE2 /* BloksAIPlugin.aip */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		508817F509F0CAB50071BF1A /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				F9C02BE40BA6E9540039151A /* Shared */,
+				2AF5F7530CF5EF4D0091D961 /* BloksAIPluginID.h */,
+				2AF5F7540CF5EF4D0091D961 /* BloksAIPlugin.cpp */,
+				2AF5F7550CF5EF4D0091D961 /* BloksAIPlugin.h */,
+				2AF5F7560CF5EF4D0091D961 /* BloksAIPluginSuites.cpp */,
+				2AF5F7570CF5EF4D0091D961 /* BloksAIPluginSuites.h */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		6EE2BA590A40BDD300CC7CE2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F938CB060B8B9CE60039754D /* BloksAIPlugin.r */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		F9C02BE40BA6E9540039151A /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				2AF5F7500CF5EF2B0091D961 /* IAIUnicodeString.cpp */,
+				2AF5F7430CF5EF100091D961 /* AppContext.cpp */,
+				2AF5F7440CF5EF100091D961 /* IllustratorSDK.cpp */,
+				2AF5F7450CF5EF100091D961 /* Main.cpp */,
+				2AF5F7460CF5EF100091D961 /* Plugin.cpp */,
+				2AF5F7470CF5EF100091D961 /* SDKAboutPluginsHelper.cpp */,
+				2AF5F7480CF5EF100091D961 /* Suites.cpp */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		6EE2BA0A0A40B76300CC7CE2 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2AF5F7580CF5EF4D0091D961 /* BloksAIPluginID.h in Headers */,
+				2AF5F75A0CF5EF4D0091D961 /* BloksAIPlugin.h in Headers */,
+				2AF5F75C0CF5EF4D0091D961 /* BloksAIPluginSuites.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		508817D309F0C9AD0071BF1A /* BloksAIPlugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 508817D709F0C9AE0071BF1A /* Build configuration list for PBXNativeTarget "BloksAIPlugin" */;
+			buildPhases = (
+				6EE2BA0A0A40B76300CC7CE2 /* Headers */,
+				508817D109F0C9AD0071BF1A /* Sources */,
+				508817D009F0C9AD0071BF1A /* Resources */,
+				508817D209F0C9AD0071BF1A /* Frameworks */,
+				6EE2BA0C0A40B77400CC7CE2 /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BloksAIPlugin;
+			productName = BloksAIPluginProject;
+			productReference = 6EE2BA530A40BB2600CC7CE2 /* BloksAIPlugin.aip */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		508817C409F0C9740071BF1A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 508817C509F0C9740071BF1A /* Build configuration list for PBXProject "BloksAIPlugin" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 508817C209F0C9740071BF1A;
+			productRefGroup = 508817D509F0C9AD0071BF1A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				508817D309F0C9AD0071BF1A /* BloksAIPlugin */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		508817D009F0C9AD0071BF1A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXRezBuildPhase section */
+		6EE2BA0C0A40B77400CC7CE2 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F938CB070B8B9CE60039754D /* BloksAIPlugin.r in Rez */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXRezBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		508817D109F0C9AD0071BF1A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2AF5F7490CF5EF100091D961 /* AppContext.cpp in Sources */,
+				2AF5F74A0CF5EF100091D961 /* IllustratorSDK.cpp in Sources */,
+				2AF5F74B0CF5EF100091D961 /* Main.cpp in Sources */,
+				2AF5F74C0CF5EF100091D961 /* Plugin.cpp in Sources */,
+				2AF5F74D0CF5EF100091D961 /* SDKAboutPluginsHelper.cpp in Sources */,
+				2AF5F74E0CF5EF100091D961 /* Suites.cpp in Sources */,
+				2AF5F7520CF5EF2B0091D961 /* IAIUnicodeString.cpp in Sources */,
+				2AF5F7590CF5EF4D0091D961 /* BloksAIPlugin.cpp in Sources */,
+				2AF5F75B0CF5EF4D0091D961 /* BloksAIPluginSuites.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		508817C609F0C9740071BF1A /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				AI_CONFIGURATION = debug;
+				AI_LOCALE = en_US;
+				AI_PLATFORM = xcode;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CONFIGURATION_BUILD_DIR = "output/mac/$(AI_CONFIGURATION)";
+				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/Default";
+				COPY_PHASE_STRIP = YES;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DSTROOT = "/tmp/$(PROJECT_NAME).dst";
+				EXPORTED_SYMBOLS_FILE = "";
+				FRAMEWORK_SEARCH_PATHS = "$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)";
+				GCC_DEBUGGING_SYMBOLS = used;
+				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = YES;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Vendor/common/includes/IllustratorSDK$(AI_CONFIGURATION).pch";
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_PKGINFO_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"Vendor/illustratorapi/**",
+					"/Developer/Headers/FlatCarbon/**",
+					"./**",
+					"Vendor/common/**",
+				);
+				INFOPLIST_FILE = Vendor/common/mac/Info.plist;
+				INFOPLIST_PREFIX_HEADER = Vendor/common/includes/SDKDef.h;
+				INFOPLIST_PREPROCESS = YES;
+				LIBRARY_SEARCH_PATHS = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OBJROOT = .;
+				ONLY_LINK_ESSENTIAL_SYMBOLS = YES;
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
+				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
+				PRODUCT_NAME = BloksAIPlugin;
+				PROJECTNAME = BloksAIPlugin;
+				REZ_SEARCH_PATHS = "";
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
+				SDKROOT = macosx10.9;
+				SEPARATE_STRIP = NO;
+				SHARED_PRECOMPS_DIR = "output/mac/sharedprecompiledheaders/$(AI_CONFIGURATION)";
+				SKIP_INSTALL = NO;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				SYMROOT = "output/mac/$(AI_CONFIGURATION)";
+				VALID_ARCHS = "i386 x86_64";
+				WRAPPER_EXTENSION = aip;
+				ZERO_LINK = NO;
+			};
+			name = debug;
+		};
+		508817C709F0C9740071BF1A /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				AI_CONFIGURATION = release;
+				AI_LOCALE = en_US;
+				AI_PLATFORM = xcode;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CONFIGURATION_BUILD_DIR = "output/mac/$(AI_CONFIGURATION)";
+				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/Default";
+				COPY_PHASE_STRIP = YES;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DSTROOT = "/tmp/$(PROJECT_NAME).dst";
+				EXPORTED_SYMBOLS_FILE = "";
+				FRAMEWORK_SEARCH_PATHS = "$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)";
+				GCC_DEBUGGING_SYMBOLS = used;
+				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = YES;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Vendor/common/includes/IllustratorSDK$(AI_CONFIGURATION).pch";
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_PKGINFO_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"Vendor/illustratorapi/**",
+					"/Developer/Headers/FlatCarbon/**",
+					"./**",
+					"Vendor/common/**",
+				);
+				INFOPLIST_FILE = Vendor/common/mac/Info.plist;
+				INFOPLIST_PREFIX_HEADER = Vendor/common/includes/SDKDef.h;
+				INFOPLIST_PREPROCESS = YES;
+				LIBRARY_SEARCH_PATHS = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OBJROOT = .;
+				ONLY_LINK_ESSENTIAL_SYMBOLS = YES;
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
+				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
+				PRODUCT_NAME = BloksAIPlugin;
+				PROJECTNAME = BloksAIPlugin;
+				REZ_SEARCH_PATHS = "";
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
+				SDKROOT = macosx10.9;
+				SEPARATE_STRIP = NO;
+				SHARED_PRECOMPS_DIR = "output/mac/sharedprecompiledheaders/$(AI_CONFIGURATION)";
+				SKIP_INSTALL = NO;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				SYMROOT = "output/mac/$(AI_CONFIGURATION)";
+				VALID_ARCHS = "i386 x86_64";
+				WRAPPER_EXTENSION = aip;
+				ZERO_LINK = NO;
+			};
+			name = release;
+		};
+		508817D809F0C9AE0071BF1A /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				SDKROOT = macosx10.9;
+				STRIP_STYLE = "non-global";
+			};
+			name = debug;
+		};
+		508817D909F0C9AE0071BF1A /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				SDKROOT = macosx10.9;
+				STRIP_STYLE = "non-global";
+			};
+			name = release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		508817C509F0C9740071BF1A /* Build configuration list for PBXProject "BloksAIPlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				508817C609F0C9740071BF1A /* debug */,
+				508817C709F0C9740071BF1A /* release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = debug;
+		};
+		508817D709F0C9AE0071BF1A /* Build configuration list for PBXNativeTarget "BloksAIPlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				508817D809F0C9AE0071BF1A /* debug */,
+				508817D909F0C9AE0071BF1A /* release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 508817C409F0C9740071BF1A /* Project object */;
+}
