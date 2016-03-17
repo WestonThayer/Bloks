@@ -19,10 +19,10 @@
 		2AF5F75A0CF5EF4D0091D961 /* BloksAIPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AF5F7550CF5EF4D0091D961 /* BloksAIPlugin.h */; };
 		2AF5F75B0CF5EF4D0091D961 /* BloksAIPluginSuites.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AF5F7560CF5EF4D0091D961 /* BloksAIPluginSuites.cpp */; };
 		2AF5F75C0CF5EF4D0091D961 /* BloksAIPluginSuites.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AF5F7570CF5EF4D0091D961 /* BloksAIPluginSuites.h */; };
-		F938CB070B8B9CE60039754D /* BloksAIPlugin.r in Rez */ = {isa = PBXBuildFile; fileRef = F938CB060B8B9CE60039754D /* BloksAIPlugin.r */; };
 		9E30833713C7581100DA79FB /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E30833613C7581100DA79FB /* CoreFoundation.framework */; };
 		C4B1644E13063BAD007644F6 /* IAIFilePath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4B1644C13063BAD007644F6 /* IAIFilePath.cpp */; };
 		C4B164A313063D79007644F6 /* SDKPlugPlug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4B164A213063D79007644F6 /* SDKPlugPlug.cpp */; };
+		F938CB070B8B9CE60039754D /* BloksAIPlugin.r in Rez */ = {isa = PBXBuildFile; fileRef = F938CB060B8B9CE60039754D /* BloksAIPlugin.r */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,12 +38,12 @@
 		2AF5F7550CF5EF4D0091D961 /* BloksAIPlugin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BloksAIPlugin.h; path = BloksAIPlugin/BloksAIPlugin.h; sourceTree = "<group>"; };
 		2AF5F7560CF5EF4D0091D961 /* BloksAIPluginSuites.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = BloksAIPluginSuites.cpp; path = BloksAIPlugin/BloksAIPluginSuites.cpp; sourceTree = "<group>"; };
 		2AF5F7570CF5EF4D0091D961 /* BloksAIPluginSuites.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BloksAIPluginSuites.h; path = BloksAIPlugin/BloksAIPluginSuites.h; sourceTree = "<group>"; };
-		6EE2BA530A40BB2600CC7CE2 /* BloksAIPlugin.aip */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BloksAIPlugin.aip; sourceTree = BUILT_PRODUCTS_DIR; };
-		F938CB060B8B9CE60039754D /* BloksAIPlugin.r */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.rez; name = BloksAIPlugin.r; path = BloksAIPlugin/BloksAIPlugin.r; sourceTree = "<group>"; };
 		6E81FEC40A8CB0E3002569B5 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist; name = Info.plist; path = Vendor/common/mac/Info.plist; sourceTree = SOURCE_ROOT; };
+		6EE2BA530A40BB2600CC7CE2 /* BloksAIPlugin.aip */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BloksAIPlugin.aip; sourceTree = BUILT_PRODUCTS_DIR; };
 		9E30833613C7581100DA79FB /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		C4B1644C13063BAD007644F6 /* IAIFilePath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = IAIFilePath.cpp; path = Vendor/illustratorapi/illustrator/IAIFilePath.cpp; sourceTree = SOURCE_ROOT; };
 		C4B164A213063D79007644F6 /* SDKPlugPlug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SDKPlugPlug.cpp; path = Vendor/common/source/SDKPlugPlug.cpp; sourceTree = SOURCE_ROOT; };
+		F938CB060B8B9CE60039754D /* BloksAIPlugin.r */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.rez; name = BloksAIPlugin.r; path = BloksAIPlugin/BloksAIPlugin.r; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +163,7 @@
 		508817C409F0C9740071BF1A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastUpgradeCheck = 0720;
 			};
 			buildConfigurationList = 508817C509F0C9740071BF1A /* Build configuration list for PBXProject "BloksAIPlugin" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -275,7 +276,7 @@
 				PROJECTNAME = BloksAIPlugin;
 				REZ_SEARCH_PATHS = "";
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
-				SDKROOT = macosx10.9;
+				SDKROOT = macosx;
 				SEPARATE_STRIP = NO;
 				SHARED_PRECOMPS_DIR = "output/mac/sharedprecompiledheaders/$(AI_CONFIGURATION)";
 				SKIP_INSTALL = NO;
@@ -336,7 +337,7 @@
 				PROJECTNAME = BloksAIPlugin;
 				REZ_SEARCH_PATHS = "";
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
-				SDKROOT = macosx10.9;
+				SDKROOT = macosx;
 				SEPARATE_STRIP = NO;
 				SHARED_PRECOMPS_DIR = "output/mac/sharedprecompiledheaders/$(AI_CONFIGURATION)";
 				SKIP_INSTALL = NO;
@@ -355,7 +356,7 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
-				SDKROOT = macosx10.9;
+				SDKROOT = macosx;
 				STRIP_STYLE = "non-global";
 			};
 			name = debug;
@@ -366,7 +367,7 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
-				SDKROOT = macosx10.9;
+				SDKROOT = macosx;
 				STRIP_STYLE = "non-global";
 			};
 			name = release;
