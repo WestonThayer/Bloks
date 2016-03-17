@@ -298,6 +298,10 @@ class BlokContainer extends Blok {
             // Layout ourselves
             super.layout(desired, undefined);
         }
+
+        let curR = this.getRect();
+        this.setCachedWidth(curR.getWidth());
+        this.setCachedHeight(curR.getHeight());
     }
 
     /** Optional positive number for the number of Bloks this BlokContainer has */

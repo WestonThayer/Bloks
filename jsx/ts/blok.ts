@@ -133,9 +133,6 @@ class Blok {
         let w = r.getWidth();
         let h = r.getHeight();
 
-        this.setCachedWidth(w);
-        this.setCachedHeight(h);
-
         let cssNode: any = {
             style: {
                 width: w,
@@ -214,7 +211,7 @@ class Blok {
         let aiDeltaX = (desired.getWidth() / actual.getWidth()) * 100;
         let aiDeltaY = (desired.getHeight() / actual.getHeight()) * 100;
 
-        let isScaleRequested = aiDeltaX !== 100 || aiDeltaY !== 100;
+        let isScaleRequested = !Utils.nearlyEqual(aiDeltaX, 100) || !Utils.nearlyEqual(aiDeltaY, 100);
 
         transformMatrix = app.concatenateScaleMatrix(transformMatrix, aiDeltaX, aiDeltaY);
 
@@ -301,17 +298,29 @@ class Blok {
                 // Select the new item
                 this._pageItem.selected = true;
             }
+
+            // Cache dims
+            let curR = this.getRect();
+            this.setCachedWidth(curR.getWidth());
+            this.setCachedHeight(curR.getHeight());
         }
         else {
-            this._pageItem.transform(
-                transformMatrix,
-                true /*changePositions*/,
-                false /*changeFillPatterns*/,
-                false /*changeFillGradients*/,
-                false /*changeStrokePattern*/,
-                0.0 /*changeLineWidth - this one is weird. If you say 5, it multiplies the current stroke width by 5... */,
-                Transformation.TOPLEFT /*transformAbout*/
-            );
+            if (isScaleRequested || !Utils.nearlyEqual(aiDeltaX, 0) || !Utils.nearlyEqual(aiDeltaY, 0)) {
+                this._pageItem.transform(
+                    transformMatrix,
+                    true /*changePositions*/,
+                    false /*changeFillPatterns*/,
+                    false /*changeFillGradients*/,
+                    false /*changeStrokePattern*/,
+                    0.0 /*changeLineWidth - this one is weird. If you say 5, it multiplies the current stroke width by 5... */,
+                    Transformation.TOPLEFT /*transformAbout*/
+                );
+            }
+
+            // Cache dims
+            let curR = this.getRect();
+            this.setCachedWidth(curR.getWidth());
+            this.setCachedHeight(curR.getHeight());
         }
     }
 
