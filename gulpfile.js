@@ -5,6 +5,8 @@ var source = require('vinyl-source-stream');
 var buffer = require("vinyl-buffer");
 var browserify = require("browserify");
 var tsify = require("tsify");
+var shell = require("gulp-shell");
+var del = require("del");
 
 gulp.task("build-jsx", function() {
     var b = browserify("jsx/ts/index.ts").plugin(tsify);
@@ -48,4 +50,104 @@ gulp.task("build-jsx", function() {
             callback();
         }))
         .pipe(gulp.dest("jsx/"));
+});
+
+// ZXP building
+
+var pwd = undefined;
+
+try {
+    var creds = require("./zxp-tools/certificate-creds.json");
+    pwd = creds.password;
+}
+catch (e) {
+    if (e.code === "MODULE_NOT_FOUND") {
+        throw new Error("./zxp-tools/certificate-creds.json doesn't exist! Please create it. Ex: { password: 'pwd' }");
+    }
+    else {
+        throw e;
+    }
+}
+
+if (!pwd) {
+    throw new Error("Unable to get the certificate file's password!");
+}
+
+gulp.task("zxp-html-extension-copy-css", function() {
+   return gulp.src(["css/**/*.css"])
+       .pipe(gulp.dest("release/MXI/HTML/com.westonthayer.bloks/css/"));
+});
+
+gulp.task("zxp-html-extension-copy-manifest", function() {
+   return gulp.src(["CSXS/manifest.xml"])
+       .pipe(gulp.dest("release/MXI/HTML/com.westonthayer.bloks/CSXS/"));
+});
+
+gulp.task("zxp-html-extension-copy-icons", function() {
+   return gulp.src(["icons/*.png"])
+       .pipe(gulp.dest("release/MXI/HTML/com.westonthayer.bloks/icons/"));
+});
+
+gulp.task("zxp-html-extension-copy-js", function() {
+   return gulp.src(["js/**/*.js"])
+       .pipe(gulp.dest("release/MXI/HTML/com.westonthayer.bloks/js/"));
+});
+
+gulp.task("zxp-html-extension-copy-jsx", function() {
+   return gulp.src(["jsx/hostscript.jsx"])
+       .pipe(gulp.dest("release/MXI/HTML/com.westonthayer.bloks/jsx/"));
+});
+
+gulp.task("zxp-html-extension-copy-html", function() {
+   return gulp.src(["index.html"])
+       .pipe(gulp.dest("release/MXI/HTML/com.westonthayer.bloks/"));
+});
+
+gulp.task("zxp-html-extension-sign", [
+    "zxp-html-extension-copy-css",
+    "zxp-html-extension-copy-manifest",
+    "zxp-html-extension-copy-icons",
+    "zxp-html-extension-copy-js",
+    "zxp-html-extension-copy-jsx",
+    "zxp-html-extension-copy-html"
+    ],
+    shell.task("zxp-tools\\ZXPSignCmd.exe -sign release\\MXI\\HTML\\com.westonthayer.bloks release\\MXI\\HTML\\com.westonthayer.bloks.zxp zxp-tools\\selfWT.p12 " + pwd + " -tsa https://timestamp.geotrust.com/tsa")
+);
+
+gulp.task("zxp-html-extension", ["zxp-html-extension-sign"], function() {
+    return del(["release/MXI/HTML/com.westonthayer.bloks"]);
+});
+
+gulp.task("zxp-mxi-copy", function() {
+    return gulp.src(["MXI/*"])
+        .pipe(gulp.dest("release/MXI/"));
+});
+
+gulp.task("zxp-plugin-mac", function() {
+    return gulp.src(["BloksAIPlugin/Mac/release/**/*"])
+        .pipe(gulp.dest("release/MXI/MAC/"));
+});
+
+gulp.task("zxp-plugin-win-64", function() {
+    return gulp.src(["BloksAIPlugin/x64/Release/BloksAIPlugin.aip"])
+        .pipe(gulp.dest("release/MXI/WIN_64/"));
+});
+
+gulp.task("zxp-plugin-win-32", function() {
+    return gulp.src(["BloksAIPlugin/Release/BloksAIPlugin.aip"])
+        .pipe(gulp.dest("release/MXI/WIN_32/"));
+});
+
+gulp.task("zxp-sign", [
+        "zxp-html-extension",
+        "zxp-mxi-copy",
+        "zxp-plugin-mac",
+        "zxp-plugin-win-64",
+        "zxp-plugin-win-32"
+    ],
+    shell.task("zxp-tools\\ZXPSignCmd.exe -sign release\\MXI release\\com.westonthayer.bloks.zxp zxp-tools\\selfWT.p12 " + pwd + " -tsa https://timestamp.geotrust.com/tsa")
+);
+
+gulp.task("zxp", ["zxp-sign"], function() {
+    return del(["release/MXI"]);
 });

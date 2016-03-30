@@ -1,10 +1,17 @@
 *.opensdf
 *.sdf
-.vs/
-BlocksAIPlugin/x64/
-BlocksAIPlugin/x86/
 *.aps
 *.user
 
-x64/
-x86/
+/.vs/
+/BloksAIPlugin/x64/
+/BloksAIPlugin/Release/
+
+/x64/Debug/
+/Debug/
+
+/x64/Release/*
+!/x64/Release/BloksAIPlugin.aip
+
+/Release/*
+!/Release/BloksAIPlugin.aip

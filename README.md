@@ -25,3 +25,11 @@ If you're making changes at the CEP level (`index.html`, `js\main.js`), you can 
 To debug the BloksAIPlugin in Visual Studio, go to project > Properties > Configuration Properties > Debugging > Command. Set that to the path to Illustrator.exe on your computer.
 
 For more tips on CEP plugin development, see [Davide Barranca's blog](http://www.davidebarranca.com/). Adobe's [CEP-Resources](https://github.com/Adobe-CEP/CEP-Resources) repo also has some documentation.
+
+# Releasing
+
+Use `npm run zxp` to produce a signed ZXP extension at `release/com.westonthayer.bloks.zxp`.
+
+* You must have created `zxp-tools/certificate-creds.json` with a valid password (Ex: `{ password: "atestpassword" }`) to successfully sign it
+* Currently only works on Windows (path delimiters for script execution are Windows-style)
+* If you need a different ZXPSignCmd, try https://github.com/Adobe-CEP/CEP-Resources/tree/master/ZXPSignCMD
