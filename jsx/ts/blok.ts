@@ -9,6 +9,7 @@ import BlokUserSettings = require("./blok-user-settings");
 import BlokContainer = require("./blok-container");
 import BlokAdapter = require("./blok-adapter");
 import Utils = require("./utils");
+import LayoutOpts = require("./layout-opts");
 
 /**
  * Wraps an Illustrator pageItem to add the capabilities needed for layout.
@@ -127,11 +128,18 @@ class Blok {
     }
 
     /** Return a css-layout node */
-    public computeCssNode(): any {
+    public computeCssNode(opts = new LayoutOpts()): any {
         let r = this.getRect();
-
         let w = r.getWidth();
         let h = r.getHeight();
+
+        if (opts.useCachedWidth) {
+            w = this.getCachedWidth();
+        }
+
+        if (opts.useCachedHeight) {
+            h = this.getCachedHeight();
+        }
 
         let cssNode: any = {
             style: {
@@ -150,8 +158,8 @@ class Blok {
     }
 
     /** Trigger a layout of our container */
-    public invalidate(): void {
-        this.getContainer().invalidate();
+    public invalidate(opts = new LayoutOpts()): void {
+        this.getContainer().invalidate(opts);
     }
 
     /**

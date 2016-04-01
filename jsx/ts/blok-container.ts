@@ -9,6 +9,7 @@ import BlokContainerUserSettings = require("./blok-container-user-settings");
 import Rect = require("./rect");
 import BlokAdapter = require("./blok-adapter");
 import Utils = require("./utils");
+import LayoutOpts = require("./layout-opts");
 
 var JSON2 = require("JSON2");
 require("./shim/myshims");
@@ -119,7 +120,7 @@ class BlokContainer extends Blok {
     }
 
     /** Return a pre-layout css-layout node for this BlokContainer and all child Bloks */
-    public /*override*/ computeCssNode(): any {
+    public /*override*/ computeCssNode(opts = new LayoutOpts()): any {
         let cssNode = super.computeCssNode();
 
         // Handle BlokContainer-specific fixed width/height rules
@@ -166,7 +167,7 @@ class BlokContainer extends Blok {
         let blokChildren = this.getChildren();
 
         blokChildren.forEach((blok) => {
-            let childCssNode = blok.computeCssNode();
+            let childCssNode = blok.computeCssNode(opts);
 
             // Clear a dim if we're stretching a Blok child
             if (!(blok instanceof BlokContainer) &&
@@ -190,11 +191,11 @@ class BlokContainer extends Blok {
     }
 
     /** Trigger a layout */
-    public /*override*/ invalidate(): void {
+    public /*override*/ invalidate(opts = new LayoutOpts()): void {
         // Start at the root of our layout tree
         let root = this.getRootContainer();
 
-        let rootNode = root.computeCssNode();
+        let rootNode = root.computeCssNode(opts);
         cssLayout(rootNode);
 
         root.layout(undefined, rootNode);
@@ -212,6 +213,28 @@ class BlokContainer extends Blok {
         let isHeightInvalid = !Utils.nearlyEqual(this.getCachedHeight(), rect.getHeight());
 
         if (isWidthInvalid || isHeightInvalid) {
+            let sel = app.activeDocument.selection;
+            
+            if (sel.length === 1 && sel[0] && sel[0] === this._pageItem) {
+                // If this is the only thing selected, enable some ease-of-use scenarios
+                if (this.getJustifyContent() === Css.Justifications.SPACE_BETWEEN) {
+                    let opts = new LayoutOpts();
+                    
+                    if (this.getFlexDirection() === Css.FlexDirections.ROW) {
+                        opts.useCachedWidth = true;
+                    }
+                    else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
+                        opts.useCachedHeight = true;
+                    }
+                    else {
+                        throw new Error("Unknown flexDirection " + this.getFlexDirection() + " !");
+                    }
+
+                    this.invalidate(opts);
+                    return;
+                }
+            }
+
             this.invalidate();
         }
     }
