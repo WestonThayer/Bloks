@@ -304,3 +304,28 @@ export function getActionsFromSelection(): { action: number, blok: any } {
         raiseException(ex);
     }
 }
+
+/**
+ * Look for PageItems with ".spacer" in their name and change their opacity.
+ *
+ * @param opacity - the new opacity value
+ */
+function changeSpacerOpacity(opacity: number): void {
+    let pageItems = app.activeDocument.pageItems;
+
+    for (let i = 0; i < pageItems.length; i++) {
+        let pageItem = pageItems[i];
+
+        if (pageItem.name && pageItem.name.indexOf(".spacer", 0) !== -1) {
+            pageItem.opacity = opacity;
+        }
+    }
+}
+
+export function hideSpacers(): void {
+    changeSpacerOpacity(0.0);
+}
+
+export function showSpacers(): void {
+    changeSpacerOpacity(100.0);
+}

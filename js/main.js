@@ -102,6 +102,12 @@
             },
             relayoutSelection: function() {
                 csInterface.evalScript("loader(7).relayoutSelection()");
+            },
+            hideSpacers: function() {
+                csInterface.evalScript("loader(7).hideSpacers()");
+            },
+            showSpacers: function() {
+                csInterface.evalScript("loader(7).showSpacers()");
             }
         };
     })();
@@ -249,6 +255,15 @@
         // Force a layout
         $("#layout-btn").click(function() {
             BlokScripts.relayoutSelection();
+        });
+        
+        // Easy show/hide of .spacer PageItems
+        $("#spacer-hide-btn").click(function() {
+            BlokScripts.hideSpacers();
+        });
+        
+        $("#spacer-show-btn").click(function() {
+            BlokScripts.showSpacers();
         });
 
 
