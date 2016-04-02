@@ -315,9 +315,25 @@ function changeSpacerOpacity(opacity: number): void {
 
     for (let i = 0; i < pageItems.length; i++) {
         let pageItem = pageItems[i];
+        let name = pageItem.name;
 
-        if (pageItem.name && pageItem.name.indexOf(".spacer", 0) !== -1) {
-            pageItem.opacity = opacity;
+        if (!name && pageItem.symbol) {
+            name = pageItem.symbol.name;
+        }
+
+        if (name) {
+            let key = ".spacer";
+
+            if (name === key) { // exact match
+                pageItem.opacity = opacity;
+            }
+            else if (name.indexOf(key, 0) !== -1) {
+                if (name.indexOf(key + " ", 0) === 0 || // start of the string
+                    name.indexOf(" " + key) === ((name.length - key.length) - 1) || // end of the string
+                    name.indexOf(" " + key + " ", 0) !== -1) { // inside of the string
+                    pageItem.opacity = opacity;
+                }
+            }
         }
     }
 }
