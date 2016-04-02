@@ -45,7 +45,9 @@ function getBlokTagType(pageItem: any): string {
 }
 
 /**
- * Checks to see if a Blok is already attached to the given pageItem.
+ * Checks to see if a Blok is already attached to the given PageItem, but
+ * will also return true if the PageItem is the child of a BlokContainer,
+ * since any direct child of a BlokContainer is ALWAYS a Blok.
  *
  * Note: this doesn't care about OOP inheritance. Will not return true
  * for a descendent of Blok.
@@ -53,7 +55,16 @@ function getBlokTagType(pageItem: any): string {
  * @param pageItem - item to check
  */
 export function isBlokAttached(pageItem: any): boolean {
-    return getBlokTagType(pageItem) === "Blok";
+    let attached = getBlokTagType(pageItem) === "Blok";
+
+    if (!attached) {
+        // Check to see if it SHOULD be a Blok (has a BlokContainer as parent)
+        if (pageItem.parent && isBlokContainerAttached(pageItem.parent)) {
+            attached = true;
+        }
+    }
+
+    return attached;
 }
 
 /**
