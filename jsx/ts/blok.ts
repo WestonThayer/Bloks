@@ -233,79 +233,29 @@ class Blok {
 
         // Apply
 
-        if (isScaleRequested && this._pageItem.typename === "TextFrame" && this._pageItem.kind === TextType.AREATEXT) {
+        if (this._pageItem.typename === "TextFrame" && this._pageItem.kind === TextType.AREATEXT) {
             // If you transform area type, it'll scale instead of just resizing the bounding box.
-            // The crazy thing is -- there's no method to resize it's bounding box. The only way to
-            // touch it at all is to create a brand new area type object...
-            // This scenario is important... so that's what we do :(
+            // You have to manipulate the TextPath
 
-            // First we have to write down the z index
-            let z = 0; // 0 is top of Z stack
+            let horizontalScale = this.getCachedTextHorizontalScale();
 
-            for (let i = 0; i < this._pageItem.parent.pageItems.length; i++) {
-                if (this._pageItem.parent.pageItems[i] === this._pageItem) {
-                    z = i;
-                    break;
-                }
+            if (horizontalScale === 100 && this._pageItem.textRange.horizontalScale !== 100) {
+                // Illustrator 19.2 won't accept 100 as a value, so we just get as close as we can.
+                // https://forums.adobe.com/message/8651137#8651137
+                horizontalScale = 100.01;
             }
 
-            // Create a path with our desired location and size
-            let tmpRect = this._pageItem.parent.pathItems.rectangle(
-                this._pageItem.geometricBounds[1] + aiDeltaY, /*top*/
-                this._pageItem.geometricBounds[0] + aiDeltaX, /*left*/
-                desired.getWidth(), /*width*/
-                desired.getHeight() /*height*/
-                /*reversed (optional boolean, not sure what it does)*/
-            );
+            // We could be laying out after the user resized a BlokContainer. Illustrator messes
+            // with these CharacterAttributes properties as part of the scale, which definitely
+            // isn't what the user wants, so restore from our cache.
+            this._pageItem.textRange.horizontalScale = horizontalScale;
+            this._pageItem.textRange.size = this.getCachedTextSize();
+            this._pageItem.textRange.leading = this.getCachedTextLeading();
 
-            // Create the new area type
-            let newAreaText = this._pageItem.parent.textFrames.areaText(
-                tmpRect, /*path to serve as the bounds*/
-                this._pageItem.orientation /*orientation (optional, not sure what it does, but seems safe to copy)*/
-                /*baseFrame (optional TextFrameItem. For when you have text flowing from one area text box to another, this would be the preceeding box...)*/
-                /*postFix (optional boolean, ...if you set postFix to true, then the baseFrame is the next/child box instead of the previous/parent)*/
-            );
-
-            //tmpRect.remove(); not necessary, seems to be eaten by area text. Attempting to remove will crash
-
-            // Now that we have a TextFrame area with the correct size, copy over everything we can to
-            // make this seamless
-
-            // ??? maybe this keeps the frames hooked up?
-            /*let prevFrame = this._pageItem.previousFrame;
-            let nextFrame = this._pageItem.nextFrame;*/
-
-            // Make sure this correctly preserves text content and styling
-            this._pageItem.textRange.duplicate(newAreaText);
-
-            // Track selection state
-            let wasSelected = this._pageItem.selected;
-
-            // Track all BlokSettings so we don't lose things
-            let settings = this.getUserSettings();
-
-            newAreaText.name = this._pageItem.name;
-            newAreaText.note = this._pageItem.note;
-            newAreaText.opacity = this._pageItem.opacity;
-
-            this._pageItem.remove();
-            this._pageItem = newAreaText;
-
-            // Copy the tags onto the new PageItem
-            BlokAdapter.getBlok(this._pageItem, settings);
-
-            // Fix the z order
-            for (let j = 0; j < z; j++) {
-                this._pageItem.zOrder(ZOrderMethod.SENDBACKWARD);
-            }
-
-            if (wasSelected) {
-                // Have to call redraw here or the selection won't go through
-                app.redraw();
-
-                // Select the new item
-                this._pageItem.selected = true;
-            }
+            this._pageItem.textPath.left += aiDeltaX;
+            this._pageItem.textPath.top += aiDeltaY;
+            this._pageItem.textPath.width = desired.getWidth();
+            this._pageItem.textPath.height = desired.getHeight();
 
             // Cache dims
             let curR = this.getRect();
@@ -343,6 +293,23 @@ class Blok {
         return this._pageItem === value._pageItem;
     }
 
+    /** If our PageItem is Area Type, cache some CharacterAttributes from it. Generally you should
+        call this when a Blok is first created or the user should call it after they've updated
+        some properties via Illustrator's UI. */
+    public updateCachedTextInfo(): void {
+        if (this._pageItem.typename === "TextFrame" && this._pageItem.kind === TextType.AREATEXT) {
+            // Bloks changes Illustrator's default behavior of doing a transform scale on
+            // Area Type when it's part of a GroupItem that's being resized to actually
+            // changing the Area Type's bounds (what you'd probably expect). The
+            // "transform scale" is actually Illustrator manipulating these 3 properties
+            // of CharacterAttributes. We keep a cache of them so that we can revert what
+            // Illustrator does to them when reizing a BlokContainer.
+            this.setCachedTextHorizontalScale(this._pageItem.textRange.horizontalScale);
+            this.setCachedTextSize(this._pageItem.textRange.size);
+            this.setCachedTextLeading(this._pageItem.textRange.leading);
+        }
+    }
+
     /** Optional positive number for width. Use as a cache, not used in layout */
     protected getCachedWidth(): number {
         return this.getSavedProperty<number>("cachedWidth");
@@ -367,6 +334,45 @@ class Blok {
         }
 
         this.setSavedProperty<number>("cachedHeight", value);
+    }
+
+    /** Optional cache of CharacterAttributes.horizontalScale */
+    protected getCachedTextHorizontalScale(): number {
+        return this.getSavedProperty<number>("cachedTextHorizontalScale");
+    }
+    /** Optional cache of CharacterAttributes.horizontalScale */
+    protected setCachedTextHorizontalScale(value: number): void {
+        if (value !== undefined && value < 0) {
+            throw new RangeError("Cannot set a negative cached text horizontalScale!");
+        }
+
+        this.setSavedProperty<number>("cachedTextHorizontalScale", value);
+    }
+
+    /** Optional cache of CharacterAttributes.size */
+    protected getCachedTextSize(): number {
+        return this.getSavedProperty<number>("cachedTextSize");
+    }
+    /** Optional cache of CharacterAttributes.size */
+    protected setCachedTextSize(value: number): void {
+        if (value !== undefined && value < 0) {
+            throw new RangeError("Cannot set a negative cached text size!");
+        }
+
+        this.setSavedProperty<number>("cachedTextSize", value);
+    }
+
+    /** Optional cache of CharacterAttributes.leading */
+    protected getCachedTextLeading(): number {
+        return this.getSavedProperty<number>("cachedTextLeading");
+    }
+    /** Optional cache of CharacterAttributes.leading */
+    protected setCachedTextLeading(value: number): void {
+        if (value !== undefined && value < 0) {
+            throw new RangeError("Cannot set a negative cached text leading!");
+        }
+
+        this.setSavedProperty<number>("cachedTextLeading", value);
     }
 
     /** Retrieve a property from the pageItem's tags. */

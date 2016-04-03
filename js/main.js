@@ -8,6 +8,7 @@
             this.isChildSettingsVisible = ko.observable(false);
             this.isCreateButtonVisible = ko.observable(false);
             this.isLayoutButtonVisible = ko.observable(false);
+            this.isAreaTextButtonVisible = ko.observable(false);
             
             // Blok settings
             this.flex = undefined;
@@ -108,6 +109,9 @@
             },
             showSpacers: function() {
                 csInterface.evalScript("loader(7).showSpacers()");
+            },
+            updateAreaText: function() {
+                csInterface.evalScript("loader(7).updateAreaText()");
             }
         };
     })();
@@ -167,6 +171,7 @@
                     viewModel.isContainerSettingsVisible(false);
                     viewModel.isCreateButtonVisible(false);
                     viewModel.isLayoutButtonVisible(false);
+                    viewModel.isAreaTextButtonVisible(false);
                 }
                 else if (result.action === 1) {
                     // Container sel
@@ -183,6 +188,7 @@
                     viewModel.isContainerSettingsVisible(true);
                     viewModel.isCreateButtonVisible(false);
                     viewModel.isLayoutButtonVisible(true);
+                    viewModel.isAreaTextButtonVisible(false);
 
                     viewModel.flexDirection(result.blok.flexDirection);
                     viewModel.justifyContent(result.blok.justifyContent);
@@ -196,6 +202,13 @@
                     viewModel.isCreateButtonVisible(false);
                     viewModel.isLayoutButtonVisible(true);
                     
+                    if (result.blok.isAreaText) {
+                        viewModel.isAreaTextButtonVisible(true);
+                    }
+                    else {
+                        viewModel.isAreaTextButtonVisible(false);
+                    }
+                    
                     viewMode.alignSelf(result.blok.alignSelf);
                 }
                 else if (result.action === 3) {
@@ -205,6 +218,7 @@
                     viewModel.isContainerSettingsVisible(true);
                     viewModel.isCreateButtonVisible(true);
                     viewModel.isLayoutButtonVisible(false);
+                    viewModel.isAreaTextButtonVisible(false);
                     viewModel.flexDirection(0);
                     viewModel.justifyContent(0);
                     viewModel.alignItems(0);
@@ -255,6 +269,10 @@
         // Force a layout
         $("#layout-btn").click(function() {
             BlokScripts.relayoutSelection();
+        });
+        
+        $("#area-text-btn").click(function() {
+            BlokScripts.updateAreaText();
         });
         
         // Easy show/hide of .spacer PageItems

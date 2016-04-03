@@ -45,9 +45,7 @@ function getBlokTagType(pageItem: any): string {
 }
 
 /**
- * Checks to see if a Blok is already attached to the given PageItem, but
- * will also return true if the PageItem is the child of a BlokContainer,
- * since any direct child of a BlokContainer is ALWAYS a Blok.
+ * Checks to see if a Blok is already attached to the given PageItem.
  *
  * Note: this doesn't care about OOP inheritance. Will not return true
  * for a descendent of Blok.
@@ -55,16 +53,19 @@ function getBlokTagType(pageItem: any): string {
  * @param pageItem - item to check
  */
 export function isBlokAttached(pageItem: any): boolean {
-    let attached = getBlokTagType(pageItem) === "Blok";
+    return getBlokTagType(pageItem) === "Blok";
+}
 
-    if (!attached) {
-        // Check to see if it SHOULD be a Blok (has a BlokContainer as parent)
-        if (pageItem.parent && isBlokContainerAttached(pageItem.parent)) {
-            attached = true;
-        }
-    }
-
-    return attached;
+/**
+ * Checks to see if the PageItem is the child of a BlokContainer, since
+ * any direct child of a BlokContainer is ALWAYS a Blok. Returns false
+ * if the PageItem has a BlokContainer attached to it.
+ *
+ * @param pageItem - item to check
+ */
+export function shouldBlokBeAttached(pageItem: any): boolean {
+    // Check to see if it SHOULD be a Blok (has a BlokContainer as parent)
+    return pageItem.parent && isBlokContainerAttached(pageItem.parent) && !isBlokContainerAttached(pageItem);
 }
 
 /**
@@ -136,12 +137,17 @@ export function getBlok(pageItem: any, settings?: BlokUserSettings): Blok {
         return undefined;
     }
 
+    let isNew = !isBlokAttached(pageItem);
     setSavedProperty<string>(pageItem, "type", "Blok");
 
     let blok = new Blok(pageItem);
 
     if (settings) {
         blok.setUserSettings(settings);
+    }
+
+    if (isNew) {
+        blok.updateCachedTextInfo();
     }
 
     return blok;

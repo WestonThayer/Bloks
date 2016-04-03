@@ -40,7 +40,7 @@ export function checkSelectionForRelayout(): void {
             let pageItem = sel[0];
 
             if (pageItem) { // can be undefined when text ranges are selected
-                if (BlokAdapter.isBlokAttached(pageItem)) {
+                if (BlokAdapter.shouldBlokBeAttached(pageItem)) {
                     let blok = BlokAdapter.getBlok(pageItem);
 
                     if (blok) {
@@ -59,7 +59,7 @@ export function checkSelectionForRelayout(): void {
                     for (let i = 0; i < app.activeDocument.symbolItems.length; i++) {
                         let symItem = app.activeDocument.symbolItems[i];
 
-                        if (symItem.symbol.name === symName && BlokAdapter.isBlokAttached(symItem)) {
+                        if (symItem.symbol.name === symName && BlokAdapter.shouldBlokBeAttached(symItem)) {
                             let blok = BlokAdapter.getBlok(symItem);
 
                             // Illustrator will refuse to run layout because we're in Symbol Editing Mode, so make a
@@ -113,7 +113,7 @@ export function relayoutSelection(): void {
         if (sel.length === 1) {
             let pageItem = sel[0];
 
-            if (BlokAdapter.isBlokAttached(pageItem)) {
+            if (BlokAdapter.shouldBlokBeAttached(pageItem)) {
                 let blok = BlokAdapter.getBlok(pageItem);
 
                 if (blok) {
@@ -142,7 +142,7 @@ export function updateSelectedBlok(settings: BlokUserSettings): void {
         if (sel.length === 1) {
             let pageItem = sel[0];
 
-            if (!BlokAdapter.isBlokAttached(pageItem)) {
+            if (!BlokAdapter.shouldBlokBeAttached(pageItem)) {
                 throw new Error("We're not updating a Blok!");
             }
 
@@ -270,12 +270,16 @@ export function getActionsFromSelection(): { action: number, blok: any } {
             let pageItem = selection[0];
 
             if (pageItem) { // can be undefined for text ranges
-                if (BlokAdapter.isBlokAttached(pageItem)) {
+                if (BlokAdapter.shouldBlokBeAttached(pageItem)) {
                     let blok = BlokAdapter.getBlok(pageItem);
 
                     if (blok) {
                         ret.action = 2;
                         ret.blok = blok.getUserSettings();
+
+                        if (pageItem.typename === "TextFrame" && pageItem.kind === TextType.AREATEXT) {
+                            ret.blok.isAreaText = true;
+                        }
                     }
                 }
                 else if (BlokAdapter.isBlokContainerAttached(pageItem)) {
@@ -311,30 +315,35 @@ export function getActionsFromSelection(): { action: number, blok: any } {
  * @param opacity - the new opacity value
  */
 function changeSpacerOpacity(opacity: number): void {
-    let pageItems = app.activeDocument.pageItems;
+    try {
+        let pageItems = app.activeDocument.pageItems;
 
-    for (let i = 0; i < pageItems.length; i++) {
-        let pageItem = pageItems[i];
-        let name = pageItem.name;
+        for (let i = 0; i < pageItems.length; i++) {
+            let pageItem = pageItems[i];
+            let name = pageItem.name;
 
-        if (!name && pageItem.symbol) {
-            name = pageItem.symbol.name;
-        }
-
-        if (name) {
-            let key = ".spacer";
-
-            if (name === key) { // exact match
-                pageItem.opacity = opacity;
+            if (!name && pageItem.symbol) {
+                name = pageItem.symbol.name;
             }
-            else if (name.indexOf(key, 0) !== -1) {
-                if (name.indexOf(key + " ", 0) === 0 || // start of the string
-                    name.indexOf(" " + key) === ((name.length - key.length) - 1) || // end of the string
-                    name.indexOf(" " + key + " ", 0) !== -1) { // inside of the string
+
+            if (name) {
+                let key = ".spacer";
+
+                if (name === key) { // exact match
                     pageItem.opacity = opacity;
+                }
+                else if (name.indexOf(key, 0) !== -1) {
+                    if (name.indexOf(key + " ", 0) === 0 || // start of the string
+                        name.indexOf(" " + key) === ((name.length - key.length) - 1) || // end of the string
+                        name.indexOf(" " + key + " ", 0) !== -1) { // inside of the string
+                        pageItem.opacity = opacity;
+                    }
                 }
             }
         }
+    }
+    catch (ex) {
+        raiseException(ex);
     }
 }
 
@@ -344,4 +353,27 @@ export function hideSpacers(): void {
 
 export function showSpacers(): void {
     changeSpacerOpacity(100.0);
+}
+
+export function updateAreaText(): void {
+    try {
+        let sel = app.activeDocument.selection;
+
+        if (sel.length === 1) {
+            let pageItem = sel[0];
+
+            if (!BlokAdapter.shouldBlokBeAttached(pageItem)) {
+                throw new Error("We're not updating a Blok!");
+            }
+
+            let blok = BlokAdapter.getBlok(pageItem);
+            blok.updateCachedTextInfo();
+        }
+        else {
+            throw new Error("Can only update one Blok at a time!");
+        }
+    }
+    catch (ex) {
+        raiseException(ex);
+    }
 }
