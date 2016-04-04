@@ -136,18 +136,13 @@ export function getBlok(pageItem: any, settings?: BlokUserSettings): Blok {
 
         return undefined;
     }
-
-    let isNew = !isBlokAttached(pageItem);
+    
     setSavedProperty<string>(pageItem, "type", "Blok");
 
     let blok = new Blok(pageItem);
 
     if (settings) {
         blok.setUserSettings(settings);
-    }
-
-    if (isNew) {
-        blok.updateCachedTextInfo();
     }
 
     return blok;

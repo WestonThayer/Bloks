@@ -44,7 +44,7 @@ ASErr BloksAIPlugin::StartupPlugin(SPInterfaceMessage *message)
 		error = sAINotifier->AddNotifier(
 			fPluginRef,
 			"Bloks",
-			kAIArtSelectionChangedNotifier,
+			kAIArtPropertiesChangedNotifier, // Art properties changed is like SelectionChanged, but more complete
 			&fRegisterSelectionChangedHandle);
 	}
 

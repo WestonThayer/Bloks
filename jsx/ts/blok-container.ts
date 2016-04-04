@@ -198,10 +198,10 @@ class BlokContainer extends Blok {
         let rootNode = root.computeCssNode(opts);
         cssLayout(rootNode);
 
-        root.layout(undefined, rootNode);
+        root.layout(undefined, rootNode, opts);
     }
 
-    public /*override*/ checkForRelayout(): void {
+    public /*override*/ checkForRelayout(lastSelection: any): void {
         // Short circut for new child count
         if (this.getCachedChildCount() !== this._pageItem.pageItems.length) {
             this.invalidate();
@@ -215,8 +215,10 @@ class BlokContainer extends Blok {
         if (isWidthInvalid || isHeightInvalid) {
             let sel = app.activeDocument.selection;
             
-            if (sel.length === 1 && sel[0] && sel[0] === this._pageItem) {
-                // If this is the only thing selected, enable some ease-of-use scenarios
+            if ((sel.length === 1 && sel[0] && sel[0] === this._pageItem) &&
+                (lastSelection.length === 1 && lastSelection[0] && lastSelection[0] === this._pageItem)) {
+                // If this was the only thing selected for the past 2 selections and our size changed in
+                // betwen selections, enable some ease- of - use scenarios
                 if (this.getJustifyContent() === Css.Justifications.SPACE_BETWEEN) {
                     let opts = new LayoutOpts();
                     
@@ -229,6 +231,8 @@ class BlokContainer extends Blok {
                     else {
                         throw new Error("Unknown flexDirection " + this.getFlexDirection() + " !");
                     }
+
+                    opts.useCachedTextInfo = true;
 
                     this.invalidate(opts);
                     return;
@@ -298,8 +302,9 @@ class BlokContainer extends Blok {
      * @param desired - a rectangle for the new location and size. Possibly ignored
      *                  depending on settings
      * @param rootNode - a matching CSS node with full style and layout information
+     * @param opts - layout options
      */
-    public /*override*/ layout(desired: Rect, rootNode: any): void {
+    public /*override*/ layout(desired: Rect, rootNode: any, opts = new LayoutOpts()): void {
         // Layout our children
         let children = this.getChildren();
 
@@ -314,12 +319,12 @@ class BlokContainer extends Blok {
             blokRect.setWidth(node.layout.width);
             blokRect.setHeight(node.layout.height);
 
-            blok.layout(blokRect, node);
+            blok.layout(blokRect, node, opts);
         }
 
         if (desired) {
             // Layout ourselves
-            super.layout(desired, undefined);
+            super.layout(desired, undefined, opts);
         }
 
         let curR = this.getRect();

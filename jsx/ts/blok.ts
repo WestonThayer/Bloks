@@ -165,8 +165,10 @@ class Blok {
     /**
      * Check the art's actual dimensions against cachedWidth and cachedHeight. If
      * they don't match, then ask the parent BlokContainer to re-layout.
+     *
+     * @param lastSelection - the last known selection
      */
-    public checkForRelayout(): void {
+    public checkForRelayout(lastSelection: any): void {
         let rect = this.getRect();
 
         let isWidthInvalid = !Utils.nearlyEqual(this.getCachedWidth(), rect.getWidth());
@@ -174,6 +176,13 @@ class Blok {
 
         if (isWidthInvalid || isHeightInvalid) {
             this.getContainer().invalidate();
+        }
+
+        if (this._pageItem.typename === "TextFrame" && this._pageItem.kind === TextType.AREATEXT) {
+            // Update text cache
+            this.setCachedTextHorizontalScale(this._pageItem.textRange.horizontalScale);
+            this.setCachedTextSize(this._pageItem.textRange.size);
+            this.setCachedTextLeading(this._pageItem.textRange.leading);
         }
     }
 
@@ -209,8 +218,9 @@ class Blok {
      *
      * @param desired - a rectangle for the new location and size
      * @param rootNode - a matching CSS node with full style and layout information, possibly undefined
+     * @param opts - layout options
      */
-    public layout(desired: Rect, rootNode: any): void {
+    public layout(desired: Rect, rootNode: any, opts = new LayoutOpts()): void {
         let actual = this.getRect();
 
         let transformMatrix = app.getIdentityMatrix();
@@ -234,24 +244,39 @@ class Blok {
         // Apply
 
         if (this._pageItem.typename === "TextFrame" && this._pageItem.kind === TextType.AREATEXT) {
-            // If you transform area type, it'll scale instead of just resizing the bounding box.
-            // You have to manipulate the TextPath
+            if (opts.useCachedTextInfo) {
+                // Bloks changes Illustrator's default behavior of doing a transform scale on
+                // Area Type when it's part of a GroupItem that's being resized to actually
+                // changing the Area Type's bounds (what you'd probably expect). The
+                // "transform scale" is actually Illustrator manipulating these 3 properties
+                // of CharacterAttributes. We keep a cache of them so that we can revert what
+                // Illustrator does to them when reizing a BlokContainer.
+                let horizontalScale = this.getCachedTextHorizontalScale();
+                let size = this.getCachedTextSize();
+                let leading = this.getCachedTextLeading();
 
-            let horizontalScale = this.getCachedTextHorizontalScale();
+                if (horizontalScale !== undefined) {
+                    this._pageItem.textRange.horizontalScale = horizontalScale;
 
-            if (horizontalScale === 100 && this._pageItem.textRange.horizontalScale !== 100) {
-                // Illustrator 19.2 won't accept 100 as a value, so we just get as close as we can.
-                // https://forums.adobe.com/message/8651137#8651137
-                horizontalScale = 100.01;
+                    if (horizontalScale === 100 && this._pageItem.textRange.horizontalScale !== 100) {
+                        // Illustrator 19.2 might not accept 100 as a value, so we just get as close as we can.
+                        // https://forums.adobe.com/message/8651137#8651137
+                        horizontalScale = 100.01;
+                        this._pageItem.textRange.horizontalScale = horizontalScale;
+                    }
+                }
+
+                if (size !== undefined) {
+                    this._pageItem.textRange.size = size;
+                }
+
+                if (leading !== undefined) {
+                    this._pageItem.textRange.leading = leading;
+                }
             }
 
-            // We could be laying out after the user resized a BlokContainer. Illustrator messes
-            // with these CharacterAttributes properties as part of the scale, which definitely
-            // isn't what the user wants, so restore from our cache.
-            this._pageItem.textRange.horizontalScale = horizontalScale;
-            this._pageItem.textRange.size = this.getCachedTextSize();
-            this._pageItem.textRange.leading = this.getCachedTextLeading();
-
+            // If you transform area type, it'll scale instead of just resizing the bounding box.
+            // You have to manipulate the TextPath
             this._pageItem.textPath.left += aiDeltaX;
             this._pageItem.textPath.top += aiDeltaY;
             this._pageItem.textPath.width = desired.getWidth();
@@ -261,6 +286,11 @@ class Blok {
             let curR = this.getRect();
             this.setCachedWidth(curR.getWidth());
             this.setCachedHeight(curR.getHeight());
+
+            // Update text cache
+            this.setCachedTextHorizontalScale(this._pageItem.textRange.horizontalScale);
+            this.setCachedTextSize(this._pageItem.textRange.size);
+            this.setCachedTextLeading(this._pageItem.textRange.leading);
         }
         else {
             if (isScaleRequested || !Utils.nearlyEqual(aiDeltaX, 0) || !Utils.nearlyEqual(aiDeltaY, 0)) {
@@ -291,23 +321,6 @@ class Blok {
      */
     public equals(value: Blok): boolean {
         return this._pageItem === value._pageItem;
-    }
-
-    /** If our PageItem is Area Type, cache some CharacterAttributes from it. Generally you should
-        call this when a Blok is first created or the user should call it after they've updated
-        some properties via Illustrator's UI. */
-    public updateCachedTextInfo(): void {
-        if (this._pageItem.typename === "TextFrame" && this._pageItem.kind === TextType.AREATEXT) {
-            // Bloks changes Illustrator's default behavior of doing a transform scale on
-            // Area Type when it's part of a GroupItem that's being resized to actually
-            // changing the Area Type's bounds (what you'd probably expect). The
-            // "transform scale" is actually Illustrator manipulating these 3 properties
-            // of CharacterAttributes. We keep a cache of them so that we can revert what
-            // Illustrator does to them when reizing a BlokContainer.
-            this.setCachedTextHorizontalScale(this._pageItem.textRange.horizontalScale);
-            this.setCachedTextSize(this._pageItem.textRange.size);
-            this.setCachedTextLeading(this._pageItem.textRange.leading);
-        }
     }
 
     /** Optional positive number for width. Use as a cache, not used in layout */
