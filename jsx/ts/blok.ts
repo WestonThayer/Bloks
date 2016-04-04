@@ -170,11 +170,14 @@ class Blok {
      */
     public checkForRelayout(lastSelection: any): void {
         let rect = this.getRect();
+        let z = this.getZIndex();
+        let cachedZ = this.getCachedZIndex();
 
         let isWidthInvalid = !Utils.nearlyEqual(this.getCachedWidth(), rect.getWidth());
         let isHeightInvalid = !Utils.nearlyEqual(this.getCachedHeight(), rect.getHeight());
+        let isZIndexInvalid = cachedZ !== undefined && cachedZ !== z;
 
-        if (isWidthInvalid || isHeightInvalid) {
+        if (isWidthInvalid || isHeightInvalid || isZIndexInvalid) {
             this.getContainer().invalidate();
         }
 
@@ -184,6 +187,9 @@ class Blok {
             this.setCachedTextSize(this._pageItem.textRange.size);
             this.setCachedTextLeading(this._pageItem.textRange.leading);
         }
+        
+        // Update z index cache
+        this.setCachedZIndex(z);
     }
 
     /** A reference to the parent BlokContainer */
@@ -323,6 +329,19 @@ class Blok {
         return this._pageItem === value._pageItem;
     }
 
+    public getZIndex(): number {
+        let index = -1;
+
+        for (let i = 0; i < this._pageItem.parent.pageItems.length; i++) {
+            if (this._pageItem === this._pageItem.parent.pageItems[i]) {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+    }
+
     /** Optional positive number for width. Use as a cache, not used in layout */
     protected getCachedWidth(): number {
         return this.getSavedProperty<number>("cachedWidth");
@@ -386,6 +405,19 @@ class Blok {
         }
 
         this.setSavedProperty<number>("cachedTextLeading", value);
+    }
+
+    /** Optional cache of layer position */
+    public getCachedZIndex(): number {
+        return this.getSavedProperty<number>("cachedZIndex");
+    }
+    /** Optional cache of layer position */
+    public setCachedZIndex(value: number): void {
+        if (value !== undefined && value < 0) {
+            throw new RangeError("Cannot set a negative cached z index!");
+        }
+
+        this.setSavedProperty<number>("cachedZIndex", value);
     }
 
     /** Retrieve a property from the pageItem's tags. */

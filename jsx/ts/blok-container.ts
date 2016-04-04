@@ -202,45 +202,80 @@ class BlokContainer extends Blok {
     }
 
     public /*override*/ checkForRelayout(lastSelection: any): void {
-        // Short circut for new child count
+        let z = this.getZIndex();
+        let cachedZ = this.getCachedZIndex();
+        let isZIndexInvalid = cachedZ !== undefined && cachedZ !== z;
+
         if (this.getCachedChildCount() !== this._pageItem.pageItems.length) {
+            // Short circut for new child count
             this.invalidate();
-            return;
         }
+        else {
+            let rect = this.getRect();
 
-        let rect = this.getRect();
-        let isWidthInvalid = !Utils.nearlyEqual(this.getCachedWidth(), rect.getWidth());
-        let isHeightInvalid = !Utils.nearlyEqual(this.getCachedHeight(), rect.getHeight());
+            let isWidthInvalid = !Utils.nearlyEqual(this.getCachedWidth(), rect.getWidth());
+            let isHeightInvalid = !Utils.nearlyEqual(this.getCachedHeight(), rect.getHeight());
 
-        if (isWidthInvalid || isHeightInvalid) {
-            let sel = app.activeDocument.selection;
-            
-            if ((sel.length === 1 && sel[0] && sel[0] === this._pageItem) &&
-                (lastSelection.length === 1 && lastSelection[0] && lastSelection[0] === this._pageItem)) {
-                // If this was the only thing selected for the past 2 selections and our size changed in
-                // betwen selections, enable some ease- of - use scenarios
-                if (this.getJustifyContent() === Css.Justifications.SPACE_BETWEEN) {
-                    let opts = new LayoutOpts();
-                    
-                    if (this.getFlexDirection() === Css.FlexDirections.ROW) {
-                        opts.useCachedWidth = true;
+            if (isWidthInvalid || isHeightInvalid) {
+                let sel = app.activeDocument.selection;
+
+                if ((sel.length === 1 && sel[0] && sel[0] === this._pageItem) &&
+                    (lastSelection.length === 1 && lastSelection[0] && lastSelection[0] === this._pageItem)) {
+                    // If this was the only thing selected for the past 2 selections and our size changed in
+                    // betwen selections, enable some ease-of-use scenarios
+                    if (this.getJustifyContent() === Css.Justifications.SPACE_BETWEEN) {
+                        let opts = new LayoutOpts();
+
+                        if (this.getFlexDirection() === Css.FlexDirections.ROW) {
+                            opts.useCachedWidth = true;
+                        }
+                        else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
+                            opts.useCachedHeight = true;
+                        }
+                        else {
+                            throw new Error("Unknown flexDirection " + this.getFlexDirection() + " !");
+                        }
+
+                        opts.useCachedTextInfo = true;
+
+                        this.invalidate(opts);
                     }
-                    else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
-                        opts.useCachedHeight = true;
-                    }
-                    else {
-                        throw new Error("Unknown flexDirection " + this.getFlexDirection() + " !");
-                    }
-
-                    opts.useCachedTextInfo = true;
-
-                    this.invalidate(opts);
-                    return;
+                }
+                else {
+                    this.invalidate();
                 }
             }
+            else {
+                if (isZIndexInvalid) {
+                    // We are a Blok child that is at a new z
+                    this.invalidate();
+                }
+                else {
+                    // Check to see if one of our Blok children is out of order
+                    let children = this.getChildren();
+                    let shouldInvalidate = false;
 
-            this.invalidate();
+                    for (let i = 0; i < children.length; i++) {
+                        let child = children[i];
+                        let childZ = child.getZIndex();
+                        let cachedChildZ = child.getCachedZIndex();
+
+                        if (cachedChildZ !== undefined && cachedChildZ != childZ) {
+                            shouldInvalidate = true;
+                        }
+
+                        child.setCachedZIndex(childZ);
+                    }
+
+                    if (shouldInvalidate) {
+                        this.invalidate();
+                    }
+                }
+            }
         }
+        
+        // Update z index cache
+        this.setCachedZIndex(z);
     }
 
     /** A (possible) reference to the parent BlokContainer */
