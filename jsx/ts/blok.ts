@@ -180,13 +180,6 @@ class Blok {
         if (isWidthInvalid || isHeightInvalid || isZIndexInvalid) {
             this.getContainer().invalidate();
         }
-
-        if (this._pageItem.typename === "TextFrame" && this._pageItem.kind === TextType.AREATEXT) {
-            // Update text cache
-            this.setCachedTextHorizontalScale(this._pageItem.textRange.horizontalScale);
-            this.setCachedTextSize(this._pageItem.textRange.size);
-            this.setCachedTextLeading(this._pageItem.textRange.leading);
-        }
         
         // Update z index cache
         this.setCachedZIndex(z);
@@ -250,37 +243,6 @@ class Blok {
         // Apply
 
         if (this._pageItem.typename === "TextFrame" && this._pageItem.kind === TextType.AREATEXT) {
-            if (opts.useCachedTextInfo) {
-                // Bloks changes Illustrator's default behavior of doing a transform scale on
-                // Area Type when it's part of a GroupItem that's being resized to actually
-                // changing the Area Type's bounds (what you'd probably expect). The
-                // "transform scale" is actually Illustrator manipulating these 3 properties
-                // of CharacterAttributes. We keep a cache of them so that we can revert what
-                // Illustrator does to them when reizing a BlokContainer.
-                let horizontalScale = this.getCachedTextHorizontalScale();
-                let size = this.getCachedTextSize();
-                let leading = this.getCachedTextLeading();
-
-                if (horizontalScale !== undefined) {
-                    this._pageItem.textRange.horizontalScale = horizontalScale;
-
-                    if (horizontalScale === 100 && this._pageItem.textRange.horizontalScale !== 100) {
-                        // Illustrator 19.2 might not accept 100 as a value, so we just get as close as we can.
-                        // https://forums.adobe.com/message/8651137#8651137
-                        horizontalScale = 100.01;
-                        this._pageItem.textRange.horizontalScale = horizontalScale;
-                    }
-                }
-
-                if (size !== undefined) {
-                    this._pageItem.textRange.size = size;
-                }
-
-                if (leading !== undefined) {
-                    this._pageItem.textRange.leading = leading;
-                }
-            }
-
             // If you transform area type, it'll scale instead of just resizing the bounding box.
             // You have to manipulate the TextPath
             this._pageItem.textPath.left += aiDeltaX;
@@ -292,11 +254,6 @@ class Blok {
             let curR = this.getRect();
             this.setCachedWidth(curR.getWidth());
             this.setCachedHeight(curR.getHeight());
-
-            // Update text cache
-            this.setCachedTextHorizontalScale(this._pageItem.textRange.horizontalScale);
-            this.setCachedTextSize(this._pageItem.textRange.size);
-            this.setCachedTextLeading(this._pageItem.textRange.leading);
         }
         else {
             if (isScaleRequested || !Utils.nearlyEqual(aiDeltaX, 0) || !Utils.nearlyEqual(aiDeltaY, 0)) {
@@ -366,45 +323,6 @@ class Blok {
         }
 
         this.setSavedProperty<number>("cachedHeight", value);
-    }
-
-    /** Optional cache of CharacterAttributes.horizontalScale */
-    protected getCachedTextHorizontalScale(): number {
-        return this.getSavedProperty<number>("cachedTextHorizontalScale");
-    }
-    /** Optional cache of CharacterAttributes.horizontalScale */
-    protected setCachedTextHorizontalScale(value: number): void {
-        if (value !== undefined && value < 0) {
-            throw new RangeError("Cannot set a negative cached text horizontalScale!");
-        }
-
-        this.setSavedProperty<number>("cachedTextHorizontalScale", value);
-    }
-
-    /** Optional cache of CharacterAttributes.size */
-    protected getCachedTextSize(): number {
-        return this.getSavedProperty<number>("cachedTextSize");
-    }
-    /** Optional cache of CharacterAttributes.size */
-    protected setCachedTextSize(value: number): void {
-        if (value !== undefined && value < 0) {
-            throw new RangeError("Cannot set a negative cached text size!");
-        }
-
-        this.setSavedProperty<number>("cachedTextSize", value);
-    }
-
-    /** Optional cache of CharacterAttributes.leading */
-    protected getCachedTextLeading(): number {
-        return this.getSavedProperty<number>("cachedTextLeading");
-    }
-    /** Optional cache of CharacterAttributes.leading */
-    protected setCachedTextLeading(value: number): void {
-        if (value !== undefined && value < 0) {
-            throw new RangeError("Cannot set a negative cached text leading!");
-        }
-
-        this.setSavedProperty<number>("cachedTextLeading", value);
     }
 
     /** Optional cache of layer position */

@@ -126,6 +126,12 @@ class BlokContainer extends Blok {
         // Handle BlokContainer-specific fixed width/height rules
         let w = cssNode.style.width;
         let h = cssNode.style.height;
+
+        if (opts.desiredContainerRect) {
+            w = opts.desiredContainerRect.getWidth();
+            h = opts.desiredContainerRect.getHeight();
+        }
+
         cssNode.style.width = undefined;
         cssNode.style.height = undefined;
 
@@ -236,7 +242,15 @@ class BlokContainer extends Blok {
                             throw new Error("Unknown flexDirection " + this.getFlexDirection() + " !");
                         }
 
-                        opts.useCachedTextInfo = true;
+                        // keep our rect
+                        opts.desiredContainerRect = rect;
+                        
+                        // Illustrator messes with CharacterAttributes size, leading, and horizontalScale
+                        // when you scale a GroupItem that contains a TextFrameItem that is AREATEXT (Area Type).
+                        // Attempting to fix those values is difficult, since a TextFrameItem can have many
+                        // TextRanges, all with different settings. Rather than attempt to store/restore those
+                        // values, we just undo the resize, but not before we record our new desired size.
+                        app.undo();
 
                         this.invalidate(opts);
                     }
