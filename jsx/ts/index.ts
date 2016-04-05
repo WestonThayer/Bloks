@@ -361,7 +361,19 @@ function changeSpacerOpacity(opacity: number): void {
                     if (name.indexOf(key + " ", 0) === 0 || // start of the string
                         name.indexOf(" " + key) === ((name.length - key.length) - 1) || // end of the string
                         name.indexOf(" " + key + " ", 0) !== -1) { // inside of the string
-                        pageItem.opacity = opacity;
+
+                        try {
+                            pageItem.opacity = opacity;
+                        }
+                        catch (ex) {
+                            if (ex.message === "Target layer cannot be modified") {
+                                // That's OK, it's in Isolation Mode. We'll do what we can, the
+                                // user can always exit Isolation Mode and try again.
+                            }
+                            else {
+                                throw ex;
+                            }
+                        }
                     }
                 }
             }
