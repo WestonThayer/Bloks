@@ -9,7 +9,6 @@ import BlokContainerUserSettings = require("./blok-container-user-settings");
 import Rect = require("./rect");
 import BlokAdapter = require("./blok-adapter");
 import Utils = require("./utils");
-import LayoutOpts = require("./layout-opts");
 
 var JSON2 = require("JSON2");
 require("./shim/myshims");
@@ -120,32 +119,25 @@ class BlokContainer extends Blok {
     }
 
     /** Return a pre-layout css-layout node for this BlokContainer and all child Bloks */
-    public /*override*/ computeCssNode(opts = new LayoutOpts()): any {
+    public /*override*/ computeCssNode(): any {
         let cssNode = super.computeCssNode();
 
         // Handle BlokContainer-specific fixed width/height rules
         let w = cssNode.style.width;
         let h = cssNode.style.height;
 
-        if (opts.desiredContainerRect) {
-            w = opts.desiredContainerRect.getWidth();
-            h = opts.desiredContainerRect.getHeight();
+        if (this.getOverrideWidth() !== undefined) {
+            w = this.getOverrideWidth();
+            this.setOverrideWidth(undefined);
+        }
+
+        if (this.getOverrideHeight() !== undefined) {
+            h = this.getOverrideHeight();
+            this.setOverrideHeight(undefined);
         }
 
         cssNode.style.width = undefined;
         cssNode.style.height = undefined;
-
-        if (this.getAlignItems() === Css.Alignments.STRETCH) {
-            if (this.getFlexDirection() === Css.FlexDirections.ROW) {
-                cssNode.style.height = h;
-            }
-            else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
-                cssNode.style.width = w;
-            }
-            else {
-                throw new Error("Unknown flexDirection!");
-            }
-        }
 
         if (this.getJustifyContent() === Css.Justifications.SPACE_BETWEEN) {
             if (this.getFlexDirection() === Css.FlexDirections.ROW) {
@@ -173,16 +165,19 @@ class BlokContainer extends Blok {
         let blokChildren = this.getChildren();
 
         blokChildren.forEach((blok) => {
-            let childCssNode = blok.computeCssNode(opts);
+            let childCssNode = blok.computeCssNode();
 
-            // Clear a dim if we're stretching a Blok child
-            if (!(blok instanceof BlokContainer) &&
-                (this.getAlignItems() === Css.Alignments.STRETCH ||
-                    blok.getAlignSelf() === Css.Alignments.STRETCH)) {
+            // Clear a dim from the child if we're stretching and give ourself
+            // a fixed dimension. If even a single Blok child is set to stretch,
+            // the BlokContainer must layout with a fixed w/h, otherwise the Blok child
+            // has no defined container to stretch in
+            if (this.getAlignItems() === Css.Alignments.STRETCH || blok.getAlignSelf() === Css.Alignments.STRETCH) {
                 if (this.getFlexDirection() === Css.FlexDirections.ROW) {
+                    cssNode.style.height = h;
                     childCssNode.style.height = undefined;
                 }
                 else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
+                    cssNode.style.width = w;
                     childCssNode.style.width = undefined;
                 }
                 else {
@@ -197,14 +192,14 @@ class BlokContainer extends Blok {
     }
 
     /** Trigger a layout */
-    public /*override*/ invalidate(opts = new LayoutOpts()): void {
+    public /*override*/ invalidate(): void {
         // Start at the root of our layout tree
         let root = this.getRootContainer();
 
-        let rootNode = root.computeCssNode(opts);
+        let rootNode = root.computeCssNode();
         cssLayout(rootNode);
 
-        root.layout(undefined, rootNode, opts);
+        root.layout(undefined, rootNode);
     }
 
     public /*override*/ checkForRelayout(lastSelection: any): void {
@@ -228,32 +223,23 @@ class BlokContainer extends Blok {
                 if ((sel.length === 1 && sel[0] && sel[0] === this._pageItem) &&
                     (lastSelection.length === 1 && lastSelection[0] && lastSelection[0] === this._pageItem)) {
                     // If this was the only thing selected for the past 2 selections and our size changed in
-                    // betwen selections, enable some ease-of-use scenarios
-                    if (this.getJustifyContent() === Css.Justifications.SPACE_BETWEEN) {
-                        let opts = new LayoutOpts();
+                    // betwen selections, enable some ease-of-use scenarios that attempt to use the new size
+                    // the user wants for the BlokContainer
 
-                        if (this.getFlexDirection() === Css.FlexDirections.ROW) {
-                            opts.useCachedWidth = true;
-                        }
-                        else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
-                            opts.useCachedHeight = true;
-                        }
-                        else {
-                            throw new Error("Unknown flexDirection " + this.getFlexDirection() + " !");
-                        }
+                    // We already have the new size in rect. Now undo their change, our layout will take their
+                    // desires into account. Also:
+                    //
+                    // Illustrator messes with CharacterAttributes size, leading, and horizontalScale
+                    // when you scale a GroupItem that contains a TextFrameItem that is AREATEXT (Area Type).
+                    // Attempting to fix those values is difficult, since a TextFrameItem can have many
+                    // TextRanges, all with different settings. Rather than attempt to store/restore those
+                    // values, we just undo the resize, but not before we record our new desired size.
+                    app.undo();
 
-                        // keep our rect
-                        opts.desiredContainerRect = rect;
-                        
-                        // Illustrator messes with CharacterAttributes size, leading, and horizontalScale
-                        // when you scale a GroupItem that contains a TextFrameItem that is AREATEXT (Area Type).
-                        // Attempting to fix those values is difficult, since a TextFrameItem can have many
-                        // TextRanges, all with different settings. Rather than attempt to store/restore those
-                        // values, we just undo the resize, but not before we record our new desired size.
-                        app.undo();
+                    this.setOverrideWidth(rect.getWidth());
+                    this.setOverrideHeight(rect.getHeight());
 
-                        this.invalidate(opts);
-                    }
+                    this.invalidate();
                 }
                 else {
                     this.invalidate();
@@ -351,9 +337,9 @@ class BlokContainer extends Blok {
      * @param desired - a rectangle for the new location and size. Possibly ignored
      *                  depending on settings
      * @param rootNode - a matching CSS node with full style and layout information
-     * @param opts - layout options
+     * @param skipScaleTransform - if true, don't perform any scale
      */
-    public /*override*/ layout(desired: Rect, rootNode: any, opts = new LayoutOpts()): void {
+    public /*override*/ layout(desired: Rect, rootNode: any, skipScaleTransform = false): void {
         // Layout our children
         let children = this.getChildren();
 
@@ -368,12 +354,12 @@ class BlokContainer extends Blok {
             blokRect.setWidth(node.layout.width);
             blokRect.setHeight(node.layout.height);
 
-            blok.layout(blokRect, node, opts);
+            blok.layout(blokRect, node);
         }
 
         if (desired) {
-            // Layout ourselves
-            super.layout(desired, undefined, opts);
+            // Layout ourselves, but never ask a BlokContainer to scale as part of layout
+            super.layout(desired, undefined, true);
         }
 
         let curR = this.getRect();
@@ -388,10 +374,40 @@ class BlokContainer extends Blok {
     /** Optional positive number for the number of Bloks this BlokContainer has */
     private setCachedChildCount(value: number): void {
         if (value !== undefined && value < 0) {
-            throw new RangeError("Cannot set a negative cached height!");
+            throw new RangeError("Cannot set a negative cached child count!");
         }
 
         this.setSavedProperty<number>("cachedChildCount", value);
+    }
+
+    /** Optional positive number that should be used as the BlokContainer's width in place of the
+    real width */
+    private getOverrideWidth(): number {
+        return this.getSavedProperty<number>("overrideWidth");
+    }
+    /** Optional positive number that should be used as the BlokContainer's width in place of the
+    real width */
+    private setOverrideWidth(value: number): void {
+        if (value !== undefined && value < 0) {
+            throw new RangeError("Cannot set a negative override width!");
+        }
+
+        this.setSavedProperty<number>("overrideWidth", value);
+    }
+
+    /** Optional positive number that should be used as the BlokContainer's width in place of the
+    real height */
+    private getOverrideHeight(): number {
+        return this.getSavedProperty<number>("overrideHeight");
+    }
+    /** Optional positive number that should be used as the BlokContainer's width in place of the
+    real height */
+    private setOverrideHeight(value: number): void {
+        if (value !== undefined && value < 0) {
+            throw new RangeError("Cannot set a negative override height!");
+        }
+
+        this.setSavedProperty<number>("overrideHeight", value);
     }
 }
 

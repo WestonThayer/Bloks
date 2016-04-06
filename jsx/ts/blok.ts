@@ -9,7 +9,6 @@ import BlokUserSettings = require("./blok-user-settings");
 import BlokContainer = require("./blok-container");
 import BlokAdapter = require("./blok-adapter");
 import Utils = require("./utils");
-import LayoutOpts = require("./layout-opts");
 
 /**
  * Wraps an Illustrator pageItem to add the capabilities needed for layout.
@@ -128,18 +127,10 @@ class Blok {
     }
 
     /** Return a css-layout node */
-    public computeCssNode(opts = new LayoutOpts()): any {
+    public computeCssNode(): any {
         let r = this.getRect();
         let w = r.getWidth();
         let h = r.getHeight();
-
-        if (opts.useCachedWidth) {
-            w = this.getCachedWidth();
-        }
-
-        if (opts.useCachedHeight) {
-            h = this.getCachedHeight();
-        }
 
         let cssNode: any = {
             style: {
@@ -158,8 +149,8 @@ class Blok {
     }
 
     /** Trigger a layout of our container */
-    public invalidate(opts = new LayoutOpts()): void {
-        this.getContainer().invalidate(opts);
+    public invalidate(): void {
+        this.getContainer().invalidate();
     }
 
     /**
@@ -217,21 +208,25 @@ class Blok {
      *
      * @param desired - a rectangle for the new location and size
      * @param rootNode - a matching CSS node with full style and layout information, possibly undefined
-     * @param opts - layout options
+     * @param skipScaleTransform - if true, don't perform any scale
      */
-    public layout(desired: Rect, rootNode: any, opts = new LayoutOpts()): void {
+    public layout(desired: Rect, rootNode: any, skipScaleTransform = false): void {
         let actual = this.getRect();
-
+        let isScaleRequested = false;
         let transformMatrix = app.getIdentityMatrix();
+        let aiDeltaX, aiDeltaY;
 
-        // Scale
-        let aiDeltaX = (desired.getWidth() / actual.getWidth()) * 100;
-        let aiDeltaY = (desired.getHeight() / actual.getHeight()) * 100;
+        if (!skipScaleTransform) {
+            // Scale
+            aiDeltaX = (desired.getWidth() / actual.getWidth()) * 100;
+            aiDeltaY = (desired.getHeight() / actual.getHeight()) * 100;
 
-        let isScaleRequested = !Utils.nearlyEqual(aiDeltaX, 100) || !Utils.nearlyEqual(aiDeltaY, 100);
+            isScaleRequested = !Utils.nearlyEqual(aiDeltaX, 100) || !Utils.nearlyEqual(aiDeltaY, 100);
 
-        transformMatrix = app.concatenateScaleMatrix(transformMatrix, aiDeltaX, aiDeltaY);
+            transformMatrix = app.concatenateScaleMatrix(transformMatrix, aiDeltaX, aiDeltaY);
+        }
 
+        // Translate
         aiDeltaX = desired.getX() - actual.getX();
         aiDeltaY = desired.getY() - actual.getY();
 
