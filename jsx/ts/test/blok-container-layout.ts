@@ -233,8 +233,12 @@ function testTextFrameArea() {
 
     Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 294, 200])));
 
-    let textFrameBlok = BlokAdapter.getBlok(pageItem.pageItems[0]);
+    let textFrame = pageItem.pageItems[0];
+    let textFrameBlok = BlokAdapter.getBlok(textFrame);
     Assert.isTrue(textFrameBlok.getRect().equals(new Rect([150, 0, 294, 65])));
+    Assert.areEqual(textFrame.textRange.horizontalScale, 100);
+    Assert.areEqual(textFrame.textRange.size, 12);
+    Assert.areEqual(textFrame.textRange.autoLeading, true);
 }
 
 function testTextFrameAreaStretch() {
@@ -248,8 +252,12 @@ function testTextFrameAreaStretch() {
 
     Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 294, 200])));
 
-    let textFrameBlok = BlokAdapter.getBlok(pageItem.pageItems[0]);
+    let textFrame = pageItem.pageItems[0];
+    let textFrameBlok = BlokAdapter.getBlok(textFrame);
     Assert.isTrue(textFrameBlok.getRect().equals(new Rect([150, 0, 294, 200])));
+    Assert.areEqual(textFrame.textRange.horizontalScale, 100);
+    Assert.areEqual(textFrame.textRange.size, 12);
+    Assert.areEqual(textFrame.textRange.autoLeading, true);
 }
 
 function testTextFrameAreaMiddle() {
@@ -264,8 +272,321 @@ function testTextFrameAreaMiddle() {
 
     Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 294, 200])));
 
-    let textFrameBlok = BlokAdapter.getBlok(pageItem.pageItems[1]);
+    textFrame = pageItem.pageItems[1];
+    let textFrameBlok = BlokAdapter.getBlok(textFrame);
     Assert.isTrue(textFrameBlok.getRect().equals(new Rect([100, 0, 244, 65])));
+    Assert.areEqual(textFrame.textRange.horizontalScale, 100);
+    Assert.areEqual(textFrame.textRange.size, 12);
+    Assert.areEqual(textFrame.textRange.autoLeading, true);
+}
+
+function testInteractiveResizeRow() {
+    let pageItem = app.activeDocument.pageItems[0];
+    app.activeDocument.selection = pageItem; // Select it
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem);
+
+    blokContainer.invalidate();
+    app.redraw(); // Create undo waypoint 1
+
+    pageItem.width = 500; // Resize width
+    app.redraw(); // Create undo waypoint 2
+
+    // Attempt relayout
+    blokContainer.checkForRelayout(app.activeDocument.selection);
+
+    // Verify that it didn't change size
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 150, 200])));
+    Assert.areEqual(pageItem.width, 150);
+
+    pageItem.height = 300; // Resize height
+    app.redraw(); // Create undo waypoint 3
+
+    // Attempt relayout
+    blokContainer.checkForRelayout(app.activeDocument.selection);
+
+    // Verify that it didn't change size
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 150, 200])));
+    Assert.areEqual(pageItem.width, 150);
+}
+
+function testInteractiveResizeColumn() {
+    let pageItem = app.activeDocument.pageItems[0];
+    app.activeDocument.selection = pageItem; // Select it
+
+    let settings = new BlokContainerUserSettings();
+    settings.flexDirection = Css.FlexDirections.COLUMN;
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem, settings);
+
+    blokContainer.invalidate();
+    app.redraw(); // Create undo waypoint 1
+
+    pageItem.width = 500; // Resize width
+    app.redraw(); // Create undo waypoint 2
+
+    // Attempt relayout
+    blokContainer.checkForRelayout(app.activeDocument.selection);
+
+    // Verify that it didn't change size
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 100, 300])));
+    Assert.areEqual(pageItem.height, 300);
+
+    pageItem.height = 200; // Resize height
+    app.redraw(); // Create undo waypoint 3
+
+    // Attempt relayout
+    blokContainer.checkForRelayout(app.activeDocument.selection);
+
+    // Verify that it didn't change size
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 100, 300])));
+    Assert.areEqual(pageItem.height, 300);
+}
+
+function testInteractiveResizeRowDistributed() {
+    let pageItem = app.activeDocument.pageItems[0];
+    app.activeDocument.selection = pageItem; // Select it
+
+    let settings = new BlokContainerUserSettings();
+    settings.justifyContent = Css.Justifications.SPACE_BETWEEN;
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem, settings);
+
+    blokContainer.invalidate();
+    app.redraw(); // Create undo waypoint 1
+
+    // Verify it stayed distributed
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 444, 200])));
+
+    pageItem.width = 600; // Resize width
+    app.redraw(); // Create undo waypoint 2
+
+    // Attempt relayout
+    blokContainer.checkForRelayout(app.activeDocument.selection);
+
+    // Verify that it is the new width
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 600, 200])));
+    Assert.areEqual(pageItem.width, 600);
+
+    // Verify that each item is original size
+    Assert.areEqual(pageItem.pageItems[2].width, 100);
+    Assert.areEqual(pageItem.pageItems[2].height, 100);
+    Assert.areEqual(pageItem.pageItems[1].width, 50);
+    Assert.areEqual(pageItem.pageItems[1].height, 200);
+    Assert.areEqual(pageItem.pageItems[0].width, 144);
+    Assert.areEqual(pageItem.pageItems[0].height, 65);
+
+    pageItem.height = 300; // Resize height
+    app.redraw(); // Create undo waypoint 3
+
+    // Attempt relayout
+    blokContainer.checkForRelayout(app.activeDocument.selection);
+
+    // Verify that it didn't change size
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 600, 200])));
+    Assert.areEqual(pageItem.height, 200);
+}
+
+function testInteractiveResizeColumnDistributed() {
+    let pageItem = app.activeDocument.pageItems[0];
+    app.activeDocument.selection = pageItem; // Select it
+
+    let settings = new BlokContainerUserSettings();
+    settings.flexDirection = Css.FlexDirections.COLUMN;
+    settings.justifyContent = Css.Justifications.SPACE_BETWEEN;
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem, settings);
+
+    blokContainer.invalidate();
+    app.redraw(); // Create undo waypoint 1
+
+    // Verify it stacked with no distribution.
+    // Align to pixel grid is turned on for this file and it has a TextFrameItem, so the numbers get
+    // slightly wonky
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([-0.01171875, 0, 144, 365])));
+
+    pageItem.height = 500; // Resize height
+    app.redraw(); // Create undo waypoint 2
+
+    // Attempt relayout
+    blokContainer.checkForRelayout(app.activeDocument.selection);
+
+    // Verify that it is the new height. Again, a bit wonky due to TextFrameItem
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([-0.0234375, 0, 143.98828125, 500])));
+    Assert.areEqual(pageItem.height, 500);
+
+    // Verify that each item is original size
+    Assert.areEqual(pageItem.pageItems[2].width, 100);
+    Assert.areEqual(pageItem.pageItems[2].height, 100);
+    Assert.areEqual(pageItem.pageItems[1].width, 50);
+    Assert.areEqual(pageItem.pageItems[1].height, 200);
+    Assert.areEqual(pageItem.pageItems[0].width, 144);
+    Assert.areEqual(pageItem.pageItems[0].height, 65);
+
+    pageItem.width = 200; // Resize width
+    app.redraw(); // Create undo waypoint 3
+
+    // Attempt relayout
+    blokContainer.checkForRelayout(app.activeDocument.selection);
+
+    // Verify that it didn't change size
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([-0.0234375, 0, 143.98828125, 500])));
+    Assert.areEqual(pageItem.width, 144);
+}
+
+function testInteractiveResizeRowDistributedStretch() {
+    let pageItem = app.activeDocument.pageItems[0];
+    app.activeDocument.selection = pageItem; // Select it
+
+    let settings = new BlokContainerUserSettings();
+    settings.justifyContent = Css.Justifications.SPACE_BETWEEN;
+    settings.alignItems = Css.Alignments.STRETCH;
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem, settings);
+
+    blokContainer.invalidate();
+    app.redraw(); // Create undo waypoint 1
+
+    // Verify it stayed distributed
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 444, 200])));
+
+    pageItem.width = 600; // Resize width
+    app.redraw(); // Create undo waypoint 2
+
+    // Attempt relayout
+    blokContainer.checkForRelayout(app.activeDocument.selection);
+
+    // Verify that it is the new width
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 600, 200])));
+    Assert.areEqual(pageItem.width, 600);
+
+    // Verify that each item is stretched
+    Assert.areEqual(pageItem.pageItems[2].width, 100);
+    Assert.areEqual(pageItem.pageItems[2].height, 200);
+    Assert.areEqual(pageItem.pageItems[1].width, 50);
+    Assert.areEqual(pageItem.pageItems[1].height, 200);
+    Assert.areEqual(pageItem.pageItems[0].width, 144);
+    Assert.areEqual(pageItem.pageItems[0].height, 200);
+
+    pageItem.height = 300; // Resize height
+    app.redraw(); // Create undo waypoint 3
+
+    // Attempt relayout
+    blokContainer.checkForRelayout(app.activeDocument.selection);
+
+    // Verify stretch
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 600, 300])));
+    Assert.areEqual(pageItem.height, 300);
+
+    Assert.areEqual(pageItem.pageItems[2].width, 100);
+    Assert.areEqual(pageItem.pageItems[2].height, 300);
+    Assert.areEqual(pageItem.pageItems[1].width, 50);
+    Assert.areEqual(pageItem.pageItems[1].height, 300);
+    Assert.areEqual(pageItem.pageItems[0].width, 144);
+    Assert.areEqual(pageItem.pageItems[0].height, 300);
+}
+
+function testInteractiveResizeRowDistributedChildStretch() {
+    let pageItem = app.activeDocument.pageItems[0];
+    app.activeDocument.selection = pageItem; // Select it
+
+    let settings = new BlokContainerUserSettings();
+    settings.justifyContent = Css.Justifications.SPACE_BETWEEN;
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem, settings);
+
+    let childSettings = new BlokUserSettings();
+    childSettings.alignSelf = Css.Alignments.STRETCH;
+    BlokAdapter.getBlok(pageItem.pageItems[0], childSettings);
+
+    blokContainer.invalidate();
+    app.redraw(); // Create undo waypoint 1
+
+    // Verify it stayed distributed
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 444, 200])));
+
+    // Verify that only last item is stretched
+    Assert.areEqual(pageItem.pageItems[2].width, 100);
+    Assert.areEqual(pageItem.pageItems[2].height, 100);
+    Assert.areEqual(pageItem.pageItems[1].width, 50);
+    Assert.areEqual(pageItem.pageItems[1].height, 200);
+    Assert.areEqual(pageItem.pageItems[0].width, 144);
+    Assert.areEqual(pageItem.pageItems[0].height, 200);
+
+    pageItem.width = 600; // Resize width
+    app.redraw(); // Create undo waypoint 2
+
+    // Attempt relayout
+    blokContainer.checkForRelayout(app.activeDocument.selection);
+
+    // Verify that it is the new width
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 600, 200])));
+    Assert.areEqual(pageItem.width, 600);
+
+    // Verify that only last item is stretched
+    Assert.areEqual(pageItem.pageItems[2].width, 100);
+    Assert.areEqual(pageItem.pageItems[2].height, 100);
+    Assert.areEqual(pageItem.pageItems[1].width, 50);
+    Assert.areEqual(pageItem.pageItems[1].height, 200);
+    Assert.areEqual(pageItem.pageItems[0].width, 144);
+    Assert.areEqual(pageItem.pageItems[0].height, 200);
+
+    pageItem.height = 300; // Resize height
+    app.redraw(); // Create undo waypoint 3
+
+    // Attempt relayout
+    blokContainer.checkForRelayout(app.activeDocument.selection);
+
+    // Verify stretch
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 600, 300])));
+    Assert.areEqual(pageItem.height, 300);
+
+    Assert.areEqual(pageItem.pageItems[2].width, 100);
+    Assert.areEqual(pageItem.pageItems[2].height, 100);
+    Assert.areEqual(pageItem.pageItems[1].width, 50);
+    Assert.areEqual(pageItem.pageItems[1].height, 200);
+    Assert.areEqual(pageItem.pageItems[0].width, 144);
+    Assert.areEqual(pageItem.pageItems[0].height, 300);
+}
+
+function testInteractiveResizeNested() {
+    // Find the groups, from the inner-most to outer-most
+    let firstGroupItem = app.activeDocument.pageItems[0].pageItems[1].pageItems[0];
+    let secondGroupItem = app.activeDocument.pageItems[0].pageItems[1];
+    let thirdGroupItem = app.activeDocument.pageItems[0];
+    
+    let firstSettings = new BlokContainerUserSettings();
+    firstSettings.alignItems = Css.Alignments.CENTER;
+    let firstBlokContainer = BlokAdapter.getBlokContainer(firstGroupItem, firstSettings);
+    
+    let secondSettings = new BlokContainerUserSettings();
+    secondSettings.flexDirection = Css.FlexDirections.COLUMN;
+    secondSettings.justifyContent = Css.Justifications.SPACE_BETWEEN;
+    let secondBlokContainer = BlokAdapter.getBlokContainer(secondGroupItem, secondSettings);
+    
+    let thirdSettings = new BlokContainerUserSettings();
+    thirdSettings.alignItems = Css.Alignments.CENTER;
+    thirdSettings.justifyContent = Css.Justifications.SPACE_BETWEEN;
+    let thirdBlokContainer = BlokAdapter.getBlokContainer(thirdGroupItem, thirdSettings);
+
+    // Select the root
+    app.activeDocument.selection = thirdGroupItem;
+
+    thirdBlokContainer.invalidate();
+    app.redraw(); // Undo waypoint 1
+
+    // Verify that it stayed distributed
+    Assert.isTrue(thirdBlokContainer.getRect().equals(new Rect([0, 0, 321, 162])));
+
+    app.activeDocument.selection = secondGroupItem; // select the second item
+    secondGroupItem.height = 120; // Make the 2nd group distribute taller
+    app.redraw(); // Undo waypoint 2
+
+    secondBlokContainer.checkForRelayout(app.activeDocument.selection);
+
+    // Verify that the second group doesn't stretch (0.5 is layout rounded after we finish)
+    Assert.isTrue(secondBlokContainer.getRect().equals(new Rect([139.5, 21, 139.5 + 78, 21 + 120])));
+
+    // But we do stretch if alignSelf is stretch
+    secondSettings.alignSelf = Css.Alignments.STRETCH;
+    secondBlokContainer = BlokAdapter.getBlokContainer(secondGroupItem, secondSettings);
+    secondBlokContainer.invalidate();
+
+    Assert.isTrue(secondBlokContainer.getRect().equals(new Rect([139.5, 0, 139.5 + 78, 162])));
 }
 
 TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRow);
@@ -281,3 +602,10 @@ TestFramework.run("blok-container-layout-strokes.ai", testStrokes);
 TestFramework.run("blok-container-layout-one-deep-textframearea.ai", testTextFrameArea);
 TestFramework.run("blok-container-layout-one-deep-textframearea.ai", testTextFrameAreaStretch);
 TestFramework.run("blok-container-layout-one-deep-textframearea.ai", testTextFrameAreaMiddle);
+TestFramework.run("blok-container-layout-one-deep.ai", testInteractiveResizeRow);
+TestFramework.run("blok-container-layout-one-deep.ai", testInteractiveResizeColumn);
+TestFramework.run("blok-container-layout-one-deep-textframearea.ai", testInteractiveResizeRowDistributed);
+TestFramework.run("blok-container-layout-one-deep-textframearea.ai", testInteractiveResizeColumnDistributed);
+TestFramework.run("blok-container-layout-one-deep-textframearea.ai", testInteractiveResizeRowDistributedStretch);
+TestFramework.run("blok-container-layout-one-deep-textframearea.ai", testInteractiveResizeRowDistributedChildStretch);
+TestFramework.run("blok-container-layout-nested-groups-alt.ai", testInteractiveResizeNested);

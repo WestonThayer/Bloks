@@ -1,5 +1,7 @@
 "use strict"
 
+import Utils = require("./utils");
+
 /**
  * Represents a rectangle in screen coordinate space.
  *
@@ -81,10 +83,10 @@ class Rect {
     }
 
     public equals(rect: Rect): boolean {
-        if (this.x1 === rect.x1 &&
-            this.y1 === rect.y1 &&
-            this.x2 === rect.x2 &&
-            this.y2 === rect.y2) {
+        if (Utils.nearlyEqual(this.x1, rect.x1) &&
+            Utils.nearlyEqual(this.y1, rect.y1) &&
+            Utils.nearlyEqual(this.x2, rect.x2) &&
+            Utils.nearlyEqual(this.y2, rect.y2)) {
             return true;
         }
 
