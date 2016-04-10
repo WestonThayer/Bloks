@@ -121,6 +121,8 @@ export function checkSelectionForRelayout(): void {
                     bloksToBeInvalidated.splice(0, bloksToBeInvalidated.length);
                 }
             }
+
+            lastSelection = sel;
         }
     }
     catch (ex) {
@@ -285,7 +287,6 @@ export function getActionsFromSelection(): { action: number, blok: any } {
 
         if (isActiveDocumentPresent()) {
             let selection = app.activeDocument.selection;
-            lastSelection = selection;
 
             if (selection.length === 0) {
                 // No operations available
