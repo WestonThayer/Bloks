@@ -1,122 +1,143 @@
 (function () {
     'use strict';
     
-    var BlokVm = (function() {        
-        function BlokVm() {
-            this.title = ko.observable("Not set");
-            this.isContainerSettingsVisible = ko.observable(false);
-            this.isChildSettingsVisible = ko.observable(false);
-            this.isCreateButtonVisible = ko.observable(false);
-            this.isLayoutButtonVisible = ko.observable(false);
-            
-            // Blok settings
-            this.flex = undefined;
-            this.alignSelf = ko.observable(undefined);
-            
-            // BlokContainer settings
-            this.flexDirection = ko.observable(0);
-            this.justifyContent = ko.observable(0);
-            this.alignItems = ko.observable(0);
-            this.flexWrap = ko.observable(0);
-        }
-        
-        BlokVm.prototype.blokEquals = function(settings) {
-            return this.flex === settings.flex &&
-                this.alignSelf() === settings.alignSelf;
-        };
-        
-        BlokVm.prototype.blokContainerEquals = function(settings) {
-            return this.blokEquals(settings) &&
-                this.flexDirection() === settings.flexDirection &&
-                this.justifyContent() === settings.justifyContent &&
-                this.alignItems() === settings.alignItems &&
-                this.flexWrap() === settings.flexWrap;
-        };
-        
-        return BlokVm;
-    })();
-    
-    /** Function container for dealing with Blok JSX API */
-    var BlokScripts = (function() {
-        var csInterface = new CSInterface();
-        
-        // TODO: how does this handle exceptions? We should crash too
-        
-        return {
-            /** Register a callback for when there's an exception from JSX */
-            onException: function(cb) {
-                csInterface.addEventListener("com.westonthayer.bloks.events.JsxExceptionRaised", function(ret) {
-                    cb(ret.data);
-                });
-            },
-            /** Register a callback for whenever Illustrator is about to undo an action. Will fire before SELECTION_CHANGED */
-            onPreUndo: function(cb) {
-                csInterface.addEventListener("com.westonthayer.bloks.events.PreUndo", function(ret) {
-                    cb();
-                });
-            },
-            /** Register a callback for whenever Illustrator is about to show or hide the rulers. */
-            onPreShowHideRulers: function(cb) {
-                csInterface.addEventListener("com.westonthayer.bloks.events.PreShowHideRulers", function(ret) {
-                    cb();
-                });
-            },
-            /** Register a callback for whenever Illustrator's SELECTION_CHANGED event fires (a lot) */
-            onSelectionChanged: function(cb) {
-                csInterface.addEventListener("com.westonthayer.bloks.events.SelectionChanged", function(ret) {
-                    // Only listen for our plugin's events, we could be hearing others
-                    if (ret.extensionId === "com.westonthayer.bloks") {
-                        cb();
-                    }
-                });
-            },
-            getActionsFromSelection: function(cb) {                
-                csInterface.evalScript("loader(7).getActionsFromSelection()", function(ret) {
-                    var result = JSON.parse(ret);
-                    cb(result);
-                });
-            },
-            createBlokContainerFromSelection: function(settingsStr, cb) {
-                csInterface.evalScript("loader(7).createBlokContainerFromSelection(" + settingsStr + ")", function(ret) {
-                    if (cb) {
-                        cb();
-                    }
-                });
-            },
-            updateSelectedBlok: function(settingsStr, cb) {
-                csInterface.evalScript("loader(7).updateSelectedBlok(" + settingsStr + ")", function(ret) {
-                    if (cb) {
-                        cb();
-                    }
-                });
-            },
-            updateSelectedBlokContainer: function(settingsStr, cb) {
-                csInterface.evalScript("loader(7).updateSelectedBlokContainer(" + settingsStr + ")", function(ret) {
-                    if (cb) {
-                        cb();
-                    }
-                });
-            },
-            checkSelectionForRelayout: function() {
-                csInterface.evalScript("loader(7).checkSelectionForRelayout()");
-            },
-            relayoutSelection: function() {
-                csInterface.evalScript("loader(7).relayoutSelection()");
-            },
-            hideSpacers: function() {
-                csInterface.evalScript("loader(7).hideSpacers()");
-            },
-            showSpacers: function() {
-                csInterface.evalScript("loader(7).showSpacers()");
-            }
-        };
-    })();
-    
-    
-    
-    
-    // Execution starts here
     try {
+        // Filters an input to either undefined or a positive number
+        ko.extenders.positiveNumeric = function(target, sec) {
+            var result = ko.pureComputed({
+                read: target,
+                write: function(newValue) {
+                    var current = target();
+                    var newValueAsNum = isNaN(newValue) || newValue === "" ? undefined : Math.abs(parseFloat(+newValue));
+                    
+                    if (current !== newValueAsNum) {
+                        target(newValueAsNum);
+                    }
+                    else {
+                        if (current !== newValue) {
+                            target.notifySubscribers(newValueAsNum);
+                        }
+                    }
+                }
+            }).extend({ notify: "always" });
+            
+            result(target);
+            return result;
+        };
+        
+        var BlokVm = (function() {        
+            function BlokVm() {
+                this.title = ko.observable("Not set");
+                this.isContainerSettingsVisible = ko.observable(false);
+                this.isChildSettingsVisible = ko.observable(false);
+                this.isCreateButtonVisible = ko.observable(false);
+                this.isLayoutButtonVisible = ko.observable(false);
+
+                // Blok settings
+                this.flex = ko.observable(undefined).extend({ positiveNumeric: 0 });
+                this.alignSelf = ko.observable(undefined);
+
+                // BlokContainer settings
+                this.flexDirection = ko.observable(0);
+                this.justifyContent = ko.observable(0);
+                this.alignItems = ko.observable(0);
+                this.flexWrap = ko.observable(0);
+            }
+
+            BlokVm.prototype.blokEquals = function(settings) {
+                return this.flex() === settings.flex &&
+                    this.alignSelf() === settings.alignSelf;
+            };
+
+            BlokVm.prototype.blokContainerEquals = function(settings) {
+                return this.blokEquals(settings) &&
+                    this.flexDirection() === settings.flexDirection &&
+                    this.justifyContent() === settings.justifyContent &&
+                    this.alignItems() === settings.alignItems &&
+                    this.flexWrap() === settings.flexWrap;
+            };
+
+            return BlokVm;
+        })();
+
+        /** Function container for dealing with Blok JSX API */
+        var BlokScripts = (function() {
+            var csInterface = new CSInterface();
+
+            // TODO: how does this handle exceptions? We should crash too
+
+            return {
+                /** Register a callback for when there's an exception from JSX */
+                onException: function(cb) {
+                    csInterface.addEventListener("com.westonthayer.bloks.events.JsxExceptionRaised", function(ret) {
+                        cb(ret.data);
+                    });
+                },
+                /** Register a callback for whenever Illustrator is about to undo an action. Will fire before SELECTION_CHANGED */
+                onPreUndo: function(cb) {
+                    csInterface.addEventListener("com.westonthayer.bloks.events.PreUndo", function(ret) {
+                        cb();
+                    });
+                },
+                /** Register a callback for whenever Illustrator is about to show or hide the rulers. */
+                onPreShowHideRulers: function(cb) {
+                    csInterface.addEventListener("com.westonthayer.bloks.events.PreShowHideRulers", function(ret) {
+                        cb();
+                    });
+                },
+                /** Register a callback for whenever Illustrator's SELECTION_CHANGED event fires (a lot) */
+                onSelectionChanged: function(cb) {
+                    csInterface.addEventListener("com.westonthayer.bloks.events.SelectionChanged", function(ret) {
+                        // Only listen for our plugin's events, we could be hearing others
+                        if (ret.extensionId === "com.westonthayer.bloks") {
+                            cb();
+                        }
+                    });
+                },
+                getActionsFromSelection: function(cb) {                
+                    csInterface.evalScript("loader(7).getActionsFromSelection()", function(ret) {
+                        var result = JSON.parse(ret);
+                        cb(result);
+                    });
+                },
+                createBlokContainerFromSelection: function(settingsStr, cb) {
+                    csInterface.evalScript("loader(7).createBlokContainerFromSelection(" + settingsStr + ")", function(ret) {
+                        if (cb) {
+                            cb();
+                        }
+                    });
+                },
+                updateSelectedBlok: function(settingsStr, cb) {
+                    csInterface.evalScript("loader(7).updateSelectedBlok(" + settingsStr + ")", function(ret) {
+                        if (cb) {
+                            cb();
+                        }
+                    });
+                },
+                updateSelectedBlokContainer: function(settingsStr, cb) {
+                    csInterface.evalScript("loader(7).updateSelectedBlokContainer(" + settingsStr + ")", function(ret) {
+                        if (cb) {
+                            cb();
+                        }
+                    });
+                },
+                checkSelectionForRelayout: function() {
+                    csInterface.evalScript("loader(7).checkSelectionForRelayout()");
+                },
+                relayoutSelection: function() {
+                    csInterface.evalScript("loader(7).relayoutSelection()");
+                },
+                hideSpacers: function() {
+                    csInterface.evalScript("loader(7).hideSpacers()");
+                },
+                showSpacers: function() {
+                    csInterface.evalScript("loader(7).showSpacers()");
+                }
+            };
+        })();
+        
+        
+        // Execution starts here
         BlokScripts.onException(function(ret) {
             alert("JSX crashed. FileName: " + ret.fileName + ", Line: " + ret.line + ", Name: " + ret.name + ", Message: " + ret.message);
         });
@@ -168,6 +189,7 @@
                     
                     if (result.blok.isAlsoChild) {
                         viewModel.isChildSettingsVisible(true);
+                        viewModel.flex(result.blok.flex);
                         viewModel.alignSelf(result.blok.alignSelf);
                     }
                     else {
@@ -190,7 +212,8 @@
                     viewModel.isCreateButtonVisible(false);
                     viewModel.isLayoutButtonVisible(true);
                     
-                    viewMode.alignSelf(result.blok.alignSelf);
+                    viewModel.flex(result.blok.flex);
+                    viewModel.alignSelf(result.blok.alignSelf);
                 }
                 else if (result.action === 3) {
                     // Create group
@@ -230,6 +253,7 @@
             });
         }
         
+        viewModel.flex.subscribe(handleBlokPropertyChanged);
         viewModel.alignSelf.subscribe(handleBlokPropertyChanged);
 
         

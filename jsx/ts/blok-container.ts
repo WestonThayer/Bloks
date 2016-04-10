@@ -185,6 +185,20 @@ class BlokContainer extends Blok {
                 }
             }
 
+            if (blok.getFlex() !== undefined && blok.getFlex() > 0) {
+                if (this.getFlexDirection() === Css.FlexDirections.ROW) {
+                    cssNode.style.width = w;
+                    childCssNode.style.width = undefined;
+                }
+                else if (this.getFlexDirection() === Css.FlexDirections.COLUMN) {
+                    cssNode.style.height = h;
+                    childCssNode.style.height = undefined;
+                }
+                else {
+                    throw new Error("Unknown FlexDirections value: " + this.getFlexDirection());
+                }
+            }
+
             cssNode.children.push(childCssNode);
         });
 

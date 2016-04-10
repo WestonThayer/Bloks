@@ -152,6 +152,29 @@ function testOneDeepRowSpaceBetween() {
     blokContainer.invalidate();
 }
 
+function testOneDeepRowFlex() {
+    let pageItem = app.activeDocument.pageItems[0];
+    let blokContainer = BlokAdapter.getBlokContainer(pageItem);
+
+    let firstChild = pageItem.pageItems[2];
+    let secondChild = pageItem.pageItems[1];
+    let thirdChild = pageItem.pageItems[0];
+
+    let childSettings = new BlokUserSettings();
+    childSettings.flex = 1;
+    BlokAdapter.getBlok(firstChild, childSettings);
+    BlokAdapter.getBlok(thirdChild, childSettings);
+
+    blokContainer.invalidate();
+
+    // Should not have changed width
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([0, 0, 350, 200])));
+
+    Assert.areEqual(firstChild.width, 150);
+    Assert.areEqual(secondChild.width, 50); // This one should not have grown
+    Assert.areEqual(thirdChild.width, 150);
+}
+
 function testTwoDeepRow() {
     let pageItem = app.activeDocument.pageItems[0];
 
@@ -594,6 +617,7 @@ TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowStretch);
 TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepRowChildStretch);
 TestFramework.run("blok-container-layout-one-deep.ai", testOneDeepColumn);
 TestFramework.run("blok-container-layout-one-deep-3.ai", testOneDeepRowSpaceBetween);
+TestFramework.run("blok-container-layout-one-deep-3.ai", testOneDeepRowFlex);
 TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepRow);
 TestFramework.run("blok-container-layout-two-deep.ai", testTwoDeepMixed);
 TestFramework.run("blok-container-layout-two-deep-alt.ai", testTwoDeepRowAlt);
