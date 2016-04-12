@@ -23,3 +23,34 @@ export function nearlyEqual(a: number, b: number): boolean {
         return (diff / Math.min((absA + absB), Number.MAX_VALUE)) < epsilon;
     }
 }
+
+/**
+ * Detects whether the key is space delimited in the given string. For example, if
+ * the key is ".spacer":
+ *     ".spacer" -> true
+ *     ".spacer thing" -> true
+ *     ".spacerthing" -> false
+ *     "thing .spacer" -> true
+ *     "thing.spacer" -> false
+ *
+ * @param name - the string to search
+ * @param key - the string to search for
+ */
+export function isKeyInString(name: string, key: string): boolean {
+    if (!name) {
+        return false;
+    }
+
+    if (name === key) { // exact match
+        return true;
+    }
+    else if (name.indexOf(key, 0) !== -1) {
+        if (name.indexOf(key + " ", 0) === 0 || // start of the string
+            name.indexOf(" " + key) === ((name.length - key.length) - 1) || // end of the string
+            name.indexOf(" " + key + " ", 0) !== -1) { // inside of the string
+            return true;
+        }
+    }
+
+    return false;
+}

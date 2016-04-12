@@ -11,6 +11,7 @@ import Blok = require("./blok");
 import BlokUserSettings = require("./blok-user-settings");
 import BlokContainer = require("./blok-container");
 import BlokContainerUserSettings = require("./blok-container-user-settings");
+import Utils = require("./utils");
 
 // npm imports
 var JSON2: any = require("JSON2");
@@ -352,29 +353,17 @@ function changeSpacerOpacity(opacity: number): void {
                 name = pageItem.symbol.name;
             }
 
-            if (name) {
-                let key = ".spacer";
-
-                if (name === key) { // exact match
+            if (Utils.isKeyInString(name, ".spacer")) {
+                try {
                     pageItem.opacity = opacity;
                 }
-                else if (name.indexOf(key, 0) !== -1) {
-                    if (name.indexOf(key + " ", 0) === 0 || // start of the string
-                        name.indexOf(" " + key) === ((name.length - key.length) - 1) || // end of the string
-                        name.indexOf(" " + key + " ", 0) !== -1) { // inside of the string
-
-                        try {
-                            pageItem.opacity = opacity;
-                        }
-                        catch (ex) {
-                            if (ex.message === "Target layer cannot be modified") {
-                                // That's OK, it's in Isolation Mode. We'll do what we can, the
-                                // user can always exit Isolation Mode and try again.
-                            }
-                            else {
-                                throw ex;
-                            }
-                        }
+                catch (ex) {
+                    if (ex.message === "Target layer cannot be modified") {
+                        // That's OK, it's in Isolation Mode. We'll do what we can, the
+                        // user can always exit Isolation Mode and try again.
+                    }
+                    else {
+                        throw ex;
                     }
                 }
             }
