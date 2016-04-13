@@ -7,6 +7,7 @@ import BlokUserSettings = require("./blok-user-settings");
 import BlokContainer = require("./blok-container");
 import BlokContainerUserSettings = require("./blok-container-user-settings");
 import Css = require("./css");
+import Utils = require("./utils");
 
 var JSON2 = require("JSON2");
 
@@ -58,14 +59,18 @@ export function isBlokAttached(pageItem: any): boolean {
 
 /**
  * Checks to see if the PageItem is the child of a BlokContainer, since
- * any direct child of a BlokContainer is ALWAYS a Blok. Returns false
- * if the PageItem has a BlokContainer attached to it.
+ * any direct child of a BlokContainer is ALWAYS a Blok (except if it's
+ * a background). Returns false if the PageItem has a BlokContainer
+ * attached to it.
  *
  * @param pageItem - item to check
  */
 export function shouldBlokBeAttached(pageItem: any): boolean {
-    // Check to see if it SHOULD be a Blok (has a BlokContainer as parent)
-    return pageItem.parent && isBlokContainerAttached(pageItem.parent) && !isBlokContainerAttached(pageItem);
+    // Check to see if it SHOULD be a Blok (has a BlokContainer as parent, but not a .bg)
+    return !Utils.isKeyInString(pageItem.name, ".bg") &&
+        pageItem.parent &&
+        isBlokContainerAttached(pageItem.parent) &&
+        !isBlokContainerAttached(pageItem);
 }
 
 /**

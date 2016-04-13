@@ -209,8 +209,9 @@ class Blok {
      * @param desired - a rectangle for the new location and size
      * @param rootNode - a matching CSS node with full style and layout information, possibly undefined
      * @param skipScaleTransform - if true, don't perform any scale
+     * @param skipCache - if true, don't cache any data
      */
-    public layout(desired: Rect, rootNode: any, skipScaleTransform = false): void {
+    public layout(desired: Rect, rootNode: any, skipScaleTransform = false, skipCache = false): void {
         let actual = this.getRect();
         let isScaleRequested = false;
         let transformMatrix = app.getIdentityMatrix();
@@ -245,10 +246,12 @@ class Blok {
             this._pageItem.textPath.width = desired.getWidth();
             this._pageItem.textPath.height = desired.getHeight();
 
-            // Cache dims
-            let curR = this.getRect();
-            this.setCachedWidth(curR.getWidth());
-            this.setCachedHeight(curR.getHeight());
+            if (!skipCache) {
+                // Cache dims
+                let curR = this.getRect();
+                this.setCachedWidth(curR.getWidth());
+                this.setCachedHeight(curR.getHeight());
+            }
         }
         else {
             if (isScaleRequested || !Utils.nearlyEqual(aiDeltaX, 0) || !Utils.nearlyEqual(aiDeltaY, 0)) {
@@ -263,10 +266,12 @@ class Blok {
                 );
             }
 
-            // Cache dims
-            let curR = this.getRect();
-            this.setCachedWidth(curR.getWidth());
-            this.setCachedHeight(curR.getHeight());
+            if (!skipCache) {
+                // Cache dims
+                let curR = this.getRect();
+                this.setCachedWidth(curR.getWidth());
+                this.setCachedHeight(curR.getHeight());
+            }
         }
     }
 

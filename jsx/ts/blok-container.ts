@@ -331,14 +331,16 @@ class BlokContainer extends Blok {
                 throw new Error("We have non-Blok children?");
             }*/
 
-            // Check to see if this is a BlokContainer. We'll convert a normal groupItem if it has
-            // a specific name. This is mostly to keep test files easy to create
-            if (pageItem.name === "<BlokGroup>" ||
-                (pageItem.pageItems && BlokAdapter.isBlokContainerAttached(pageItem))) {
-                sortedChildren.push(BlokAdapter.getBlokContainer(pageItem));
-            }
-            else {
-                sortedChildren.push(BlokAdapter.getBlok(pageItem));
+            if (!Utils.isKeyInString(pageItem.name, ".bg")) {
+                // Check to see if this is a BlokContainer. We'll convert a normal groupItem if it has
+                // a specific name. This is mostly to keep test files easy to create
+                if (pageItem.name === "<BlokGroup>" ||
+                    (pageItem.pageItems && BlokAdapter.isBlokContainerAttached(pageItem))) {
+                    sortedChildren.push(BlokAdapter.getBlokContainer(pageItem));
+                }
+                else {
+                    sortedChildren.push(BlokAdapter.getBlok(pageItem));
+                }
             }
         }
 
@@ -369,6 +371,21 @@ class BlokContainer extends Blok {
             blokRect.setHeight(node.layout.height);
 
             blok.layout(blokRect, node);
+        }
+
+        // Layout the .bg
+        if (this._pageItem.pageItems.length > 0 &&
+            Utils.isKeyInString(this._pageItem.pageItems[this._pageItem.pageItems.length - 1].name, ".bg")) {
+            let bg = this._pageItem.pageItems[this._pageItem.pageItems.length - 1];
+            // Hack, we shouldn't be calling the constructor directly, but it's an easy way to get the layout func
+            let bgBlok = new Blok(bg);
+
+            bgBlok.layout(
+                new Rect([0, 0, rootNode.layout.width, rootNode.layout.height]),
+                rootNode,
+                false,
+                true
+            );
         }
 
         if (desired) {
