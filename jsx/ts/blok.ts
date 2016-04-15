@@ -16,44 +16,13 @@ import Utils = require("./utils");
  */
 class Blok {
     /**
-     * Normalize art object bounds be what we consider visible bounds.
+     * Normalize art object bounds
      *
      * @param pageItem - an Illustrator pageItem
-     * @returns a 4 digit array representing the visible bounds of art in SCREEN coordinates
+     * @returns a 4 digit array representing the geometric bounds of art in SCREEN coordinates
      */
     protected static getPageItemBounds(pageItem: any): number[] {
-        var bounds = pageItem.visibleBounds;
-
-        if (pageItem.typename === "TextFrame" && pageItem.kind == TextType.AREATEXT) {
-            bounds = pageItem.geometricBounds;
-        }
-        else if (pageItem.typename === "GroupItem") {
-            let geoBounds = pageItem.geometricBounds;
-
-            // Extremely special case. If a GroupItem contains a TextFrame that's AREATEXT, it's
-            // possible for the top visible bound of that TextFrame to be greater than it's geometric
-            // bounds. Since we always for a GroupItem's visible bounds, it naturally includes the taller
-            // version of the TextFrame.
-            //
-            // Since it's normal for the GroupItem's visible and geometric bounds to differ (in cases
-            // where child PathItems have a stroke), we have to check to see if the discrepency is
-            // specifically due to a TextFrame. I've only seen this for the top or bottom bound, all others
-            // seem to be fine.
-            for (let b = 1; b < 4; b += 2) {
-                if (!Utils.nearlyEqual(bounds[b], geoBounds[b])) {
-                    for (let i = 0; i < pageItem.pageItems.length; i++) {
-                        let child = pageItem.pageItems[i];
-
-                        if (child.typename === "TextFrame" && child.kind == TextType.AREATEXT) {
-                            if (Utils.nearlyEqual(bounds[b], child.visibleBounds[b])) {
-                                bounds[b] = geoBounds[b];
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        var bounds = pageItem.geometricBounds;
 
         // Convert from cartesian to screen coordinates
         bounds[1] *= -1;
