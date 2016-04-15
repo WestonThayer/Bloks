@@ -68,7 +68,7 @@ ASErr BloksAIPlugin::StartupPlugin(SPInterfaceMessage *message)
 			&fRegisterRulerHandle);
 	}
 
-	sAIUser->MessageAlert(ai::UnicodeString("Hello from BloksAIPlugin!"));
+	//sAIUser->MessageAlert(ai::UnicodeString("Hello from BloksAIPlugin!"));
 
 	return error;
 }
@@ -83,7 +83,7 @@ ASErr BloksAIPlugin::ShutdownPlugin(SPInterfaceMessage *message)
 		//error = Plugin::LockPlugin(false);
 	}
 
-	sAIUser->MessageAlert(ai::UnicodeString("Goodbye from BloksAIPlugin!"));
+	//sAIUser->MessageAlert(ai::UnicodeString("Goodbye from BloksAIPlugin!"));
 
 	if (!error)
 	{
