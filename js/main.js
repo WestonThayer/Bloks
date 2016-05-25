@@ -27,6 +27,8 @@
         
         var BlokVm = (function() {        
             function BlokVm() {
+                this.isErrorStateVisible = ko.observable(true);
+                this.isEmptyStateVisible = ko.observable(false);
                 this.title = ko.observable("Not set");
                 this.isContainerSettingsVisible = ko.observable(false);
                 this.isChildSettingsVisible = ko.observable(false);
@@ -173,63 +175,73 @@
                 BlokScripts.relayoutSelection();
             }
         });
+        
+        function respondToActions(result) {
+            // If we ever hear back from the plugin, no more need for
+            // initial state to show
+            viewModel.isErrorStateVisible(false);
+            
+            if (result.action === 0) {
+                viewModel.isEmptyStateVisible(true);
+                viewModel.title("No Options");
+                viewModel.isChildSettingsVisible(false);
+                viewModel.isContainerSettingsVisible(false);
+                viewModel.isCreateButtonVisible(false);
+                viewModel.isLayoutButtonVisible(false);
+            }
+            else if (result.action === 1) {
+                // Container sel
+                viewModel.isEmptyStateVisible(false);
+                viewModel.title("Blok Group");
 
-        BlokScripts.onSelectionChanged(function() {  
-            BlokScripts.getActionsFromSelection(function(result) {
-                if (result.action === 0) {
-                    viewModel.title("No Options");
-                    viewModel.isChildSettingsVisible(false);
-                    viewModel.isContainerSettingsVisible(false);
-                    viewModel.isCreateButtonVisible(false);
-                    viewModel.isLayoutButtonVisible(false);
-                }
-                else if (result.action === 1) {
-                    // Container sel
-                    viewModel.title("Blok Group");
-                    
-                    if (result.blok.isAlsoChild) {
-                        viewModel.isChildSettingsVisible(true);
-                        viewModel.flex(result.blok.flex);
-                        viewModel.alignSelf(result.blok.alignSelf);
-                    }
-                    else {
-                        viewModel.isChildSettingsVisible(false);
-                    }
-                    
-                    viewModel.isContainerSettingsVisible(true);
-                    viewModel.isCreateButtonVisible(false);
-                    viewModel.isLayoutButtonVisible(true);
-
-                    viewModel.flexDirection(result.blok.flexDirection);
-                    viewModel.justifyContent(result.blok.justifyContent);
-                    viewModel.alignItems(result.blok.alignItems);
-                }
-                else if (result.action === 2) {
-                    // child sel
-                    viewModel.title("Blok Item");
+                if (result.blok.isAlsoChild) {
                     viewModel.isChildSettingsVisible(true);
-                    viewModel.isContainerSettingsVisible(false);
-                    viewModel.isCreateButtonVisible(false);
-                    viewModel.isLayoutButtonVisible(true);
-                    
                     viewModel.flex(result.blok.flex);
                     viewModel.alignSelf(result.blok.alignSelf);
                 }
-                else if (result.action === 3) {
-                    // Create group
-                    viewModel.title("Blok Group");
-                    viewModel.isChildSettingsVisible(false);
-                    viewModel.isContainerSettingsVisible(true);
-                    viewModel.isCreateButtonVisible(true);
-                    viewModel.isLayoutButtonVisible(false);
-                    viewModel.flexDirection(0);
-                    viewModel.justifyContent(0);
-                    viewModel.alignItems(0);
-                }
                 else {
-                    throw new Error("Unexpected action value: " + result);
+                    viewModel.isChildSettingsVisible(false);
                 }
-            });
+
+                viewModel.isContainerSettingsVisible(true);
+                viewModel.isCreateButtonVisible(false);
+                viewModel.isLayoutButtonVisible(true);
+
+                viewModel.flexDirection(result.blok.flexDirection);
+                viewModel.justifyContent(result.blok.justifyContent);
+                viewModel.alignItems(result.blok.alignItems);
+            }
+            else if (result.action === 2) {
+                // child sel
+                viewModel.isEmptyStateVisible(false);
+                viewModel.title("Blok Item");
+                viewModel.isChildSettingsVisible(true);
+                viewModel.isContainerSettingsVisible(false);
+                viewModel.isCreateButtonVisible(false);
+                viewModel.isLayoutButtonVisible(true);
+
+                viewModel.flex(result.blok.flex);
+                viewModel.alignSelf(result.blok.alignSelf);
+            }
+            else if (result.action === 3) {
+                // Create group
+                viewModel.isEmptyStateVisible(false);
+                viewModel.title("Blok Group");
+                viewModel.isChildSettingsVisible(false);
+                viewModel.isContainerSettingsVisible(true);
+                viewModel.isCreateButtonVisible(true);
+                viewModel.isLayoutButtonVisible(false);
+                viewModel.flexDirection(0);
+                viewModel.justifyContent(0);
+                viewModel.alignItems(0);
+            }
+            else {
+                throw new Error("Unexpected action value: " + result);
+            }
+        }
+
+        BlokScripts.onSelectionChanged(function() {  
+            BlokScripts.getActionsFromSelection(respondToActions);
             
             if (!isUndo) {
                 BlokScripts.checkSelectionForRelayout();
@@ -296,6 +308,9 @@
         $("#reload-btn").click(function () {
             location.reload();
         });
+        
+        // Make an initial query on first boot
+        BlokScripts.getActionsFromSelection(respondToActions);
     }
     catch (ex) {
         alert("CEP crashed: " + ex.toString());

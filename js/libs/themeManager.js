@@ -101,8 +101,10 @@ var themeManager = (function () {
         addRule(styleId, ".hostButton", "background-color:" + "#" + darkBgdColor);
         addRule(styleId, ".hostButton:hover", "background-color:" + "#" + bgdColor);
         addRule(styleId, ".hostButton:active", "background-color:" + "#" + darkBgdColor);
-        addRule(styleId, ".hostButton", "border-color: " + "#" + lightBgdColor);        
-
+        addRule(styleId, ".hostButton", "border-color: " + "#" + lightBgdColor);
+        
+        // Bloks: added for SVG fills
+        addRule(styleId, ".hostFill", "fill:#" + fontColor);
     }
     
     
