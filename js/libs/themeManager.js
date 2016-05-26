@@ -105,6 +105,7 @@ var themeManager = (function () {
         
         // Bloks: added for SVG fills
         addRule(styleId, ".hostFill", "fill:#" + fontColor);
+        addRule(styleId, ".hostStroke", "stroke:#" + fontColor);
     }
     
     
