@@ -27,7 +27,7 @@
             <div class="settings-container" data-bind="visible: !isEmptyStateVisible()">
                 <div data-bind="visible: isChildSettingsVisible">
                     <div id="flex">
-                        <p>Grow:</p>
+                        <p>Grow (&lt;ENTER&gt; to commit):</p>
                         <input type="text" placeholder="unset" class="topcoat-text-input" data-bind="value: flex" />
                     </div>
 
@@ -113,7 +113,7 @@
                 
                 <div class="settings-container_buttons">
                     <button id="create-btn" class="topcoat-button--large--cta hostFontSize" data-bind="visible: isCreateButtonVisible">Create</button>
-                    <button id="layout-btn" class="topcoat-button--large hostFontSize" data-bind="visible: isLayoutButtonVisible">Layout</button>
+                    <button id="layout-btn" class="topcoat-button--large hostFontSize" data-bind="visible: isLayoutButtonVisible">Relayout</button>
                 </div>
             </div>
             
