@@ -63,13 +63,17 @@
                     <div id="flex-direction">
                         <p>Orientation:</p>
                         <div class="topcoat-button-bar">
-                            <label class="topcoat-button-bar__item">
+                            <label title="Vertical" class="topcoat-button-bar__item">
                                 <input type="radio" name="flex-direction-grp" data-bind="checked: flexDirection, checkedValue: 1" />
-                                <span class="topcoat-button-bar__button hostFontSize">Vertical</span>
+                                <span class="topcoat-button-bar__button">
+                                    <svg class="hostFill topcoat-button-bar__button__svg" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>vertical</title><rect x="1" y="1" width="14" height="4"/><rect x="1" y="6" width="9" height="4"/><rect x="1" y="11" width="12" height="4"/></svg>
+                                </span>
                             </label>
-                            <label class="topcoat-button-bar__item">
+                            <label title="Horizontal" class="topcoat-button-bar__item">
                                 <input type="radio" name="flex-direction-grp" data-bind="checked: flexDirection, checkedValue: 0"/>
-                                <span class="topcoat-button-bar__button hostFontSize">Horizontal</span>
+                                <span class="topcoat-button-bar__button">
+                                    <svg class="hostFill topcoat-button-bar__button__svg" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>buttons</title><rect x="6" y="6" width="14" height="4" transform="translate(21 -5) rotate(90)"/><rect x="3.5" y="3.5" width="9" height="4" transform="translate(13.5 -2.5) rotate(90)"/><rect x="-3" y="5" width="12" height="4" transform="translate(10 4) rotate(90)"/></svg>
+                                </span>
                             </label>
                         </div>
                     </div>
@@ -77,13 +81,19 @@
                     <div id="justify-content">
                         <p>Spacing:</p>
                         <div class="topcoat-button-bar">
-                            <label class="topcoat-button-bar__item">
+                            <label title="Tight" class="topcoat-button-bar__item">
                                 <input type="radio" name="justify-content-grp" data-bind="checked: justifyContent, checkedValue: 0" />
-                                <span class="topcoat-button-bar__button hostFontSize">Tight</span>
+                                <span class="topcoat-button-bar__button">
+                                    <svg data-bind="visible: flexDirection()" class="hostFill topcoat-button-bar__button__svg" data-name="vertically tight" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>buttons</title><rect x="1" y="3" width="14" height="4"/><rect x="1" y="8" width="12" height="4"/></svg>
+                                    <svg data-bind="visible: !flexDirection()" class="hostFill topcoat-button-bar__button__svg" data-name="horizontally tight" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>buttons</title><rect x="4" y="6" width="14" height="4" transform="translate(19 -3) rotate(90)"/><rect y="5" width="12" height="4" transform="translate(13 1) rotate(90)"/></svg>
+                                </span>
                             </label>
-                            <label class="topcoat-button-bar__item">
+                            <label title="Distributed" class="topcoat-button-bar__item">
                                 <input type="radio" name="justify-content-grp" data-bind="checked: justifyContent, checkedValue: 1" />
-                                <span class="topcoat-button-bar__button hostFontSize">Distributed</span>
+                                <span class="topcoat-button-bar__button">
+                                    <svg data-bind="visible: flexDirection()" class="hostFill topcoat-button-bar__button__svg" data-name="vertically space-between" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>buttons</title><rect x="1" y="1" width="14" height="4"/><rect x="1" y="11" width="12" height="4"/><rect x="7" y="6" width="1" height="1"/><rect x="7" y="9" width="1" height="1"/></svg>
+                                    <svg data-bind="visible: !flexDirection()" class="hostFill topcoat-button-bar__button__svg" data-name="vertically space-between" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>buttons</title><rect x="9" y="7" width="1" height="1" transform="translate(17 -2) rotate(90)"/><rect x="6" y="7" width="1" height="1" transform="translate(14 1) rotate(90)"/><rect x="6" y="6" width="14" height="4" transform="translate(21 -5) rotate(90)"/><rect x="-3" y="5" width="12" height="4" transform="translate(10 4) rotate(90)"/></svg>
+                                </span>
                             </label>
                         </div>
                     </div>
