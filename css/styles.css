@@ -3,7 +3,7 @@
 .content {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     min-height: 100vh;
 }
 
@@ -26,25 +26,44 @@
     opacity: 0.8;
 }
 
-.empty-state > #svg-group {
-    opacity: 0.8;
-}
-
 .settings-container {
     flex-grow: 1;
     margin: 0 6px 6px;
-}
-
-.settings-container .settings-container_buttons {
-    margin: 20px 0 0;
+    position: relative;
 }
 
 .bottombuttons {
-    margin: 0 6px 4px;
+    margin: 12px 6px 4px;
 }
 
-.topcoat-button-bar__button__svg {
-    margin: 4px 0 0 0;
+.divider {
+    border-top: 1px solid rgba(0,0,0,0.8);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    width: 100%;
+    margin: 12px 0 0 0;
+}
+
+.label {
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+
+.label--inline {
+    display: inline-block;
+    margin: 5px 0 0 0;
+    vertical-align: top;
+}
+
+.label--disabled {
+    opacity: 0.6;
+}
+
+.label-placeholder-container {
+    position: absolute;
+    text-align: center;
+    left: 0;
+    right: 0;
 }
 
 
@@ -81,3 +100,4 @@ by the settings of the CC application
 
 /* Bloks helper for SVG fills */
 .hostFill{}
+.hostStroke{}

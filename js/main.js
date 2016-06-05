@@ -28,7 +28,6 @@
         var BlokVm = (function() {        
             function BlokVm() {
                 this.isErrorStateVisible = ko.observable(true);
-                this.isEmptyStateVisible = ko.observable(false);
                 this.title = ko.observable("Not set");
                 this.isContainerSettingsVisible = ko.observable(false);
                 this.isChildSettingsVisible = ko.observable(false);
@@ -38,6 +37,7 @@
                 // Blok settings
                 this.flex = ko.observable(undefined).extend({ positiveNumeric: 0 });
                 this.alignSelf = ko.observable(undefined);
+                this.parentBlokContainerFlexDirection = ko.observable(0);
 
                 // BlokContainer settings
                 this.flexDirection = ko.observable(0);
@@ -182,7 +182,6 @@
             viewModel.isErrorStateVisible(false);
             
             if (result.action === 0) {
-                viewModel.isEmptyStateVisible(true);
                 viewModel.title("No Options");
                 viewModel.isChildSettingsVisible(false);
                 viewModel.isContainerSettingsVisible(false);
@@ -191,13 +190,13 @@
             }
             else if (result.action === 1) {
                 // Container sel
-                viewModel.isEmptyStateVisible(false);
                 viewModel.title("Blok Group");
 
                 if (result.blok.isAlsoChild) {
                     viewModel.isChildSettingsVisible(true);
                     viewModel.flex(result.blok.flex);
                     viewModel.alignSelf(result.blok.alignSelf);
+                    viewModel.parentBlokContainerFlexDirection(result.blok.parentBlokContainer.flexDirection);
                 }
                 else {
                     viewModel.isChildSettingsVisible(false);
@@ -213,7 +212,6 @@
             }
             else if (result.action === 2) {
                 // child sel
-                viewModel.isEmptyStateVisible(false);
                 viewModel.title("Blok Item");
                 viewModel.isChildSettingsVisible(true);
                 viewModel.isContainerSettingsVisible(false);
@@ -222,10 +220,10 @@
 
                 viewModel.flex(result.blok.flex);
                 viewModel.alignSelf(result.blok.alignSelf);
+                viewModel.parentBlokContainerFlexDirection(result.blok.parentBlokContainer.flexDirection);
             }
             else if (result.action === 3) {
                 // Create group
-                viewModel.isEmptyStateVisible(false);
                 viewModel.title("Blok Group");
                 viewModel.isChildSettingsVisible(false);
                 viewModel.isContainerSettingsVisible(true);

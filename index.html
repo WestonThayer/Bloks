@@ -19,20 +19,89 @@
                 <p class="error-state_error centered-presenter_label">Uhoh, we couldn't connect to the Illustrator plugin. Make sure BloksAIPlugin.aip is installed correctly.</p>
             </div>
             
-            <div class="empty-state centered-presenter" data-bind="visible: isEmptyStateVisible">
-                <svg id="svg-group" class="hostFill hostStroke" xmlns="http://www.w3.org/2000/svg" width="112.75" height="89.29" viewBox="0 0 112.75 89.29"><defs><style>.cls-1,.cls-2,.cls-3{fill:none;stroke-miterlimit:10;}.cls-2{stroke-dasharray:1.99 1.99;}.cls-3{stroke-dasharray:1.95 1.95;}</style></defs><title>getstarted</title><rect x="7" y="7.42" width="47.25" height="33.25"/><rect x="60.5" y="30.67" width="30.75" height="26.25"/><polyline class="cls-1" points="100.17 65.83 100.17 66.83 99.17 66.83"/><line class="cls-2" x1="97.17" y1="66.83" x2="2.5" y2="66.83"/><polyline class="cls-1" points="1.5 66.83 0.5 66.83 0.5 65.83"/><line class="cls-3" x1="0.5" y1="63.88" x2="0.5" y2="2.47"/><polyline class="cls-1" points="0.5 1.5 0.5 0.5 1.5 0.5"/><line class="cls-2" x1="3.49" y1="0.5" x2="98.17" y2="0.5"/><polyline class="cls-1" points="99.17 0.5 100.17 0.5 100.17 1.5"/><line class="cls-3" x1="100.17" y1="3.45" x2="100.17" y2="64.86"/><polygon points="100.17 66.83 100.17 83.92 104.5 81.67 108 89.29 110.75 88.04 107.5 80.29 112.75 80.17 100.17 66.83"/></svg>
-                <p class="empty-state_prompt center-presenter_label">Select more than one object to get started.</p>
-            </div>
-            
-            <div class="settings-container" data-bind="visible: !isEmptyStateVisible()">
-                <div data-bind="visible: isChildSettingsVisible">
-                    <div id="flex">
-                        <p>Grow (&lt;ENTER&gt; to commit):</p>
-                        <input type="text" placeholder="unset" class="topcoat-text-input" data-bind="value: flex" />
+            <div class="settings-container" data-bind="visible: !isErrorStateVisible()">
+                <div class="label-placeholder-container" style="margin: 60px 0 0 0;" data-bind="visible: !isContainerSettingsVisible()">
+                    <p class="label label--disabled">No BlokGroup Selected</p>
+                    <p class="label label--disabled">Select more than one object to create one.</p>
+                </div>
+                
+                <div data-bind="style: { visibility: isContainerSettingsVisible() ? 'visible' : 'hidden' }">
+                    <div id="flex-direction">
+                        <p class="label" title="Whether art is stacked top-to-bottom or left-to-right">Orientation:</p>
+                        <div class="topcoat-button-bar">
+                            <label class="topcoat-button-bar__item">
+                                <input type="radio" name="flex-direction-grp" data-bind="checked: flexDirection, checkedValue: 1" />
+                                <span class="topcoat-button-bar__button hostFontSize">Vertical</span>
+                            </label>
+                            <label class="topcoat-button-bar__item">
+                                <input type="radio" name="flex-direction-grp" data-bind="checked: flexDirection, checkedValue: 0"/>
+                                <span class="topcoat-button-bar__button hostFontSize">Horizontal</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="justify-content">
+                        <p class="label">Space between Children:</p>
+                        <div class="topcoat-button-bar">
+                            <label class="topcoat-button-bar__item">
+                                <input type="radio" name="justify-content-grp" data-bind="checked: justifyContent, checkedValue: 0" />
+                                <span class="topcoat-button-bar__button hostFontSize">None</span>
+                            </label>
+                            <label class="topcoat-button-bar__item">
+                                <input type="radio" name="justify-content-grp" data-bind="checked: justifyContent, checkedValue: 1" />
+                                <span class="topcoat-button-bar__button hostFontSize">Equally Distributed</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="align-items">
+                        <p class="label" title="How art is aligned within this group"><span data-bind="visible: !flexDirection()">Vertical</span><span data-bind="visible: flexDirection()">Horizontal</span> Alignment for Children:</p>
+                        <div class="topcoat-button-bar">
+                            <label class="topcoat-button-bar__item">
+                                <input type="radio" name="align-items-grp" data-bind="checked: alignItems, checkedValue: 0" />
+                                <span class="topcoat-button-bar__button hostFontSize">
+                                    <span data-bind="visible: !flexDirection()">Top</span>
+                                    <span data-bind="visible: flexDirection()">Left</span>
+                                </span>
+                            </label>
+                            <label class="topcoat-button-bar__item">
+                                <input type="radio" name="align-items-grp" data-bind="checked: alignItems, checkedValue: 1" />
+                                <span class="topcoat-button-bar__button hostFontSize">Center</span>
+                            </label>
+                            <label class="topcoat-button-bar__item">
+                                <input type="radio" name="align-items-grp" data-bind="checked: alignItems, checkedValue: 2" />
+                                <span class="topcoat-button-bar__button hostFontSize">
+                                    <span data-bind="visible: !flexDirection()">Bottom</span>
+                                    <span data-bind="visible: flexDirection()">Right</span>
+                                </span>
+                            </label>
+                            <label class="topcoat-button-bar__item">
+                                <input type="radio" name="align-items-grp" data-bind="checked: alignItems, checkedValue: 3" />
+                                <span class="topcoat-button-bar__button hostFontSize">Stretch</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button id="create-btn" class="topcoat-button--large--cta hostFontSize" style="display: block; margin: 20px 0 0 0;" data-bind="style: { visibility: isCreateButtonVisible() ? 'visible' : 'hidden' }">Create</button>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="label-placeholder-container" style="margin: 40px 0 0 0;" data-bind="visible: !isChildSettingsVisible()">
+                    <p class="label label--disabled">No Blok Selected</p>
+                </div>
+                
+                <div data-bind="style: { visibility: isChildSettingsVisible() ? 'visible' : 'hidden' }">
+                    <div id="flex" style="margin: 12px 0 0 0;">
+                        <p class="label label--inline" title="A value of '1' causes the object fill the remaining space in the BlokGroup&#13;A value of '2' causes the object to fill twice the space as another object set to '1'&#13;A value of 'unset' uses the object's normal size&#13;Use ENTER to commit"><span data-bind="visible: !parentBlokContainerFlexDirection()">Horizontal</span><span data-bind="visible: parentBlokContainerFlexDirection()">Vertical</span> Flexibility:</p>
+                        <input type="text" placeholder="unset" class="topcoat-text-input" style="width: 60px;" data-bind="value: flex" />
+                        <span title="A value of '1' causes the object fill the remaining space in the BlokGroup&#13;A value of '2' causes the object to fill twice the space as another object set to '1'&#13;A value of 'unset' uses the object's normal size&#13;Use ENTER to commit" style="display: inline-block; margin: 3px 0 0 4px;">
+                            <svg class="hostFill" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><defs><style>.cls-1{fill:none;stroke-miterlimit:10;stroke-width:0.93px;}.cls-2{font-size:10px;font-family:Myriad Pro;-webkit-user-select:none;user-select:none;cursor:default;}</style></defs><title>buttons</title><circle class="cls-1 hostStroke" cx="8" cy="8" r="7"/><text class="cls-2" transform="translate(5.5 11)">?</text></svg>
+                        </span>
                     </div>
 
                     <div id="align-self">
-                        <p>Personal Alignment:</p>
+                        <p class="label">Personal <span data-bind="visible: !parentBlokContainerFlexDirection()">Vertical</span><span data-bind="visible: parentBlokContainerFlexDirection()">Horizontal</span> Alignment:</p>
 
                         <div class="topcoat-button-bar">
                             <label class="topcoat-button-bar__item">
@@ -41,7 +110,10 @@
                             </label>
                             <label class="topcoat-button-bar__item">
                                 <input type="radio" name="align-self-grp" data-bind="checked: alignSelf, checkedValue: 0" />
-                                <span class="topcoat-button-bar__button hostFontSize">Start</span>
+                                <span class="topcoat-button-bar__button hostFontSize">
+                                    <span data-bind="visible: !parentBlokContainerFlexDirection()">Top</span>
+                                    <span data-bind="visible: parentBlokContainerFlexDirection()">Left</span>
+                                </span>
                             </label>
                             <label class="topcoat-button-bar__item">
                                 <input type="radio" name="align-self-grp" data-bind="checked: alignSelf, checkedValue: 1" />
@@ -49,7 +121,10 @@
                             </label>
                             <label class="topcoat-button-bar__item">
                                 <input type="radio" name="align-self-grp" data-bind="checked: alignSelf, checkedValue: 2" />
-                                <span class="topcoat-button-bar__button hostFontSize">End</span>
+                                <span class="topcoat-button-bar__button hostFontSize">
+                                    <span data-bind="visible: !parentBlokContainerFlexDirection()">Bottom</span>
+                                    <span data-bind="visible: parentBlokContainerFlexDirection()">Right</span>
+                                </span>
                             </label>
                             <label class="topcoat-button-bar__item">
                                 <input type="radio" name="align-self-grp" data-bind="checked: alignSelf, checkedValue: 3" />
@@ -58,78 +133,14 @@
                         </div>
                     </div>
                 </div>
-
-                <div data-bind="visible: isContainerSettingsVisible">
-                    <div id="flex-direction">
-                        <p>Orientation:</p>
-                        <div class="topcoat-button-bar">
-                            <label title="Vertical" class="topcoat-button-bar__item">
-                                <input type="radio" name="flex-direction-grp" data-bind="checked: flexDirection, checkedValue: 1" />
-                                <span class="topcoat-button-bar__button">
-                                    <svg class="hostFill topcoat-button-bar__button__svg" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>vertical</title><rect x="1" y="1" width="14" height="4"/><rect x="1" y="6" width="9" height="4"/><rect x="1" y="11" width="12" height="4"/></svg>
-                                </span>
-                            </label>
-                            <label title="Horizontal" class="topcoat-button-bar__item">
-                                <input type="radio" name="flex-direction-grp" data-bind="checked: flexDirection, checkedValue: 0"/>
-                                <span class="topcoat-button-bar__button">
-                                    <svg class="hostFill topcoat-button-bar__button__svg" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>buttons</title><rect x="6" y="6" width="14" height="4" transform="translate(21 -5) rotate(90)"/><rect x="3.5" y="3.5" width="9" height="4" transform="translate(13.5 -2.5) rotate(90)"/><rect x="-3" y="5" width="12" height="4" transform="translate(10 4) rotate(90)"/></svg>
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="justify-content">
-                        <p>Spacing:</p>
-                        <div class="topcoat-button-bar">
-                            <label title="Tight" class="topcoat-button-bar__item">
-                                <input type="radio" name="justify-content-grp" data-bind="checked: justifyContent, checkedValue: 0" />
-                                <span class="topcoat-button-bar__button">
-                                    <svg data-bind="visible: flexDirection()" class="hostFill topcoat-button-bar__button__svg" data-name="vertically tight" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>buttons</title><rect x="1" y="3" width="14" height="4"/><rect x="1" y="8" width="12" height="4"/></svg>
-                                    <svg data-bind="visible: !flexDirection()" class="hostFill topcoat-button-bar__button__svg" data-name="horizontally tight" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>buttons</title><rect x="4" y="6" width="14" height="4" transform="translate(19 -3) rotate(90)"/><rect y="5" width="12" height="4" transform="translate(13 1) rotate(90)"/></svg>
-                                </span>
-                            </label>
-                            <label title="Distributed" class="topcoat-button-bar__item">
-                                <input type="radio" name="justify-content-grp" data-bind="checked: justifyContent, checkedValue: 1" />
-                                <span class="topcoat-button-bar__button">
-                                    <svg data-bind="visible: flexDirection()" class="hostFill topcoat-button-bar__button__svg" data-name="vertically space-between" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>buttons</title><rect x="1" y="1" width="14" height="4"/><rect x="1" y="11" width="12" height="4"/><rect x="7" y="6" width="1" height="1"/><rect x="7" y="9" width="1" height="1"/></svg>
-                                    <svg data-bind="visible: !flexDirection()" class="hostFill topcoat-button-bar__button__svg" data-name="vertically space-between" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>buttons</title><rect x="9" y="7" width="1" height="1" transform="translate(17 -2) rotate(90)"/><rect x="6" y="7" width="1" height="1" transform="translate(14 1) rotate(90)"/><rect x="6" y="6" width="14" height="4" transform="translate(21 -5) rotate(90)"/><rect x="-3" y="5" width="12" height="4" transform="translate(10 4) rotate(90)"/></svg>
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="align-items">
-                        <p>Child Alignment:</p>
-                        <div class="topcoat-button-bar">
-                            <label class="topcoat-button-bar__item">
-                                <input type="radio" name="align-items-grp" data-bind="checked: alignItems, checkedValue: 0" />
-                                <span class="topcoat-button-bar__button hostFontSize">Start</span>
-                            </label>
-                            <label class="topcoat-button-bar__item">
-                                <input type="radio" name="align-items-grp" data-bind="checked: alignItems, checkedValue: 1" />
-                                <span class="topcoat-button-bar__button hostFontSize">Center</span>
-                            </label>
-                            <label class="topcoat-button-bar__item">
-                                <input type="radio" name="align-items-grp" data-bind="checked: alignItems, checkedValue: 2" />
-                                <span class="topcoat-button-bar__button hostFontSize">End</span>
-                            </label>
-                            <label class="topcoat-button-bar__item">
-                                <input type="radio" name="align-items-grp" data-bind="checked: alignItems, checkedValue: 3" />
-                                <span class="topcoat-button-bar__button hostFontSize">Stretch</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="settings-container_buttons">
-                    <button id="create-btn" class="topcoat-button--large--cta hostFontSize" data-bind="visible: isCreateButtonVisible">Create</button>
-                    <button id="layout-btn" class="topcoat-button--large hostFontSize" data-bind="visible: isLayoutButtonVisible">Relayout</button>
-                </div>
             </div>
             
+            <div class="divider"></div>
+            
             <div class="bottombuttons" data-bind="visible: !isErrorStateVisible()">
-                <button id="spacer-hide-btn" class="topcoat-button--large hostFontSize">Hide .spacer</button>
-                <button id="spacer-show-btn" class="topcoat-button--large hostFontSize">Show .spacer</button>
+                <button id="spacer-hide-btn" class="topcoat-button--large hostFontSize" title="Set the opacity of all art with '.spacer' in its name to 0.0">Hide .spacer</button>
+                <button id="spacer-show-btn" class="topcoat-button--large hostFontSize" title="Set the opacity of all art with '.spacer' in its name to 1.0">Show .spacer</button>
+                <button id="layout-btn" class="topcoat-button--large hostFontSize" data-bind="disable: !isLayoutButtonVisible()" title="Manually trigger layout on the selected object">Relayout</button>
                 
                 <button id="reload-btn" class="topcoat-button--large hostFontSize">Reload</button>
             </div>

@@ -146,7 +146,7 @@ class Blok {
     }
 
     /** A reference to the parent BlokContainer */
-    protected getContainer(): BlokContainer {
+    public getContainer(): BlokContainer {
         let container = undefined;
 
         if (BlokAdapter.isBlokContainerAttached(this._pageItem.parent)) {

@@ -160,6 +160,22 @@ class BlokContainer extends Blok {
         cssNode.style.alignItems = Css.enumStringToCssString(Css.Alignments[this.getAlignItems()]);
         cssNode.style.flexWrap = Css.enumStringToCssString(Css.FlexWraps[this.getFlexWrap()]);
 
+        // Add padding if we have a .bg and they supplied a padding. Ex:
+        // .bg padding: 2 0 2 0;
+        if (this.hasBg()) {
+            let bg = this.getBg();
+            let paddingRegex = /padding:\s?(\d+) (\d+) (\d+) (\d+);/;
+
+            if (paddingRegex.test(bg.name)) {
+                let matches = paddingRegex.exec(bg.name);
+
+                cssNode.style.paddingTop = parseFloat(matches[1]);
+                cssNode.style.paddingRight = parseFloat(matches[2]);
+                cssNode.style.paddingBottom = parseFloat(matches[3]);
+                cssNode.style.paddingLeft = parseFloat(matches[4]);
+            }
+        }
+
         cssNode.children = [];
 
         let blokChildren = this.getChildren();
@@ -293,7 +309,7 @@ class BlokContainer extends Blok {
     }
 
     /** A (possible) reference to the parent BlokContainer */
-    protected /*override*/ getContainer(): BlokContainer {
+    public /*override*/ getContainer(): BlokContainer {
         let container = undefined;
 
         try {
@@ -374,9 +390,8 @@ class BlokContainer extends Blok {
         }
 
         // Layout the .bg
-        if (this._pageItem.pageItems.length > 0 &&
-            Utils.isKeyInString(this._pageItem.pageItems[this._pageItem.pageItems.length - 1].name, ".bg")) {
-            let bg = this._pageItem.pageItems[this._pageItem.pageItems.length - 1];
+        if (this.hasBg()) {
+            let bg = this.getBg();
             // Hack, we shouldn't be calling the constructor directly, but it's an easy way to get the layout func
             let bgBlok = new Blok(bg);
 
@@ -439,6 +454,23 @@ class BlokContainer extends Blok {
         }
 
         this.setSavedProperty<number>("overrideHeight", value);
+    }
+
+    /** Check to see if this BlokGroup has a .bg layer at the bottom of z-order */
+    private hasBg(): boolean {
+        if (this._pageItem.pageItems.length > 0 &&
+            Utils.isKeyInString(this._pageItem.pageItems[this._pageItem.pageItems.length - 1].name, ".bg")) {
+            return true;
+        }
+    }
+
+    /** Get the .bg */
+    private getBg(): any {
+        if (this.hasBg()) {
+            return this._pageItem.pageItems[this._pageItem.pageItems.length - 1];
+        }
+
+        return undefined;
     }
 }
 

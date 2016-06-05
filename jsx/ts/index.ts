@@ -302,6 +302,7 @@ export function getActionsFromSelection(): { action: number, blok: any } {
                         if (blok) {
                             ret.action = 2;
                             ret.blok = blok.getUserSettings();
+                            ret.blok.parentBlokContainer = blok.getContainer().getUserSettings();
 
                             if (pageItem.typename === "TextFrame" && pageItem.kind === TextType.AREATEXT) {
                                 ret.blok.isAreaText = true;
@@ -316,6 +317,7 @@ export function getActionsFromSelection(): { action: number, blok: any } {
 
                         if (pageItem.parent && BlokAdapter.isBlokContainerAttached(pageItem.parent)) {
                             ret.blok.isAlsoChild = true;
+                            ret.blok.parentBlokContainer = blokContainer.getContainer().getUserSettings();
                         }
                     }
                     else {
