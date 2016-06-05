@@ -91,6 +91,21 @@ class Blok {
 
     /** Make our current state match the given user settings */
     public setUserSettings(value: BlokUserSettings): void {
+        if (value.alignSelf === Css.Alignments.STRETCH &&
+            this.getAlignSelf() !== Css.Alignments.STRETCH) {
+            let rect = this.getRect();
+            this.setCachedPrestretchWidth(rect.getWidth());
+            this.setCachedPrestretchHeight(rect.getHeight());
+        }
+        else if (this.getAlignSelf() === Css.Alignments.STRETCH &&
+            value.alignSelf !== Css.Alignments.STRETCH) {
+            let cachedPrestretchWidth = this.getCachedPrestretchWidth();
+            let cachedPrestretchHeight = this.getCachedPrestretchHeight();
+            let rect = new Rect([0, 0, cachedPrestretchWidth, cachedPrestretchHeight]);
+
+            this.layout(rect, undefined);
+        }
+
         this.setFlex(value.flex);
         this.setAlignSelf(value.alignSelf);
     }
@@ -266,6 +281,32 @@ class Blok {
         }
 
         return index;
+    }
+
+    /** Positive number for this art's width before someone asked it to stretch. Use as a cache, not used in layout */
+    public getCachedPrestretchWidth(): number {
+        return this.getSavedProperty<number>("cachedPrestretchWidth");
+    }
+    /** Positive number for this art's width before someone asked it to stretch. Use as a cache, not used in layout */
+    public setCachedPrestretchWidth(value: number): void {
+        if (value !== undefined && value < 0) {
+            throw new RangeError("Cannot set a negative cached prestretch width!");
+        }
+
+        this.setSavedProperty<number>("cachedPrestretchWidth", value);
+    }
+
+    /** Positive number for this art's height before someone asked it to stretch. Use as a cache, not used in layout */
+    public getCachedPrestretchHeight(): number {
+        return this.getSavedProperty<number>("cachedPrestretchHeight");
+    }
+    /** Positive number for this art's height before someone asked it to stretch. Use as a cache, not used in layout */
+    public setCachedPrestretchHeight(value: number): void {
+        if (value !== undefined && value < 0) {
+            throw new RangeError("Cannot set a negative cached prestretch height!");
+        }
+
+        this.setSavedProperty<number>("cachedPrestretchHeight", value);
     }
 
     /** Optional positive number for width. Use as a cache, not used in layout */
