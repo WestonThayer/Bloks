@@ -99,11 +99,8 @@ class Blok {
         }
         else if (this.getAlignSelf() === Css.Alignments.STRETCH &&
             value.alignSelf !== Css.Alignments.STRETCH) {
-            let cachedPrestretchWidth = this.getCachedPrestretchWidth();
-            let cachedPrestretchHeight = this.getCachedPrestretchHeight();
-            let rect = new Rect([0, 0, cachedPrestretchWidth, cachedPrestretchHeight]);
-
-            this.layout(rect, undefined);
+            this.setUseCachedPrestretch(true);
+            this.invalidate();
         }
 
         this.setFlex(value.flex);
@@ -112,9 +109,19 @@ class Blok {
 
     /** Return a css-layout node */
     public computeCssNode(): any {
-        let r = this.getRect();
-        let w = r.getWidth();
-        let h = r.getHeight();
+        let w, h;
+
+        if (this.getUseCachedPrestretch()) {
+            w = this.getCachedPrestretchWidth();
+            h = this.getCachedPrestretchHeight();
+
+            this.setUseCachedPrestretch(false);
+        }
+        else {
+            let r = this.getRect();
+            w = r.getWidth();
+            h = r.getHeight();
+        }
 
         let cssNode: any = {
             style: {
@@ -307,6 +314,15 @@ class Blok {
         }
 
         this.setSavedProperty<number>("cachedPrestretchHeight", value);
+    }
+
+    /** Flag for whether cached prestretch width/height should be used in layout instead of real dims */
+    public getUseCachedPrestretch(): boolean {
+        return this.getSavedProperty<boolean>("useCachedPrestretch");
+    }
+    /** Flag for whether cached prestretch width/height should be used in layout instead of real dims */
+    public setUseCachedPrestretch(value: boolean): void {
+        this.setSavedProperty<boolean>("useCachedPrestretch", value);
     }
 
     /** Optional positive number for width. Use as a cache, not used in layout */

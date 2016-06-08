@@ -114,11 +114,26 @@ class BlokContainer extends Blok {
 
         if (value.alignItems === Css.Alignments.STRETCH &&
             this.getAlignItems() !== Css.Alignments.STRETCH) {
-            this.cacheChildPrestretchDims();
+            let children = this.getChildren();
+
+            for (let i = 0; i < children.length; i++) {
+                let child = children[i];
+                let rect = child.getRect();
+
+                child.setCachedPrestretchWidth(rect.getWidth());
+                child.setCachedPrestretchHeight(rect.getHeight());
+            }
         }
         else if (this.getAlignItems() === Css.Alignments.STRETCH &&
             value.alignItems !== Css.Alignments.STRETCH) {
-            this.restoreChildPrestretchDims();
+            let children = this.getChildren();
+
+            for (let i = 0; i < children.length; i++) {
+                let child = children[i];
+                child.setUseCachedPrestretch(true);
+            }
+
+            this.invalidate();
         }
 
         this.setFlexDirection(value.flexDirection);
@@ -420,33 +435,6 @@ class BlokContainer extends Blok {
         let curR = this.getRect();
         this.setCachedWidth(curR.getWidth());
         this.setCachedHeight(curR.getHeight());
-    }
-
-    /** Write down all children's current dimensions before switching into stretch layout */
-    private cacheChildPrestretchDims(): void {
-        let children = this.getChildren();
-
-        for (let i = 0; i < children.length; i++) {
-            let child = children[i];
-            let rect = child.getRect();
-
-            child.setCachedPrestretchWidth(rect.getWidth());
-            child.setCachedPrestretchHeight(rect.getHeight());
-        }
-    }
-
-    /** Restore all children's dimensions from the cache when we switch away from stretch layout */
-    private restoreChildPrestretchDims(): void {
-        let children = this.getChildren();
-
-        for (let i = 0; i < children.length; i++) {
-            let child = children[i];
-            let cachedPrestretchWidth = child.getCachedPrestretchWidth();
-            let cachedPrestretchHeight = child.getCachedPrestretchHeight();
-            let rect = new Rect([0, 0, cachedPrestretchWidth, cachedPrestretchHeight]);
-
-            child.layout(rect, undefined);
-        }
     }
 
     /** Optional positive number for the number of Bloks this BlokContainer has */
