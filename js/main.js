@@ -283,7 +283,15 @@
         // Group creation
         $("#create-btn").click(function() {
             viewModel.isCreateButtonVisible(false);
-            BlokScripts.createBlokContainerFromSelection(ko.toJSON(viewModel));
+            
+            var settings = {
+                flexDirection: viewModel.flexDirection(),
+                justifyContent: viewModel.justifyContent(),
+                alignItems: viewModel.alignItems(),
+                flexWrap: viewModel.flexWrap()
+            };
+            
+            BlokScripts.createBlokContainerFromSelection(JSON.stringify(settings));
         });
         
         // Force a layout
