@@ -49,6 +49,13 @@ function isActiveDocumentPresent(): boolean {
     }
 }
 
+/** Check to see if the given PageItem is the root art of a Symbol. */
+function isPageItemSymbolRoot(pageItem: any): boolean {
+    return pageItem.parent &&
+        pageItem.parent.parent &&
+        pageItem.parent.parent.name === "Symbol Editing Mode";
+}
+
 // Global variables
 var bloksToBeInvalidated = []; // A cache of Bloks to call invalidate() on when its possible to do so
 var lastSelection; // Tracks the most recent result of app.activeDocument.selection
@@ -73,7 +80,7 @@ export function checkSelectionForRelayout(): void {
                         let blokContainer = BlokAdapter.getBlokContainer(pageItem);
                         blokContainer.checkForRelayout(lastSelection);
                     }
-                    else if (pageItem.parent && pageItem.parent.parent && pageItem.parent.parent.name === "Symbol Editing Mode") {
+                    else if (isPageItemSymbolRoot(pageItem)) {
                         // We're editing a Symbol. Special cases to make this important scenario work
                         let symName = pageItem.parent.name;
 
@@ -167,12 +174,31 @@ export function updateSelectedBlok(settings: BlokUserSettings): void {
         if (sel.length === 1) {
             let pageItem = sel[0];
 
-            if (!BlokAdapter.shouldBlokBeAttached(pageItem)) {
+            if (BlokAdapter.shouldBlokBeAttached(pageItem)) {
+                let blok = BlokAdapter.getBlok(pageItem, settings);
+                blok.invalidate();
+            }
+            else if (isPageItemSymbolRoot(pageItem)) {
+                let symName = pageItem.parent.name;
+                let blok: Blok = undefined;
+
+                // Use the document's list of symbols to find the Bloks that wrap the symbol
+                for (let i = 0; i < app.activeDocument.symbolItems.length; i++) {
+                    let symItem = app.activeDocument.symbolItems[i];
+
+                    if (symItem.symbol.name === symName && BlokAdapter.shouldBlokBeAttached(symItem)) {
+                        if (!blok) {
+                            blok = BlokAdapter.getBlok(pageItem, settings, true);
+                        }
+
+                        let symBlok = BlokAdapter.getBlok(symItem, blok.getUserSettings());
+                        bloksToBeInvalidated.push(symBlok);
+                    }
+                }
+            }
+            else {
                 throw new Error("We're not updating a Blok!");
             }
-
-            let blok = BlokAdapter.getBlok(pageItem, settings);
-            blok.invalidate();
         }
         else {
             throw new Error("Can only update one Blok at a time!");
@@ -318,6 +344,29 @@ export function getActionsFromSelection(): { action: number, blok: any } {
                         if (pageItem.parent && BlokAdapter.isBlokContainerAttached(pageItem.parent)) {
                             ret.blok.isAlsoChild = true;
                             ret.blok.parentBlokContainer = blokContainer.getContainer().getUserSettings();
+                        }
+                    }
+                    else if (isPageItemSymbolRoot(pageItem)) {
+                        let symName = pageItem.parent.name;
+
+                        // Use the document's list of symbols to find the Bloks that wrap the symbol
+                        for (let i = 0; i < app.activeDocument.symbolItems.length; i++) {
+                            let symItem = app.activeDocument.symbolItems[i];
+
+                            if (symItem.symbol.name === symName) {
+                                if (BlokAdapter.shouldBlokBeAttached(symItem)) {
+                                    let blok = BlokAdapter.getBlok(pageItem, undefined, true);
+                                    ret.action = 2;
+                                    ret.blok = blok.getUserSettings();
+                                    //ret.blok.parentBlokContainer = blok.getContainer().getUserSettings();
+
+                                    if (pageItem.typename === "TextFrame" && pageItem.kind === TextType.AREATEXT) {
+                                        ret.blok.isAreaText = true;
+                                    }
+
+                                    break;
+                                }
+                            }
                         }
                     }
                     else {

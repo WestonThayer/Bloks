@@ -124,13 +124,13 @@ export function setSavedProperty<T>(pageItem: any, name: string, value: T): void
  *          if the parent isn't a BlokContainer, or undefined if the pageItem is the only thing
  *          in Isolation Mode.
  */
-export function getBlok(pageItem: any, settings?: BlokUserSettings): Blok {
+export function getBlok(pageItem: any, settings?: BlokUserSettings, skipContainerCheck: boolean = false): Blok {
     if (isDirectlyIsolated(pageItem)) {
         // Isolation Mode means that the parent just can't be a BlokContainer, so we can't fufill the request
         return undefined;
     }
 
-    if (!isBlokContainerAttached(pageItem.parent)) {
+    if (!skipContainerCheck && !isBlokContainerAttached(pageItem.parent)) {
         // If somehow we got unparented from a BlokContainer, the pageItem is not a Blok anymore.
         // Remove it's tag and don't fulfill the request.
         let blokTag = retrieveBlokTag(pageItem);

@@ -220,7 +220,10 @@
 
                 viewModel.flex(result.blok.flex);
                 viewModel.alignSelf(result.blok.alignSelf);
-                viewModel.parentBlokContainerFlexDirection(result.blok.parentBlokContainer.flexDirection);
+                
+                if (result.blok.parentBlokContainer) {
+                    viewModel.parentBlokContainerFlexDirection(result.blok.parentBlokContainer.flexDirection);
+                }
             }
             else if (result.action === 3) {
                 // Create group
