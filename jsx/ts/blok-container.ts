@@ -211,7 +211,8 @@ class BlokContainer extends Blok {
             // a fixed dimension. If even a single Blok child is set to stretch,
             // the BlokContainer must layout with a fixed w/h, otherwise the Blok child
             // has no defined container to stretch in
-            if (this.getAlignItems() === Css.Alignments.STRETCH || blok.getAlignSelf() === Css.Alignments.STRETCH) {
+            if (blok.getAlignSelf() === Css.Alignments.STRETCH ||
+                (this.getAlignItems() === Css.Alignments.STRETCH && blok.getAlignSelf() === undefined)) {
                 if (this.getFlexDirection() === Css.FlexDirections.ROW) {
                     cssNode.style.height = h;
                     childCssNode.style.height = undefined;
