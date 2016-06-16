@@ -100,7 +100,6 @@ class Blok {
         else if (this.getAlignSelf() === Css.Alignments.STRETCH &&
             value.alignSelf !== Css.Alignments.STRETCH) {
             this.setUseCachedPrestretch(true);
-            this.invalidate();
         }
 
         this.setFlex(value.flex);
@@ -210,6 +209,14 @@ class Blok {
 
         if (!skipScaleTransform) {
             // Scale
+            if (actual.getWidth() === 0) {
+                actual.setWidth(1);
+            }
+
+            if (actual.getHeight() === 0) {
+                actual.setHeight(1);
+            }
+
             aiDeltaX = (desired.getWidth() / actual.getWidth()) * 100;
             aiDeltaY = (desired.getHeight() / actual.getHeight()) * 100;
 

@@ -132,8 +132,6 @@ class BlokContainer extends Blok {
                 let child = children[i];
                 child.setUseCachedPrestretch(true);
             }
-
-            this.invalidate();
         }
 
         this.setFlexDirection(value.flexDirection);
