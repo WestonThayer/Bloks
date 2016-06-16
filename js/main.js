@@ -199,6 +199,8 @@
                     viewModel.parentBlokContainerFlexDirection(result.blok.parentBlokContainer.flexDirection);
                 }
                 else {
+                    viewModel.flex(undefined);
+                    viewModel.alignSelf(undefined);
                     viewModel.isChildSettingsVisible(false);
                 }
 
