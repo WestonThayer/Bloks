@@ -56,22 +56,24 @@ gulp.task("build-jsx", function() {
 
 var pwd = undefined;
 
-try {
-    var creds = require("./zxp-tools/certificate-creds.json");
-    pwd = creds.password;
-}
-catch (e) {
-    if (e.code === "MODULE_NOT_FOUND") {
-        throw new Error("./zxp-tools/certificate-creds.json doesn't exist! Please create it. Ex: { password: 'pwd' }");
+gulp.task("zxp-get-creds", function() {
+    try {
+        var creds = require("./zxp-tools/certificate-creds.json");
+        pwd = creds.password;
     }
-    else {
-        throw e;
+    catch (e) {
+        if (e.code === "MODULE_NOT_FOUND") {
+            throw new Error("./zxp-tools/certificate-creds.json doesn't exist! Please create it. Ex: { password: 'pwd' }");
+        }
+        else {
+            throw e;
+        }
     }
-}
 
-if (!pwd) {
-    throw new Error("Unable to get the certificate file's password!");
-}
+    if (!pwd) {
+        throw new Error("Unable to get the certificate file's password!");
+    }
+});
 
 gulp.task("zxp-html-extension-copy-css", function() {
    return gulp.src(["css/**/*.css"])
@@ -104,6 +106,7 @@ gulp.task("zxp-html-extension-copy-html", function() {
 });
 
 gulp.task("zxp-html-extension-sign", [
+    "zxp-get-creds",
     "zxp-html-extension-copy-css",
     "zxp-html-extension-copy-manifest",
     "zxp-html-extension-copy-icons",
