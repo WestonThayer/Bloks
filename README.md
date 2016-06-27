@@ -2,6 +2,8 @@ A UX for flexbox layout within Illustrator. Work in progress.
 
 # Development
 
+> Note: step #4 can be skipped if you don't need to change anything in the native plugin. Point Illustrator to the release .aip plugins checked into this repo.
+
 1. Clone the repo
     1. On a PC: `%appdata%\Adobe\CEP\extensions\`
     2. On a Mac: `~/Library/Application Support/Adobe/CEP/extensions/`
