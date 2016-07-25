@@ -200,6 +200,10 @@ const ActionParamKeyID kAIExportDocumentSaveAllKey	= 'sall'; // boolean
 /** Parameter to \c #kAIExportDocumentAction. The artboards range string. Optional when 
 \c # kAIExportDocumentSaveAllKey is true or  \c #kAIExportDocumentSaveMultipleArtboardsKey is false*/
 const ActionParamKeyID kAIExportDocumentSaveRangeKey	= 'sran'; // string
+
+const ActionParamKeyID kAIEnableBatchExport = 'ebep';						// string
+
+const ActionParamKeyID kAIExportDocumentPreventFileNameUniquifyKey = 'pfnu'; // string
 // -----------------------------------------------------------------------------
 /** @ingroup Actions
 	Prints the current document. Takes no parameters. */

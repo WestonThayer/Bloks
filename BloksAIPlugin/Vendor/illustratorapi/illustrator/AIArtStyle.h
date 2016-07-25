@@ -6,7 +6,7 @@
  *     Purpose:	Adobe Illustrator Art Style Suite.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2007 Adobe Systems Incorporated.
+ * Copyright 1986-2015 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file 
@@ -34,6 +34,10 @@
 
 #ifndef __AIPathStyle__
 #include "AIPathStyle.h"
+#endif
+
+#ifndef __AIPaintStyle__
+#include "AIPaintStyle.h"
 #endif
 
 #include "AIHeaderBegin.h"
@@ -112,8 +116,10 @@ enum AIArtStyleFocusValue {
 /** @ingroup Errors 
 	Returned by \c #AIArtStyleSuite::RedefineNamedStyle() if the style passed in
 	is not a named style. */
-#define kStyleTypeNotCompatible				'STYP'
+#define kStyleTypeNotCompatible			'STYP'
 
+/** Maximum number of real characters in a style name. */
+#define kMaxStyleNameLength				63
 
 
 /*******************************************************************************
@@ -603,7 +609,6 @@ struct AIArtStyleSuite {
 			@param artStyle The art style.
 			@param aiPathStyleMap [out] A buffer in which to return the path style map.  */
 	AIAPI AIErr (*GetPaintMap) ( AIArtStyleHandle artStyle, AIPathStyleMap* aiPathStyleMap );
-
 
 };
 

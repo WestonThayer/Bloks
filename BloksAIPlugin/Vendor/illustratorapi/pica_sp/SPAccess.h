@@ -31,7 +31,7 @@
 #include "SPPlugs.h"
 #include "SPMData.h"
 
-#ifdef MAC_ENV
+#if defined(MAC_ENV) && !defined(IOS_ENV)
 	#import <CoreServices/CoreServices.h>
 #endif
 
@@ -167,6 +167,10 @@ typedef struct SPAccess *SPAccessRef;
 
 
 #ifdef MAC_ENV
+#if	defined(IOS_ENV)
+typedef struct _SPMacResChain SPMacResChain;
+typedef SPMacResChain* SPPlatformAccessRef;
+#else
 #ifndef __FILES__
 #if __LP64__
 	typedef int                             FSIORefNum;
@@ -184,6 +188,7 @@ typedef struct {
 
 /** Resource chain access information on Mac OS */
 typedef SPMacResChain *SPPlatformAccessRef;
+#endif	// !defined(IOS_ENV)
 
 #endif
 
@@ -194,6 +199,7 @@ typedef HINSTANCE SPPlatformAccessRef;
 
 #endif
 
+#if	!defined(IOS_ENV)
 /** Access  information for the resource chain on Mac OS, or library information on Windows.
 	See \c #SPAccessSuite::GetAccessInfo(). */
 typedef struct {
@@ -206,6 +212,7 @@ typedef struct {
 	/** The time since the last access operation, in clock-ticks (1/60th second). */
 	ai::uint32 lastAccessTicks;
 } SPPlatformAccessInfo;
+#endif	// !defined(IOS_ENV)
 
 
 
@@ -331,6 +338,7 @@ typedef struct SPAccessSuite {
 			@param count [out] A buffer in which to return the count.
 		*/
 	SPAPI SPErr (*GetAccessCount)( SPAccessRef access, ai::int32 *count );
+#if	!defined(IOS_ENV)
 	/** Retrieves the platform-specific resource access information of a plug-in accessor.
 		This is for the resource-chain in Mac OS, or the plug-in library in Windows.
 			@param access The access object.
@@ -351,6 +359,7 @@ typedef struct SPAccessSuite {
 		@param resourceAccess The new resource-access information.
 		*/
 	SPAPI SPErr (*SetPluginResourceAccess)( SPPluginRef plugin, SPPlatformAccessRef resourceAccess );
+#endif	// !defined(IOS_ENV)
 
 	/** Sends a message to a plug-in, using an accessor object.
 			@param access The access object.
@@ -393,6 +402,7 @@ SPAPI SPErr SPGetAccessPlugin( SPAccessRef access, SPPluginRef *plugin );
 SPAPI SPErr SPGetAccessEntry( SPAccessRef access, SPEntry *entry );
 /** Internal */
 SPAPI SPErr SPGetAccessCount( SPAccessRef access, ai::int32 *count );
+#if	!defined(IOS_ENV)
 /** Internal */
 SPAPI SPErr SPGetAccessInfo( SPAccessRef access, SPPlatformAccessInfo *info );
 
@@ -400,6 +410,7 @@ SPAPI SPErr SPGetAccessInfo( SPAccessRef access, SPPlatformAccessInfo *info );
 SPAPI SPErr SPGetPluginResourceAccess( SPPluginRef plugin, SPPlatformAccessRef *resourceAccess );
 /** Internal */
 SPAPI SPErr SPSetPluginResourceAccess( SPPluginRef plugin, SPPlatformAccessRef resourceAccess );
+#endif	// !defined(IOS_ENV)
 
 /** Internal */
 SPAPI SPErr SPCallPlugin( SPAccessRef access, const char *caller, const char *selector,

@@ -260,8 +260,10 @@ typedef SPAPI SPErr (*SPFreeStringPoolProc)( SPStringPoolRef stringPool );
 typedef SPAPI SPErr (*SPMakeWStringProc)( SPStringPoolRef stringPool, const char *string,
 			const char **wString );
 
+#if	!defined(IOS_ENV)
 /** Internal */
 typedef SPAPI SPErr (*SPGetHostAccessInfoProc)( SPPlatformAccessInfo *spHostAccessInfo );
+#endif	// !defined(IOS_ENV)
 
 /** Internal */
 typedef SPAPI SPBoolean (*SPFilterEventProc)( NotifyEvent event, const void *eventData );

@@ -212,6 +212,9 @@ private:
 #define define_suite(suite) static ai::Suite<ai::S##suite> s##suite;
 #define use_suite(suite) declare_suite(suite) define_suite(suite)
 
+#define extern_declare_suite(suite) declare_suite(suite) extern ai::Suite<ai::S##suite> s##suite;
+#define extern_define_suite(suite) ai::Suite<ai::S##suite> s##suite;
+
 //--------------------------------------------------------------------------------
 // the following macros are used to declare an ADM suite pointer. the suite
 // version is needed in addition to its name.
@@ -223,10 +226,13 @@ private:
 		public: \
 			typedef suite##Suite##vers methods; \
 			enum {version = k##suite##SuiteVersion##vers}; \
-			static char* name () {return k##suite##Suite;}; \
+			static const char* name () {return k##suite##Suite;}; \
 		}; \
 	}
 #define define_adm_suite(suite, vers) static ai::Suite<ai::S##suite##vers> s##suite;
 #define use_adm_suite(suite, vers) declare_adm_suite(suite, vers) define_adm_suite(suite, vers)
+#define extern_declare_adm_suite(suite, vers) declare_adm_suite(suite, vers) extern ai::Suite<ai::S##suite##vers> s##suite;
+#define extern_define_adm_suite(suite, vers) ai::Suite<ai::S##suite##vers> s##suite;
+
 
 #endif

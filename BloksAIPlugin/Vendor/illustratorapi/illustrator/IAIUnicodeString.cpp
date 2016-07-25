@@ -153,9 +153,10 @@ ai::UnicodeString::UnicodeString (const UnicodeString& s)
 
 ai::UnicodeString::~UnicodeString (void)
 {
-	AIErr result = kNoErr;
 	if ( fImpl )
-		result = sAIUnicodeString->Destroy(*this);
+	{
+		sAIUnicodeString->Destroy(*this);
+	}
 }
 
 

@@ -1194,7 +1194,7 @@ inline UnicodeString::size_type UnicodeString::as_ASUnicode ( ASUnicode* buffer,
 
 inline UnicodeString::size_type UnicodeString::as_WCHARStr ( WCHARStr::LPWSTR buffer, size_type bufferMax ) const
 {
-	AI_STATIC_CHECK(sizeof(WCHARStr::WCHAR) == sizeof(ai::UnicodeString::UTF16Char), WCHAR_size_does_not_match_unsigned_short_size);
+	AI_STATIC_CHECK(sizeof(WCHARStr::WCHAR) == sizeof(ai::UnicodeString::UTF16Char), WCHAR_size_does_not_match_unsigned_short_size); //-V503
 	return as_ASUnicode( reinterpret_cast<ASUnicode*>(buffer), bufferMax );
 }
 
@@ -1230,7 +1230,7 @@ inline UnicodeString::size_type UnicodeString::as_Roman ( const ai::PStr&  pasca
 
 inline WCHARStr::WCHARStr (const UnicodeString& string) : fConstStr()
 {
-	AI_STATIC_CHECK(sizeof(WCHAR) == sizeof(ai::UnicodeString::UTF16Char), WCHAR_size_does_not_match_unsigned_short_size);
+	AI_STATIC_CHECK(sizeof(WCHAR) == sizeof(ai::UnicodeString::UTF16Char), WCHAR_size_does_not_match_unsigned_short_size); //-V503
 
 	const std::basic_string<ASUnicode>& cInput = string.as_ASUnicode();
 	const size_t cLen = cInput.length();
@@ -1250,14 +1250,14 @@ inline WCHARStr::WCHARStr (const ASUnicode* string)
 {
 	if ( string && *string )
 	{
-		AI_STATIC_CHECK(sizeof(WCHARStr::WCHAR) == sizeof(ai::UnicodeString::UTF16Char), WCHAR_size_does_not_match_unsigned_short_size);
+		AI_STATIC_CHECK(sizeof(WCHARStr::WCHAR) == sizeof(ai::UnicodeString::UTF16Char), WCHAR_size_does_not_match_unsigned_short_size); //-V503
 		fConstStr.assign(reinterpret_cast<LPCWSTR>(string));
 	}
 }
 
 inline const ASUnicode* WCHARStr::as_ASUnicode () const
 {
-	AI_STATIC_CHECK(sizeof(WCHARStr::WCHAR) == sizeof(ai::UnicodeString::UTF16Char), WCHAR_size_does_not_match_unsigned_short_size);
+	AI_STATIC_CHECK(sizeof(WCHARStr::WCHAR) == sizeof(ai::UnicodeString::UTF16Char), WCHAR_size_does_not_match_unsigned_short_size); //-V503
 	return reinterpret_cast<const ASUnicode*>(this->as_LPCWSTR());
 }
 

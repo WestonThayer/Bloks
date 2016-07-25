@@ -148,9 +148,11 @@
 
 //check for consistency
 #ifdef MAC_ENV
+    #if !defined(IOS_ENV)
 	#if ((!defined(AS_MAC_64) && !defined(AS_MAC_32)) || (defined(AS_MAC_64) && defined(AS_MAC_32)) || (defined(AS_WIN_32) || defined(AS_WIN_64)) )
 		#error
 	#endif
+    #endif
 #endif
 
 //macro for MAC 64 bit

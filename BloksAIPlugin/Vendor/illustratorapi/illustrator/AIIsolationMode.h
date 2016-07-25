@@ -5,10 +5,10 @@
  *        Name:	AIIsolationMode.h
  *      Author:
  *        Date:
- *     Purpose:	Adobe Illustrator 16.0 Isolation Mode Suite.
+ *     Purpose:	Adobe Illustrator Isolation Mode Suite.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 2006-2011 Adobe Systems Incorporated.
+ * Copyright 2006-2016 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file 
@@ -45,8 +45,8 @@
  **/
 
 #define kAIIsolationModeSuite				"AI Isolation Mode"
-#define kAIIsolationModeSuiteVersion4		AIAPI_VERSION(4)
-#define kAIIsolationModeSuiteVersion		kAIIsolationModeSuiteVersion4
+#define kAIIsolationModeSuiteVersion5		AIAPI_VERSION(5)
+#define kAIIsolationModeSuiteVersion		kAIIsolationModeSuiteVersion5
 #define kAIIsolationModeVersion				kAIIsolationModeSuiteVersion
 
 
@@ -189,7 +189,6 @@ typedef struct {
 		*/
 	AIAPI void (*GetIsolatedArtAndParents)(AIArtHandle *isolatedArtParent, ai::AutoBuffer<AIArtHandle> *parentChain);
 
-
 	/** Reports whether isolation mode is in effect.
 		(Note that this function returns a boolean value, not an error code.)
 			@return True if isolation mode is on, false if it is off.
@@ -242,6 +241,19 @@ typedef struct {
 	 */
 	AIAPI AIErr (*CancelIsolationMode)(void);
 	
+	/** Sets the opacity value applied to the non-isolated art layers.
+			@param inNewOpacity The new opacity value, in the range [0..1] where 0 is
+	 			completely transparent and 1 is completely opaque.
+		*/
+	AIAPI AIErr (*SetNonIsolatedArtLayerOpacity)(const AIReal inNewOpacity);
+	
+	/** Gets the current opacity value applied to the non-isolated art layers.
+		Note that this function returns a numeric opacity value, not an error code.
+			@return The new opacity value, in the range [0..1] where 0 is completely
+	 			transparent and 1 is completely opaque.
+		*/
+	AIAPI AIReal (*GetNonIsolatedArtLayerOpacity)();
+
 } AIIsolationModeSuite;
 
 

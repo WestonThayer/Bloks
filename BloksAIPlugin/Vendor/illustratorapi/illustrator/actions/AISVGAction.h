@@ -157,5 +157,17 @@ const ActionParamKeyID kAISVGIncludeUnusedStylesKey		= 'IUSt'; // bool
 /** Parameter to \c #kAIExportDocumentAction for SVG.
 	True to generate responsive SVG.  */
 const ActionParamKeyID kAISVGGenerateResponsiveSVGKey		= 'GRSv'; // bool
+/** Parameter to \c #kAIExportDocumentAction for SVG.
+	Object names (IDs) to use, an \c #AISVGIdType value.  */
+const ActionParamKeyID kAISVGIdTypeKey					= 'IdTK'; // enum AISVGIdType
+/** Parameter to \c #kAIExportDocumentAction for SVG.
+True to create minified SVG */
+const ActionParamKeyID kAISVGMinifyKey					= 'mnfy'; // bool
+/** Parameter to \c #kAIExportDocumentAction for SVG.
+True to create responsive SVG */
+const ActionParamKeyID kAISVGResponsiveKey = 'rpsv'; // bool
+/**  Parameter to \c #kAIExportDocumentAction for SVG.
+True to identify the action as export */
+const ActionParamKeyID kAISVGExportActionKey = 'SiEK'; //bool
 
 #endif	// _AISVGACTION_H_

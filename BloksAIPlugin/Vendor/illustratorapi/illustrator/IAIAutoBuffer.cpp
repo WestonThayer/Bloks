@@ -66,7 +66,6 @@ void ai::SPAlloc::DeleteBlock (void* block)
 {
 	if ( block )
 	{
-		SPErr spError = kNoErr;
-		spError = sSPBlocks->FreeBlock (block);
+		/*SPErr spError =*/ sSPBlocks->FreeBlock (block);
 	}
 }

@@ -73,12 +73,13 @@ enum {
  */
 typedef ai::uint32	ActionParamUnitID;
 
+#ifndef unitNone
 /** Allowed values for \c ::ActionParamUnitID  */
 enum {
 	// The Photoshop APIs also define these constants. If a plug-in includes both
 	// the Photoshop APIs and the Illustrator APIs then there would be compilation
 	// problems. We let the Photoshop definitions win.
-#ifndef unitNone
+
 	/** unit value - coerced */
 	unitNone =		'#Nne',
 	/** unit value - base 72ppi */
@@ -91,8 +92,9 @@ enum {
 	unitPoints =	'#Pxl',
 	/** tagged unit value, percentage */
 	unitPercent =	'#Prc'
-#endif
+
 };
+#endif
 
 /** Identifies a unique key associated with a parameter block */
 typedef ai::uint32	ActionParamKeyID;

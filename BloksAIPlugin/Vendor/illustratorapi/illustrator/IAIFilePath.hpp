@@ -40,9 +40,13 @@
     #ifndef __COREFOUNDATION_CFURL__
         #include <CoreFoundation/CFURL.h>
     #endif
-    #ifndef __FILES__
-        #include <Carbon/Carbon.h>
-    #endif
+    #if defined(IOS_ENV)
+		typedef short FSVolumeRefNum;
+	#else
+        #ifndef __FILES__
+            #include <Carbon/Carbon.h>
+        #endif
+    #endif	// !defined(IOS_ENV)
 #else
 
 typedef signed long OSStatus;

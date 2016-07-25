@@ -3,13 +3,12 @@
 
 /*
  *        Name:	AIUndo.h
- *   $Revision: 6 $
  *      Author:
  *        Date:
  *     Purpose:	Adobe Illustrator Undo Suite.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2007 Adobe Systems Incorporated.
+ * Copyright 1986-2016 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file
@@ -27,10 +26,7 @@
  **
  **/
 
-#ifndef __AITypes__
 #include "AITypes.h"
-#endif
-
 #include "IAIUnicodeString.h"
 
 #include "AIHeaderBegin.h"
@@ -45,7 +41,7 @@
  **/
 
 #define kAIUndoSuite			"AI Undo Suite"
-#define kAIUndoSuiteVersion		AIAPI_VERSION(7)
+#define kAIUndoSuiteVersion		AIAPI_VERSION(8)
 #define kAIUndoVersion			kAIUndoSuiteVersion
 
 
@@ -148,16 +144,6 @@ typedef struct {
 		*/
 	AIAPI AIErr (*SetKind) ( ai::int32 kind );
 
-	/**
-		@deprecated	Use Unicode version \c #SetTagUS() instead.
-
-		Sets a tag string and integer for the undo transaction that is generated
-		by the current API context.	Affects only standard undo contexts; see @ref UndoContext.
-			@param tagString A descriptive string.
-			@param tagInteger An identifying number.
-		*/
-	AIAPI AIErr (*SetTag) ( char* tagString, ai::int32 tagInteger );
-
 	/** Counts the number of undo and redo transactions that a user can
 		perform. Does not count silent or appended transactions. Use with
 		\c #GetNthTransactionTag() to iterate through transactions in the
@@ -167,19 +153,6 @@ typedef struct {
 
 		*/
 	AIAPI AIErr (*CountTransactions) ( ai::int32* past, ai::int32* future );
-
-	/**
-		@deprecated	Use Unicode version \c #GetNthTransactionTagUS() instead.
-
-		Retrieves a transaction tag by position index from the current undo/redo context.
-		Use with \c #CountTransactions() to iterate through transactions in the
-		current standard undo context.
-			@param n The position index. Positive values indicate undo transactions,
-				negative values indicate redo transactions. No transaction is at index 0.
-			@param tagString [out] A buffer in which to return the descriptive string.
-			@param tagInteger [out] A buffer in which to return the identifying number.
-	 	*/
-	AIAPI AIErr (*GetNthTransactionTag) ( ai::int32 n, char** tagString, ai::int32* tagInteger );
 
 	/** Reports whether the current API context is marked as silent for undo purposes.
 		If the current context is nested, this can return true while the outer
@@ -196,16 +169,42 @@ typedef struct {
 	*/
 	AIAPI AIErr (*SetTagUS) ( const ai::UnicodeString& tagString, ai::int32 tagInteger );
 
-	/** Retrieves a transaction tag (a Unicode string) by position index from the current undo/redo context.
+	/** Retrieves a Unicode tag string and integer for the undo transaction that is generated
+	 by the current API context.	Works only standard undo contexts; see @ref UndoContext.
+	 @param tagString [out] A buffer in which to return the descriptive Unicode string.
+	 @param tagInteger [out] A buffer in which to return the identifying number.
+	 */
+	AIAPI AIErr (*GetTagUS) ( ai::UnicodeString& tagString, ai::int32* tagInteger );
+
+	/** Sets a transaction tag (a Unicode string) by position index for the current undo/redo context.
 	Use with \c #CountTransactions() to iterate through transactions in the
 	current standard undo context.
-	@param n The position index. Positive values indicate undo transactions,
-		negative values indicate redo transactions. No transaction is at index 0.
-	@param tagString [out] A buffer in which to return the descriptive Unicode string.
-	@param tagInteger [out] A buffer in which to return the identifying number.
+	@param n The position index. Positive values indicate redo transactions,
+		negative values indicate undo transactions. No transaction is at index 0.
+	 @param tagString A descriptive Unicode string.
+	 @param tagInteger An identifying number.
 	*/
+	AIAPI AIErr (*SetNthTransactionTagUS) ( ai::int32 n, const ai::UnicodeString& tagString, ai::int32 tagInteger );
 
+	/** Retrieves a transaction tag (a Unicode string) by position index from the current undo/redo context.
+	 Use with \c #CountTransactions() to iterate through transactions in the
+	 current standard undo context.
+	 @param n The position index. Positive values indicate redo transactions,
+		negative values indicate undo transactions. No transaction is at index 0.
+	 @param tagString [out] A buffer in which to return the descriptive Unicode string.
+	 @param tagInteger [out] A buffer in which to return the identifying number.
+	 */
 	AIAPI AIErr (*GetNthTransactionTagUS) ( ai::int32 n, ai::UnicodeString& tagString, ai::int32* tagInteger );
+
+    /** For internal use only.
+	 Suspend/Resume undo recording.
+     */
+    AIAPI AIErr (*SetRecordingSuspended) ( AIBoolean inSuspend );
+
+	/** For internal use only.
+	 Reports if undo recording is suspended.
+	 */
+    AIAPI AIErr (*IsRecordingSuspended) ( AIBoolean* outIsSuspended );
 
 } AIUndoSuite;
 

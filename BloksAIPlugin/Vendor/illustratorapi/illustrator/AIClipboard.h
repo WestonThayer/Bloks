@@ -9,7 +9,7 @@
  *     Purpose:	Adobe Illustrator Clipboard Suite.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2007 Adobe Systems Incorporated.
+ * Copyright 1986-2015 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file 
@@ -43,9 +43,9 @@
  **/
 
 #define kAIClipboardSuite			"AI Clipboard Suite"
-#define kAIClipboardSuiteVersion3		AIAPI_VERSION(3)	// In AI 9.0
+#define kAIClipboardSuiteVersion4		AIAPI_VERSION(4)	// In AI 20.0
 // latest version
-#define kAIClipboardSuiteVersion		kAIClipboardSuiteVersion3
+#define kAIClipboardSuiteVersion		kAIClipboardSuiteVersion4
 #define kAIClipboardVersion			kAIClipboardSuiteVersion
 
 /** @ingroup Callers
@@ -65,6 +65,14 @@
 			of the message.
 	*/
 #define kSelectorAIGoClipboard				"AI Go"
+
+/** @ingroup Selectors
+	Prepare clipboard data asynchronously.
+	The \c option field of the \c #AIClipboardAsyncMessage is currently
+	\c #kClipboardCopy only.
+*/
+#define kSelectorAIPrepareAsyncClipboard				"AI Prepare Async"
+
 /** @ingroup Selectors
 	Check if you can copy the data in the current document to your format.
 	Return \c #kNoErr if you can and \c #kCantCopyErr
@@ -98,6 +106,31 @@ enum AIClipboardFormatOptions {
 		to track the state of the user preference.
 	*/
 	kClipboardCannotCopy				=	(1<<3)
+};
+
+/** Data-preparation status values for asynchronous clipboard write operations.
+See \c #AIClipboardSuite::SetClipboardDataAsyncStatus() and
+\c #AIClipboardSuite::GetClipboardDataAsyncStatus(). */
+enum AIClipboardDataAsyncStatus{
+
+	/** Default sentinel value */
+	kAICBAsyncStatus_None = 0,
+
+	/** Clipboard data is in the process of preparation. */
+	kAICBAsyncStatus_InProgress,
+
+	/** Clipboard data preparation is cancelled by user. */
+	kAICBAsyncStatus_Cancelled,
+
+	/** Clipboard data preparation has encountered some error. */
+	kAICBAsyncStatus_Error,
+
+	/** Clipboard data preparation is successful. */
+	kAICBAsyncStatus_Success,
+
+	/** Clipboard data preparation has timed out
+	because the asynchronous operation failed to respond. */
+	kAICBAsyncStatus_Timeout
 };
 
 /** @ingroup Errors
@@ -146,6 +179,21 @@ typedef struct {
 	ai::int32 option;
 } AIClipboardMessage;
 
+/** The message structure received when the clipboard format handler's main
+entry point receives a message with caller \c #kCallerAIClipboard and
+selector \c #kSelectorAIPrepareAsyncClipboard. */
+struct AIClipboardAsyncMessage{
+
+	/** The message data. */
+	SPMessageData d;
+
+	/** The clipboard object. */
+	AIClipboardHandle Clipboard;
+
+	/** The supported clipboard operations,
+	a logical OR of \c #AIClipboardFormatOptions values. */
+	ai::int32 option;  // Currently, only kClipboardCopy is supported.
+};
 
 /*******************************************************************************
  **
@@ -233,6 +281,44 @@ typedef struct {
 			@param n The index, in the range <code>[0..numHandlers-1]</code> .
 			@param Clipboard [out] A buffer in which to return the clipboard handler reference.*/
 	AIAPI AIErr (*GetNthClipboard) (ai::int32 n, AIClipboardHandle *Clipboard);
+
+	/** Sets the data-preparation status of an asynchronous clipboard write operation.
+	@param Clipboard The clipboard handler reference.
+	@param asyncOperationStatus The status of clipboard data,
+	an \c #AIClipboardDataAsyncStatus value.
+	*/
+	AIAPI AIErr(*SetClipboardDataAsyncStatus) (AIClipboardHandle Clipboard, ai::int32 asyncOperationStatus);
+
+	/** Retrieves the data-preparation status of an asynchronous clipboard write operation.
+	@param Clipboard The clipboard handler reference.
+	@param asyncOperationStatus [out] A buffer in which to return the status of clipboard data,
+	an \c #AIClipboardDataAsyncStatus value.
+	*/
+	AIAPI AIErr(*GetClipboardDataAsyncStatus) (AIClipboardHandle Clipboard, ai::int32& asyncOperationStatus);
+
+	/** Sets the value to show in the progress bar during an asynchronous clipboard write operation.
+	Calls \c #ResetClipboardDataAsyncOperationTimer() internally.
+	@param Clipboard The clipboard handler reference.
+	@param current A number between 0 and the specified maximum that represents how far the operation has progressed.
+	@param max The maximum value, representing 100% progress.
+	@param progressText A text message to display in the progress bar.
+	*/
+	AIAPI AIErr(*SetClipboardDataAsyncProgress) (AIClipboardHandle Clipboard, size_t current, size_t max, const ai::UnicodeString& progressText);
+
+	/** Sets a timeout for an asynchronous clipboard write operation.
+	If the async operation does not communicate with the parent process within this period,
+	it is assumed that the process has encountered some error, and the operation is aborted.
+	@param Clipboard The clipboard handler reference.
+	@param timeout A number of seconds.  <<??>>
+	*/
+	AIAPI AIErr(*SetClipboardDataAsyncTimeout) (AIClipboardHandle Clipboard, AIReal timeout);
+
+	/** Resets the timeout timer to 0. A client should use this to tell Illustrator that the async process
+	is still alive, and the clipboard write operation should continue.
+	@param Clipboard The clipboard handler reference.
+	*/
+	AIAPI AIErr(*ResetClipboardDataAsyncOperationTimer) (AIClipboardHandle Clipboard);
+
 
 } AIClipboardSuite;
 

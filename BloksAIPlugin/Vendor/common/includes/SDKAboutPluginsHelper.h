@@ -1,6 +1,6 @@
 //========================================================================================
 //  
-//  $File: //ai_stream/rel_19_0/devtech/sdk/public/samplecode/common/includes/SDKAboutPluginsHelper.h $
+//  $File: //ai_stream/rel_20_0/devtech/sdk/public/samplecode/common/includes/SDKAboutPluginsHelper.h $
 //
 //  $Revision: #1 $
 //

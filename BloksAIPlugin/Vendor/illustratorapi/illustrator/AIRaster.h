@@ -331,7 +331,9 @@ typedef struct AIRasterRecord	{
 	AIRasterRecord()
 		:	flags(0), byteWidth(0), bitsPerPixel(0),
 			colorSpace(kInvalidColorSpace), originalColorSpace(kInvalidColorSpace)			
-	{}
+	{
+		bounds.left = bounds.top = bounds.right = bounds.bottom = 0;
+	}
 } AIRasterRecord;
 
 

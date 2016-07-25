@@ -46,8 +46,8 @@
  **/
 
 #define kAICursorSnapSuite				"AI Cursor Snap Suite"
-#define kAICursorSnapSuiteVersion15		AIAPI_VERSION(15)
-#define kAICursorSnapSuiteVersion		kAICursorSnapSuiteVersion15
+#define kAICursorSnapSuiteVersion16		AIAPI_VERSION(16)
+#define kAICursorSnapSuiteVersion		kAICursorSnapSuiteVersion16
 #define kAICursorSnapVersion			kAICursorSnapSuiteVersion
 
 
@@ -64,9 +64,14 @@ enum {
 };
 
 
-/**  Flags for custom constraints: snap to constraint when shift key is down.
+/**  Flags for custom constraints:
   See \c #AICursorSnapSuite. */
+/* Snap to constraint when shift key is down. */
 #define kShiftConstraint			(1<<0L)
+/* Override drawing the default annotation when a custom constraint is hit,
+ * and draw custom constraints based on the callback
+ */
+#define kDrawCustomAnnotations		(1<<1L)
 
 
 /** Boundary editors for the transformation tools.
@@ -81,6 +86,29 @@ enum {
  ** Types
  **
  **/
+/*
+ * AICustomAnnotationLine 
+ * represents a line segment by a start and end point which 
+*/
+struct AICustomAnnotationLine
+{
+	AIRealPoint startPoint;
+	AIRealPoint endPoint;
+};
+
+typedef AICustomAnnotationLine* AICustomAnnotationLinePtr;
+
+/** Function pointer type to retrieve details of custom annotations
+* to be drawn (if kDrawCustomAnnotations flag is set).
+* The function pointer is set  in AICursorConstraint struct during constraint addition
+* When the custom constraint is hit and annotations are ready to be drawn, the callback is invoked.
+*		@param	inId				ConstraintId of the custom constraint hit
+*		@param	inSnappedPt			The point we snapped to
+*		@param  outNumberOfLines	Number Of Annotation Lines to be drawn (To be Filled by the callback)
+*		@param	outAnnotationLines	An array of custom annotations lines to be drawn (To be Filled by the callback)
+* The calling function is responsible to destroy the array of points.
+*/
+typedef AIErr(*CustomAnnotationsCallback)(ai::uint32 inId, const AIRealPoint& inSnappedPt, size_t* outNumberOfLines, AICustomAnnotationLine** outAnnotationLines);
 
 /**
 	Structure describing a custom constraint for \c #AICursorSnapSuite..
@@ -93,18 +121,48 @@ struct AICursorConstraint {
 		\li \c kLinearConstraintRel: A line whose angle is relative
 			to the constraint \c angle.
 	*/
-	ai::int32				kind;
+	ai::int32					kind;
 	/** Flags for the constraint. The only flag is \c #kShiftConstraint,
 	 which means snap to the constraint when the shift key is down.*/
-	ai::int32				flags;
+	ai::int32					flags;
 	/** Origin point for the constraint. */
-	AIRealPoint			point;
+	AIRealPoint					point;
 	/** When \c kind is \c kLinearConstraintRel, the angle of the line. */
-	AIFloat			angle;
-	/** Label for the constraint presented to the user. */
-	char*				label;
-};
+	AIReal						angle;
+	/** Label for the constraint presented to the user. Keep the max size to be 256 bytes */
+	ai::UnicodeString			label;
+	/** Callback function registered by client to retrieve details for drawing custom annotations. */
+	CustomAnnotationsCallback	getCustomAnnotationDetails;
 
+	/* Constructors */
+	AICursorConstraint(const ai::int32 inKind,
+		const ai::int32 inFlags,
+		const AIRealPoint& inPoint,
+		const AIReal inAngle,
+		const ai::UnicodeString& inLabel,
+		const CustomAnnotationsCallback inCustomAnnotationsCallback) :
+			kind(inKind),
+			flags(inFlags),
+			point(inPoint),
+			angle(inAngle),
+			label(inLabel),
+			getCustomAnnotationDetails(inCustomAnnotationsCallback)
+	{}
+
+	AICursorConstraint() :
+		kind(0),
+		flags(0),
+		angle(kAIRealZero),
+		getCustomAnnotationDetails(NULL)
+	{
+		point.h = kAIRealZero;
+		point.v = kAIRealZero;
+	}
+
+	/* Destructor */
+	~AICursorConstraint() 
+	{}
+};
 
 /*******************************************************************************
  **
@@ -191,7 +249,7 @@ struct AICursorSnapSuite {
 			@param constraints An array of custom constraints. The function makes a
 				copy, so the caller can free this memory after making the call.
 	 */
-	AIAPI AIErr			(*SetCustom)			(ai::int32 count, const AICursorConstraint* constraints);
+	AIAPI AIErr(*SetCustom)			(const ai::AutoBuffer<AICursorConstraint>& constraints);
 
 	/** Snaps the cursor to a specified constraint, using a specified technique, using
 		the "Snap To Point" application preference.

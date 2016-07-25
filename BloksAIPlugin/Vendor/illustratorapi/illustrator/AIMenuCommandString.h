@@ -91,12 +91,16 @@
 #define kAIPlaceCommandStr                                           "AI Place"                                                     
 
 /** @ingroup MenuCommand
-	File:Save for Microsoft Office */
-#define kSaveForOfficeCommandStr                                     "Save for Office"                                              
+	File:Export */
+#define kExportCommandStr                                            "export"          
 
 /** @ingroup MenuCommand
-	File:Export */
-#define kExportCommandStr                                            "export"                                                       
+	File:Export Selection */
+#define kExportSelectionCommandStr                                   "exportSelection"  
+
+/** @ingroup MenuCommand
+	File:Export/Export For Screens */
+#define kExportForScreensCommandStr                                   "exportForScreens"  
 
 /** @ingroup MenuCommand
 	File:Scripts:Other Script */

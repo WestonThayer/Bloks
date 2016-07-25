@@ -3,10 +3,10 @@
 
 /*
  *        Name:	AIShapeConstruction.h
- *     Purpose:	Adobe Illustrator utility routines for some basic shapes.
+ *     Purpose:	Adobe Illustrator utility routines for some basic shapes construction.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1996-2014 Adobe Systems Incorporated.
+ * Copyright 1996-2015 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file 
@@ -38,7 +38,7 @@
  **/
 
 #define kAIShapeConstructionSuite			"AI Shape Construction Suite"
-#define kAIShapeConstructionSuiteVersion	AIAPI_VERSION(7)
+#define kAIShapeConstructionSuiteVersion	AIAPI_VERSION(8)
 #define kAIShapeConstructionVersion			kAIShapeConstructionSuiteVersion
 
 
@@ -346,6 +346,25 @@ typedef struct {
 	AIAPI AIErr (*NewEllipticalPie)(AIRealPoint center, AIReal width, AIReal height,
 									AIReal rotationAngle, AIReal startAngle, AIReal endAngle,
 									AIBoolean isReversed, AIArtHandle *newArt);
+
+	/** Creates a path for a line.
+	@param startPoint The starting point of line.
+	@param endPoint The end point of line.
+	@param art [out] A buffer in which to return the new path object.
+	*/
+
+	AIAPI AIErr(*NewLinePoint)(const AIRealPoint& startPoint, const AIRealPoint& endPoint,
+							   AIArtHandle *newArt);
+
+	/** Creates a path for a line.
+	@param center The coordinate of the center of line (Mid point of line).
+	@param length of line in document points.
+	@param rotationAngle absolute rotation angle of the line.
+	@param art [out] A buffer in which to return the new path object.
+	*/
+	AIAPI AIErr(*NewLine)(const AIRealPoint& center, const AIReal length, const AIReal
+						  rotationAngle, AIArtHandle *newArt);
+	
 
 } AIShapeConstructionSuite;
 

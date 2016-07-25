@@ -77,7 +77,7 @@ public:
 	/** Copy constructor.
 		@param b buffer to be copied.
 	*/
-	explicit AutoBuffer (const AutoBuffer& b)
+	AutoBuffer (const AutoBuffer& b)
 	: fCapacity(b.fCapacity),
 	  fBuffer(0)
 	{
@@ -177,6 +177,7 @@ public:
 				Destroy(fBuffer);
 				A::DeleteBlock(fBuffer);
 				fBuffer = reinterpret_cast<elem*>(A::AllocateBlock(ByteCount(rhs.fCapacity)));
+				fCapacity = rhs.fCapacity;
 			}
 			Copy(rhs.fBuffer);
 		}

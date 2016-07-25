@@ -188,7 +188,7 @@ struct AIDataFilterSuite {
 			@param store A buffer containing the data.
 			@param count A pointer to the number of bytes in \c store.
 		*/
-	AIAPI AIErr (*WriteDataFilter) ( AIDataFilter *filter, char *store, size_t *count );
+	AIAPI AIErr (*WriteDataFilter) ( AIDataFilter *filter, const char *store, size_t *count );
 
 	/** Seeks to a position in a filter's stream, as returned by \c #MarkDataFilter().
 		Not all data filters support random access.
@@ -263,7 +263,7 @@ struct AIDataFilterSuite {
 			@param prefix The string to insert at the start of each line.
 			@param filter [out] A buffer in which to return the new filter reference.
 		*/
-	AIAPI AIErr (*NewA85DataFilter) ( char *statestr, char* prefix, AIDataFilter **filter );
+	AIAPI AIErr (*NewA85DataFilter) ( char *statestr, const char* prefix, AIDataFilter **filter );
 
 	/** Creates a new ZLib data filter that compresses or decompresses data from a linked filter.
 			@param statestr Whether the filter is compressing or decompressing, one of:

@@ -55,6 +55,10 @@
 #include "ASHelp.h"
 #endif
 
+#ifndef __AIColor__
+#include "AIColor.h"
+#endif
+
 #ifndef FLT_MAX
 #include <float.h>
 #endif
@@ -70,8 +74,8 @@
  **/
 
 #define kAIToolSuite			"AI Tool Suite"
-#define kAIToolSuiteVersion15	AIAPI_VERSION(15)
-#define kAIToolSuiteVersion		kAIToolSuiteVersion15
+#define kAIToolSuiteVersion16	AIAPI_VERSION(16)
+#define kAIToolSuiteVersion		kAIToolSuiteVersion16
 #define kAIToolVersion			kAIToolSuiteVersion
 
 /** @ingroup Notifiers
@@ -243,6 +247,12 @@ Return code for response to \c #kSelectorAIAlternateSelectionToolQuery when
 the alternate selection tool is ready for selection. */
 #define kAcceptAlternateSelectionToolReply		'ASTR'
 
+/** @ingroup Selectors
+This can be used to get strokes directly without listening to mouse down, drag and up events.
+The message data is an \c #AIToolDryInkMessage
+that contains the cursor location and modifier key information. */
+#define kSelectorAIToolDrawDryInk			"AI Tool Draw Dry Ink"
+
 //  Brush tools share these options, so if you add new ones,
 //	make sure they do not overlap with the brush tool options defined in
 //	AIBrushMgr.h, which start at 1L<<16 and go up.
@@ -298,7 +308,12 @@ enum AIToolOptions {
     /** Indicates that the tool does not support soft selection modes, when used with the tablet/pen. \c #AIToolSuite::SetSoftSelectedTool().
         The inverted tablet pen tool will still function as the original tool.
      */
-	kToolDoesntWantSoftSelectionOption   = (1<<8)
+	kToolDoesntWantSoftSelectionOption   = (1<<8),
+
+	/** Indicates that tool does want OS to draw its wet ink and provide its final Ink points to render rather than listening to mouse events
+	*/
+	kToolWantsOSHandleInk = (1<<9)
+
 };
 
 
@@ -554,6 +569,20 @@ enum AITabletCapabilities
 	/* Clockwise rotation of the cursor around its own axis. */
 	kTwistOrientation		=		1 << 7
 };
+/** History Data associated with an Event. */
+struct AIEventHistoryData
+{
+	/** The location of the event */
+	AIPoint position;
+	/** For graphic tablets, tangential pressure on the finger wheel of the airbrush tool. */
+	AIToolPressure stylusWheel;
+	/** How the tool is angled, also called altitude or elevation. */
+	AIToolAngle tilt;
+	/** The direction of tilt, measured clockwise in degrees around the Z axis, also called azimuth, */
+	AIToolAngle bearing;
+	/**  Rotation of the tool, measured clockwise in degrees around the tool's barrel. */
+	AIToolAngle rotation;
+};
 /** The contents of a tool message. */
 struct AIToolMessage {
 	/** The message data. */
@@ -580,8 +609,9 @@ struct AIToolMessage {
 	AIToolAngle bearing;
 	/**  Rotation of the tool, measured clockwise in degrees around the tool's barrel. */
 	AIToolAngle rotation;
+	/** The history data associated with the event */
+	ai::AutoBuffer<AIEventHistoryData> eventHistoryData;
 };
-
 
 /** The contents of a tool notification. */
 struct AIToolNotifyData {
@@ -596,6 +626,69 @@ struct AIEyedropperDragNotifyData {
 	AIEvent event;
 	/** True if the path style has changed as a result of the drag event. */
 	AIBoolean pathStyleChanged;
+};
+
+struct AIDocumentInkParams
+{
+	enum PenTipShape
+	{
+		kPenTipShapeCircle,
+		kPenTipShapeRectangle
+	};
+	PenTipShape fShape;
+	AIColor fColor;
+	AIPoint fSize;
+
+	AIDocumentInkParams() :fShape(kPenTipShapeCircle)
+	{
+		fColor.kind = kThreeColor;
+		fColor.c.rgb.red = 0.0f;
+		fColor.c.rgb.green = 0.0f;
+		fColor.c.rgb.blue = 0.0f;
+		fSize.h = 1;
+		fSize.v = 1;
+	}
+};
+
+
+struct AIDocumentInkPoint
+{
+	AIRealPoint		 fLocation;
+	AIToolPressure	 fPressure;
+	AIToolPressure	 fStylusWheel;
+	AIToolAngle		 fRotation;
+	AIToolPressure	 fBearing;
+	AIToolPressure	 fTilt;
+
+	AIDocumentInkPoint()
+	{
+		fLocation.h = 0.0;
+		fLocation.v = 0;
+		fPressure = 0;
+		fStylusWheel = kAIToolMinRotation;
+		fBearing = kAIToolMinBearing;
+		fRotation = kAIToolMinRotation;
+		fTilt = kAIToolMinTilt;
+	}
+};
+
+/** The contents of a tool message. */
+struct AIToolDryInkMessage {
+	/** The message data. */
+	SPMessageData d;
+	/** The tool plug-in receiving the message.
+	If the plug-in has more than one tool installed, it can
+	determine which one was selected by comparing this handle
+	to those it has saved in the \c globals variable. */
+	AIToolHandle tool;
+
+	/** Future use We might need this for modifiers*/
+	AIEvent *event;
+
+	ai::AutoBuffer<AIDocumentInkPoint> inkStrokes;
+
+	AIToolDryInkMessage() :tool(0), event(nil)
+	{}
 };
 
 
@@ -966,6 +1059,13 @@ AIErr UpdateInfoPalette( AIToolHandle tool, AIRealPoint origin, AIArtHandle art 
 	 */
 	AIAPI AIErr (*GetCurrentToolName) ( const char **name );
 
+	/** Retrieves the unique name of the currently active tool. This is the same
+	name you get from \c #currentToolName from \c #AIEffectiveToolChangeData.
+	@param name	[out] A pointer to point to the name string. Do not modify
+	this string. Copy it immediately to use it.
+	*/
+	AIAPI AIErr(*GetCurrentEffectiveToolName) (const char **name);
+
 	/** Retrieves the numerical identifier of the most recently used built-in selection tool,
             and optionally retrieves the unique name of the tool, from \c AIToolNames.h.
             (Note that this function returns an \c #AIToolType, not an error code.)
@@ -1002,6 +1102,10 @@ AIErr UpdateInfoPalette( AIToolHandle tool, AIRealPoint origin, AIArtHandle art 
 	   @param darkNormalIconResource[out]  A buffer in which to return the resource name for dark UI theme icon.
 	*/
 	AIAPI AIErr(*GetToolIcons) (const AIToolHandle tool, char **normalIconResourceName, char **darkNormalIconResourceName);
+
+	/**
+	*/
+	AIAPI AIErr(*SetDocumentInkParams)(const AIToolHandle tool, const AIDocumentInkParams& inDocInkParams);
 };
 
 

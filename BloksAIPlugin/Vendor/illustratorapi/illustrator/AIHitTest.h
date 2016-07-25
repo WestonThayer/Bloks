@@ -44,12 +44,13 @@
  **/
 
 #define kAIHitTestSuite				"AI Hit Test Suite"
-#define kAIHitTestSuiteVersion13	AIAPI_VERSION(6)
-#define kAIHitTestSuiteVersion		kAIHitTestSuiteVersion13
+#define kAIHitTestSuiteVersion19	AIAPI_VERSION(7)
+#define kAIHitTestSuiteVersion		kAIHitTestSuiteVersion19
 #define kAIHitTestVersion			kAIHitTestSuiteVersion
 
 
-/** Hit types */
+/** Hit types for objects found by hit requests.
+See \c #AIHitTestSuite::GetType() and \c #AIHitTestSuite::GetSubType() */
 enum AIHitType {
 	/** Hit an anchor point. */
 	kPHitType,
@@ -134,6 +135,10 @@ struct AIToolHitData {
 	/** The \c #AIHitType value for the found object.
 		See \c #AIHitTestSuite::GetType() */
 	ai::int16 type;
+	/** The \c #AIHitType value for the subtype when the type of the
+	found object is \c #kFillHitType.
+	See \c #AIHitTestSuite::GetSubType() */
+	ai::int16 subType;
 	/** If the hit is on an anchor point or segment of a path,
 		the path segment number.
 		See \c #AIHitTestSuite::GetPathSegment() */
@@ -154,6 +159,7 @@ struct AIToolHitData {
 	AIReal t;
 	AIToolHitData():hit(false),
 					type(0),
+					subType(0),
 					segment(0),
 					object(NULL),
 					group(NULL),
@@ -250,6 +256,16 @@ struct AIHitTestSuite {
 			@return The \c #AIHitType value for the found object.
 		*/
 	AIAPI ai::int32 (*GetType) ( AIHitRef hit );
+
+	/** Retrieves the sub-type for an object of type \c #kFillHitType that
+		was found by a successful hit test. Sub-types of the Fill hit type can be
+		In, Out, Segment, or Center. Otherwise, returns the primary type.
+		(Note that this function returns a constant value, not an error code.)
+			@param    hit    The hit object. Only valid if \c #IsHit() returns true for this hit.
+			@return The \c #AIHitType value for the sub-type of the found object,
+				or the primary type if the found object was not of type \c #kFillHitType.
+	*/
+	AIAPI ai::int32(*GetSubType) (AIHitRef hit);
 
 	/** Retrieves the leaf object that was found by a successful hit test.
 		(Note that this function returns an object value, not an error code.)

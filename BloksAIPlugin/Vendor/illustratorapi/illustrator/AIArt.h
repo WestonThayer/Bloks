@@ -42,8 +42,8 @@
  **/
 
 #define kAIArtSuite				"AI Art Suite"
-#define kAIArtSuiteVersion17	AIAPI_VERSION(17)
-#define kAIArtSuiteVersion		kAIArtSuiteVersion17
+#define kAIArtSuiteVersion18	AIAPI_VERSION(18)
+#define kAIArtSuiteVersion		kAIArtSuiteVersion18
 #define kAIArtVersion			kAIArtSuiteVersion
 
 
@@ -135,7 +135,7 @@ enum AIArtType {
 	kForeignArt,
 	/** A text object read from a legacy file (AI10 or earlier) */
 	kLegacyTextArt,
-	/** Chart Art (experimental) */
+	/** Chart Art (Deprecated) */
 	kChartArt,
 };
 
@@ -248,7 +248,10 @@ enum AIArtUserAttr {
 	kArtStyleIsDirty = 0x00040000,
 
 	/** Neither Edit Art Nor Result art of plug-in groups is included in the search for matching art; valid only for matching. */
-	kMatchArtNotIntoPluginGroups = 0x00080000
+	kMatchArtNotIntoPluginGroups = 0x00080000,
+
+	/** Contents of graph objects are included in the search for matching art, valid only for matching.*/
+	kMatchArtInCharts = 0x00100000
 };
 
 /** Flags for \c #AIArtSuite::GetArtTransformBounds() and \c #AIArtSuite::GetArtRotatedBounds()
@@ -383,6 +386,16 @@ enum AIPathPolarity
 	kAIPolarPath,
 	kAINonPolarPath
 
+};
+
+enum AIArtTimeStampOptions
+{
+	kAITimeStampOfArt = 1,
+	// Example Usecase: Hiding/Showing a Layer in Layer Panel does not update the thumbnail of that Layer because timestamp of Layer's group art changes but that of its children does not.
+	kAITimeStampOfChildren = kAITimeStampOfArt << 1,
+	// Example Usecase: Thumbnail of Assets contained in Export Assets Panel are in sync with the visibility of that art on the document. 
+	//					So if an group, added as an asset in Export Assets Panel, is shown/hidden (or its children are shown/hidden) then the thumbnail of that group in Asset Panel updates accordingly.
+	kAITimeStampMaxFromArtAndChildren = kAITimeStampOfChildren << 1
 };
 
 /** @ingroup Errors
@@ -1188,13 +1201,20 @@ if (!visible) {
 
 	/** Retrieves the modification time stamp for an art object.
 		@param art [in] The art object
+		@param option [in] The type of timeStamp to get, an \c ::AIArtTimeStampOptions value.
 		@param timeStamp [out] A buffer in which to return the modification time stamp.
 	*/
-	AIAPI AIErr (*GetArtTimeStamp) ( AIArtHandle art, size_t* timeStamp );
+	AIAPI AIErr (*GetArtTimeStamp) ( AIArtHandle art, enum AIArtTimeStampOptions option, size_t* timeStamp );
 
-	AIAPI AIErr (*ConvertPointTypeToAreaType) ( AIArtHandle art, AIArtHandle* newArtHandle);
+	/*  Retrieves the global art edit timestamp. This value is a counter that is incremented on each art edit (0 at the beginning
+		of the session). A comparison between the global timestamp and an art timestamp could reveal when the art was edited last.
+		@return The global art edit time stamp for this session.
+	*/
+	AIAPI size_t (*GetGlobalTimeStamp) ();
 
-	AIAPI AIErr (*ConvertAreaTypeToPointType) ( AIArtHandle art, AIArtHandle* newArtHandle);
+	AIAPI AIErr (*ConvertPointTypeToAreaType) ( AIArtHandle art, AIArtHandle* newArtHandle );
+
+	AIAPI AIErr (*ConvertAreaTypeToPointType) ( AIArtHandle art, AIArtHandle* newArtHandle );
 
 } AIArtSuite;
 

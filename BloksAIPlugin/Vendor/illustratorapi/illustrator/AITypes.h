@@ -9,7 +9,7 @@
  *     Purpose:	Adobe Illustrator core type definitions.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2007 Adobe Systems Incorporated.
+ * Copyright 1986-2015 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file 
@@ -83,8 +83,10 @@
 #define kPluginInterfaceVersion18001	0x18000001	// AI 18.0
 #define kPluginInterfaceVersion18011	0x18000011	// AI 18.1
 #define kPluginInterfaceVersion19001	0x19000001	// AI 19.0
+#define kPluginInterfaceVersion19021	0x19000021	// AI 19.2
+#define kPluginInterfaceVersion20001	0x20000001	// AI 20.0
 
-#define kPluginInterfaceVersion			kPluginInterfaceVersion19001
+#define kPluginInterfaceVersion			kPluginInterfaceVersion20001
 
 
 #ifdef MAC_ENV
@@ -115,16 +117,12 @@
 #if !defined(Macintosh)
 #if defined(MAC_ENV)
 #define Macintosh 1
-#else
-#define Macintosh 0
 #endif
 #endif
 
 #if !defined(MSWindows)
 #if defined(WIN_ENV)
 #define MSWindows 1
-#else
-#define MSWindows 0
 #endif
 #endif
 
@@ -199,10 +197,11 @@ typedef struct _t_AIFloatRect {
 /** Point specified with \c #AIReal coordinates.*/
 typedef struct _t_AIRealMatrix {
 	AIReal a, b, c, d, tx, ty;
+	/** Sets to Identity.*/
 	void Init()
 	{
-		a = 0.0; b = 1.0;
-		c = 1.0; d = 0.0;
+		a = 1.0; b = 0.0;
+		c = 0.0; d = 1.0;
 		tx = 0.0; ty = 0.0;
 	}
 } AIRealMatrix, *AIRealMatrixPtr;
@@ -254,18 +253,12 @@ typedef struct MacDialog_t* AIDialogRef;
 
 #ifdef WIN_ENV
 /** Port reference, Windows only, same as Windows \c HDC. */
-// AISTRICT
-//typedef void* AIPortRef;
 typedef HDC AIPortRef;
 
 /** Window reference, Windows only, same as Windows \c HWND. */
-// AISTRICT
-//typedef void* AIWindowRef;
 typedef HWND AIWindowRef;
 
 /** Dialog reference, Windows only, same as Windows \c HWND. */
-// AISTRICT
-//typedef void* AIDialogRef;
 typedef HWND AIDialogRef;
 #endif
 
@@ -360,6 +353,23 @@ typedef enum AIPaintUsage {
 	kAIUsedOnBoth = 0x0003
 } AIPaintUsage;
 
+/** These constants identifier can be used to determine the quadrant in a plane.
+			 |
+	SecondQ	 |  FirstQ
+	--------------------  
+	ThirdQ	 |  FourthQ
+			 |
+*/
+namespace ai
+{
+	typedef enum Quadrant {
+		kFirstQuadrant = 1,
+		kSecondQuadrant,
+		kThirdQuadrant,
+		kFourthQuadrant
+	} Quadrant;
+}
+
 /** These constants identify the various shipping versions of Illustrator. */
 typedef enum AIVersion {
 	kAIVersion1 = 1,
@@ -380,7 +390,8 @@ typedef enum AIVersion {
 	kAIVersion16,
 	kAIVersion17,
 	kAIVersion18,
-	kAIVersion19
+	kAIVersion19,
+	kAIVersion20
 } AIVersion;
 
 /** These constants identify the various units used in Illustrator. */

@@ -46,7 +46,7 @@
  **/
 
 #define kAIRealMathSuite			"AI Real Math Suite"
-#define kAIRealMathSuiteVersion		AIAPI_VERSION(3)
+#define kAIRealMathSuiteVersion		AIAPI_VERSION(4)
 #define kAIRealMathVersion			kAIRealMathSuiteVersion
 
 // Most of this stuff is completely unnecessary, and is just here to ease the
@@ -102,9 +102,10 @@
 #define kAIReal3PiOver2				((AIReal) (kAIRealThreeHalves*kAIPi))
 #define kAIRealTwoPi 				((AIReal) (kAIPi*2.0))
 
-#define kAIRealSquareRootOfTwo		((AIReal) 1.4142135623)		/* 2^(1/2) */
-#define kAIRealAvogadrosOther		((AIReal) 0.5522847498)		/* (4/3) [2^(1/2) - 1] */
-#define kAIRealGolden 				((AIReal) 1.6180339888)		/* [1 + 5^(1/2)]/2 */
+#define kAIRealSquareRootOfTwo		((AIReal) 1.4142135623)								/* 2^(1/2) */
+#define kAIRealSquareRootOfThree	((AIReal) 1.7320508075688772935274463415059)		/* 3^(1/2) */
+#define kAIRealAvogadrosOther		((AIReal) 0.5522847498)								/* (4/3) [2^(1/2) - 1] */
+#define kAIRealGolden 				((AIReal) 1.6180339888)								/* [1 + 5^(1/2)]/2 */
 
 #define kSmallestFixedNumberEquivalent_Tolerance		((AIReal) (1.0 / (1 << 16)) )	// 1 / 2^16
 #define kAIRealTolerance								kSmallestFixedNumberEquivalent_Tolerance
@@ -281,7 +282,7 @@ typedef struct {
 			@param radian The number of radians in the angle.
 			@return The number of degrees in the angle.
 		*/
-	AIAPI AIReal (*RadianToDegree) ( AIReal radian );
+    AIAPI AIReal (*RadianToDegree) ( AIReal radian );
 
 	/** Computes the square root of a real number.
 			@param a The number.
@@ -693,6 +694,14 @@ typedef struct {
 		    @param result [out] A buffer in which to return the result.
 		*/
 	AIAPI void (*AIDoubleRectUnion) ( const AIDoubleRect *a, const AIDoubleRect *b, AIDoubleRect *result );
+
+	/** Restricts an angle to a given range.
+		@param angle		The angle to be restricted in radians.
+		@param startAngle	The beginning of the range in radians.
+							For startAngle=n, the range is [n, (n + 2 * pi)).
+		@return The restricted angle.
+	*/
+	AIAPI AIReal(*RestrictAngleToRange)(AIReal angle, AIReal startAngle);
 } AIRealMathSuite;
 
 

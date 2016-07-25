@@ -64,7 +64,11 @@ class IAIPointImpl : public S
 private:
 	typedef typename ai::PointTraits::PointStruct_Traits<S>::Coordinates_t CoordinateType;
 public: 
-	IAIPointImpl(){}
+	IAIPointImpl()
+	{
+		this->h = 0;
+		this->v = 0;
+	}
 	IAIPointImpl(const S& p)
 	{	
 		this->h = p.h;

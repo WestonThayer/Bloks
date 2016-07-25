@@ -1,21 +1,32 @@
 #ifndef _AICSXSExtension_H_
 #define _AICSXSExtension_H_
-/*
-*		 Name:	_AICSXSExtension_H_
-*        Date:	Started 2011
-*     Purpose:	Adobe Illustrator CSXS Extension Header.
-*
-* ADOBE SYSTEMS INCORPORATED
-* Copyright 2009 Adobe Systems Incorporated.
-* All rights reserved.
-*
-* NOTICE:  Adobe permits you to use, modify, and distribute this file
-* in accordance with the terms of the Adobe license agreement
-* accompanying it. If you have received this file from a source other
-* than Adobe, then your use, modification, or distribution of it
-* requires the prior written permission of Adobe.
-*
-*/
+//========================================================================================
+//  
+//  ADOBE CONFIDENTIAL
+// 
+//	Owner: 
+//  
+//  Author: 
+//  
+//  $DateTime: $
+//  
+//  $Revision: $
+//  
+//  $Change: $
+//  
+//  Copyright 2015 Adobe Systems Incorporated
+//  All Rights Reserved.
+//  
+//  NOTICE:  All information contained herein is, and remains
+//  the property of Adobe Systems Incorporated and its suppliers,
+//  if any.  The intellectual and technical concepts contained
+//  herein are proprietary to Adobe Systems Incorporated and its
+//  suppliers and are protected by trade secret or copyright law.
+//  Dissemination of this information or reproduction of this material
+//  is strictly forbidden unless prior written permission is obtained
+//  from Adobe Systems Incorporated.
+//  
+//========================================================================================
 
 #ifndef __AITypes__
 #include "AITypes.h"
@@ -32,11 +43,14 @@
 **/
 
 #define kAICSXSExtensionSuite			"AI CSXS Extension Suite"
-#define kAICSXSExtensionSuiteVersion	AIAPI_VERSION(3)
+#define kAICSXSExtensionSuiteVersion	AIAPI_VERSION(4)
 #define kAICSXSExtensionVersion		kAICSXSExtensionSuiteVersion
 
 #define kAICSXSExtensionUnloadNotifier	"Extension Unloaded Notifier"
 
+#define kAICSXSExtensionLoadNotifier	"Extension Loaded Notifier"
+
+#define kAICSXSPanelVisibilityChangeNotifier "Extension Panel Visibility Changed Notifier"
 /**
 	Constants for reporting the status of Creative Suite extensions.
 	See \c #AICSXSExtensionSuite::GetExtensionState().
@@ -49,6 +63,10 @@ enum AICSXSExtensionState
 	kAICSXSExtensionRegisteredState,
 	/** Extension is loaded. */
 	kAICSXSExtensionLoadedState,
+	/** Extension is loaded and Visible , valid for Panel and Dashboard Extension as of AI 19.2. */
+	kAICSXSExtensionLoadedVisibleState,
+	/** Extension is loaded but inVisible , valid for Panel and Dashboard Extension as of AI 19.2. */
+	kAICSXSExtensionLoadedInvisibleState,
 	/** Extension is unloaded. */
 	kAICSXSExtensionUnLoadedState,
 	/** Internal use  */
@@ -102,6 +120,18 @@ typedef struct {
 	*/
 	AIAPI AIErr (*SendEventToExtension) (const char* extensionId, const char* eventID, const char* appId, const char* data);
 
+	/** Sets the visibility of a panel.
+	NOTE: This suite function does not "launch" any extension. It simply changes visibility state of container of the input extension
+	If you need to know the "launch" status of an extension use GetExtensionState.
+	@param extensionId [in] The unique identifier of the extension.
+	@param show [in] weather to show/hide the extension panel.
+	**/
+	AIAPI AIErr (*ShowExtension) (const char* extensionId, bool show);
+
+	/** Unloads extension of specified extension ID
+	@param extensionId [in] The unique identifier of the extension.
+	*/
+	AIAPI AIErr(*UnloadExtension) (const char* extensionId);
 } AICSXSExtensionSuite;
 
 #include "AIHeaderEnd.h"

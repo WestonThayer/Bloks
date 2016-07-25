@@ -127,7 +127,7 @@ typedef struct AITagSuite {
   				the address of the tag type string if the tag exists.
   				Call with \c NULL to opt out.
 		*/
-	AIErr (*GetTagType) ( void *object, const char *name, char **type );
+	AIErr (*GetTagType) ( void *object, const char *name,const char **type );
 
 	/** Retrieves the number of times an object tag has changed.
 			@param object The object, an \c #AIArtHandle.

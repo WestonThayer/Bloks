@@ -15,7 +15,7 @@
  * accompanying it. If you have received this file from a source other 
  * than Adobe, then your use, modification, or distribution of it 
  * requires the prior written permission of Adobe.
- *
+ *:
  */
 
 #ifndef __ASTypes__
@@ -58,7 +58,7 @@ typedef struct {
 			@param url The URL to display.
 			@return True if the web browser is opened successfully.
 		*/
-	ASAPI ASBoolean (*OpenURL)(char *url);
+	ASAPI ASBoolean (*OpenURL)(const char *url);
 } AIURLSuite;
 
 

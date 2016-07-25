@@ -9,7 +9,7 @@
  *     Purpose: Adobe Illustrator User Utilities Suite.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2007 Adobe Systems Incorporated.
+ * Copyright 2016 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file
@@ -66,14 +66,14 @@
 
 // v.14.0
 #define kAIUserSuite				"AI User Suite"
-#define kAIUserSuiteVersion12		AIAPI_VERSION(12)
-#define kAIUserSuiteVersion			kAIUserSuiteVersion12
+#define kAIUserSuiteVersion13		AIAPI_VERSION(13)
+#define kAIUserSuiteVersion			kAIUserSuiteVersion13
 #define kAIUserVersion				kAIUserSuiteVersion
 
 #if Macintosh || MSWindows
 #define kAIMacUserSuite				"AI Mac User Suite"
-#define kAIMacUserSuiteVersion6		AIAPI_VERSION(6)
-#define kAIMacUserSuiteVersion		kAIMacUserSuiteVersion5
+#define kAIMacUserSuiteVersion7		AIAPI_VERSION(7)
+#define kAIMacUserSuiteVersion		kAIMacUserSuiteVersion7
 #define kAIMacUserVersion			kAIMacUserSuiteVersion
 #endif
 
@@ -771,6 +771,14 @@ struct AIUserSuite {
 		(ArtScaleFactor/ ViewScaleFactor)
     */
 	AIAPI AIReal(*GetArtToViewScaleFactor)(AIDocumentViewHandle view);
+
+
+	/** Launches a folder.
+	@param folderPath Path of the folder to launch.
+	@return \c #kBadParameterErr if the path object is invalid or references a file rather than a folder.
+	*/
+	AIAPI AIErr(*LaunchFolder)(ai::FilePath folderPath);
+
 };
 
 

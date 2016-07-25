@@ -3,9 +3,6 @@
 
 /*
  *        Name:	AIFileFormat.h
- *   $Revision: 25 $
- *      Author:
- *        Date:
  *     Purpose:	Adobe Illustrator File Format Suite.
  *
  * ADOBE SYSTEMS INCORPORATED
@@ -47,6 +44,7 @@
 
 #include "IAIFilePath.hpp"
 #include "AIArtboardRange.h"
+#include "AIActionManager.h"
 
 #include "AIHeaderBegin.h"
 
@@ -61,8 +59,8 @@
  **
  **/
 #define kAIFileFormatSuite				"AI File Format Suite"
-#define kAIFileFormatSuiteVersion13		AIAPI_VERSION(13)
-#define kAIFileFormatSuiteVersion		kAIFileFormatSuiteVersion13
+#define kAIFileFormatSuiteVersion14		AIAPI_VERSION(14)			// From AI 20.0
+#define kAIFileFormatSuiteVersion		kAIFileFormatSuiteVersion14
 #define kAIFileFormatVersion			kAIFileFormatSuiteVersion
 
 
@@ -238,8 +236,24 @@ enum AIFileFormatOptions {
 		Not used for adding a format. */
 	kFileFormatSaveCopyOption =					(1<<15),
 
+	/** Write the contents of selected artwork in a document to a file
+		in a non-Illustrator format.
+		The format is included in the File > Export Selection file types.
+		Use when adding a format. */
+	kFileFormatExportSelection =				(1 << 16),
+
+	/**  Enables Batch Export mode which prevents certain actions like:
+	1. Prevent individual file format plugins from showing File Replace Dialog.
+	2. Prevent individual file format plugins to add exported files to Recent File Menu Items.
+	Not used when adding a format. */
+	kFileFormatBatchExport		=				(1 << 17),
+
+	/**  Prevent a file format plugin from uniquifying file name.
+	Not used when adding a format. */
+	kFileFormatSuppressPluginFileNameUniquify = (1 << 18),
+
 	/**  Prevents this file format from appearing in the file
-		selection menu of the Open and Place dialogs.
+		selection menu of the Open, Place, Save and Export dialogs.
 		Use when adding a format. */
 	kFileFormatSuppressUI =						(1<<21),
 	/** Set in combination with \c #kFileFormatWrite for a
@@ -294,7 +308,7 @@ enum AIFileFormatOptions {
 		Illustrator without loss of data.
 		The format should be added if this format can be saved 
 		in touch workspace.
-		*/
+		Use when adding a format.*/
 	kFileFormatWriteInTouch		=				(1<<31)
 };
 
@@ -669,6 +683,7 @@ struct AIFileFormatSuite {
 kFileFormatRead
 kFileFormatImportArt
 kFileFormatExport
+kFileFormatExportSelection
 kFileFormatPlaceArt
 kFileFormatImportStyles
 kFileFormatSuppliesPrintRecordOption
@@ -690,6 +705,7 @@ kFileFormatCheckAlways
 				\verbatim
 				kNoExtendedOptions
 				kSaveMultiArtboards
+				kFileFormatPlaceInTouch
 				\endverbatim
 
 
@@ -769,6 +785,7 @@ kFileFormatCheckAlways
 				\verbatim
 				kNoExtendedOptions
 				kSaveMultiArtboards
+				kFileFormatPlaceInTouch
 				\endverbatim
 				
 			@see \c #AddFileFormat(), \c #SetFileFormatFilter()
@@ -900,6 +917,7 @@ kFileFormatCheckAlways
 			\verbatim
 			kNoExtendedOptions
 			kSaveMultiArtboards
+			kFileFormatPlaceInTouch
 			\endverbatim
 	*/
 	AIAPI AIErr (*GetFileFormatExtendedOptions) ( AIFileFormatHandle fileFormat, ai::int32 *extendedOptions );
@@ -911,9 +929,16 @@ kFileFormatCheckAlways
 			\verbatim
 			kNoExtendedOptions
 			kSaveMultiArtboards
+			kFileFormatPlaceInTouch
 			\endverbatim
 	*/
 	AIAPI AIErr (*SetFileFormatExtendedOptions) ( AIFileFormatHandle fileFormat, ai::int32 extendedOptions);
+
+	/** Used for exporting the current document as one whole file or as multiple artBoards
+	@param actionParam An action parameter block containing keys "name", "frmt", "ext", "smab", "sall", "sran" as defined in AIDocumentAction.h
+	Will return error (and not throw a dialog) if the above action keys are missing.
+	*/
+	AIAPI AIErr(*GoExport) (AIActionParamValueRef actionParam);
 } ;
 
 

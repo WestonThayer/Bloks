@@ -3,12 +3,12 @@
 
 /*
  *        Name:	AIPaintStyle.h
- *      Author:	Dave Lazarony
- *        Date:	6/17/96
+ *      Author:	Vivek Agrawal
+ *        Date:	2/22/2016
  *     Purpose:	AI Paint Style Suite.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2007 Adobe Systems Incorporated.
+ * Copyright 2015-2016 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file 
@@ -52,10 +52,10 @@
  **/
 
 #define kAIPaintStyleSuite			"AI Paint Style Suite"
-#define kAIPaintStyleSuiteVersion9	AIAPI_VERSION(9)
+#define kAIPaintStyleSuiteVersion10	AIAPI_VERSION(10)
 
 /* Latest version */
-#define kAIPaintStyleSuiteVersion	kAIPaintStyleSuiteVersion9
+#define kAIPaintStyleSuiteVersion	kAIPaintStyleSuiteVersion10
 #define kAIPaintStyleVersion		kAIPaintStyleSuiteVersion
 
 /** @ingroup Callers
@@ -389,13 +389,25 @@ typedef struct
 		*/
 	ASBoolean ASAPI (*DisplayColorPickerWithOptions)(AIColor *currentColor, const AIColorPickerOptions &options );
 
-	/** Changes the stroke alignment on an art.
-			@param art [in] The art handle whose stroke alignment is to be changed..
-				On output, the color the user selected.
-			@param strokeAlignment [in] The requirement alignment type. For possible values please see enum \c #AIStrokeAlignmentType.
-			@return kNoErr if successful, error code otherwise.
-		*/
+	/** Changes the stroke alignment for an art object.
+			@param art [in] The art handle.
+			@param strokeAlignment [in] The new alignment type, a constant in \c #AIStrokeAlignmentType.
+			@return \c #kNoErr if successful, error code otherwise.
+	*/
 	AIErr ASAPI (*SetStrokeAlignment)(AIArtHandle art, ai::uint32 strokeAlignment);
+
+	/** Changes the stroke alignment for the currently selected art object or objects.
+			@param strokeAlignment [in] The new alignment type, a constant in \c #AIStrokeAlignmentType.
+			@return \c #kNoErr if successful, error code otherwise.
+	*/
+	AIErr ASAPI(*SetStrokeAlignmentOnSelection)(ai::uint32 strokeAlignment);
+
+	/** Retrieves the stroke alignment for the currently selected art object or objects.
+		(Note that this function returns a numeric value, not an error code.)
+			@return The stroke alignment type of the current selection, a constant in \c #AIStrokeAlignmentType.
+				If there is no selection or selected art objects have different states,	returns  \c #kAIStrokeAlignmentCenter.
+	*/
+	ai::uint32 ASAPI(*GetStrokeAlignmentFromSelection)();
 
 } AIPaintStyleSuite;
 

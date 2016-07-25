@@ -39,12 +39,12 @@
  **/
 
 #define kAIGeometrySuite		"AI Geometry Suite"
-#define kAIGeometryVersion5		AIAPI_VERSION(5)
-#define kAIGeometrySuiteVersion	kAIGeometryVersion5
+#define kAIGeometryVersion6		AIAPI_VERSION(6)
+#define kAIGeometrySuiteVersion	kAIGeometryVersion6
 
 
 /** @ingroup Errors */
-#define kCancelledErr			'CAN!'
+#define kCancelledErr			kCanceledErr
 /** @ingroup Errors */
 #define kFormatErr				'FRM!'
 
@@ -90,6 +90,11 @@ typedef enum {
 	/** A legacy text object.
 		@note AI11 and later. */
 	kAIGeometryOrganizeLegacyText,
+	/** A chart object. */
+	kAIGeometryOrganizeChart,
+	/** A Plugin Art Object.
+		@note AI19.2 and later */
+	kAIGeometryOrganizePluginArt,
 	/** Internal */
 	kAIGeometryOrganizeDummy = 0xFFFFFFFF
 
@@ -480,13 +485,17 @@ typedef struct {
 			@param stateProcs Contains pointers to callbacks that receive additional parameters
 				to the painting operations.
 			@param userData Developer-defined data to be passed to callbacks.
+			@param skipArtTypes A logical OR of \c #AIArtUserAttr values for art objects to skip during iteration.
+				As an example, pass  kArtHidden | kArtLocked to skip hidden and locked arts
+				Pass 0 to skip no arts.
 		*/
 	ASAPI AIErr (*GeometryIterate) ( AIArtHandle art,
 									 AIGeometryOrganizationProcs *organizationProcs,
 									 AIGeometryConstructionProcs *constructionProcs,
 									 AIGeometryPaintingProcs *paintingProcs,
 									 AIGeometryStateProcs *stateProcs,
-									 AIGeometryUserData userData );
+									 AIGeometryUserData userData,
+									 ai::int32 skipArtTypes);
 
 } AIGeometrySuite;
 

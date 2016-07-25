@@ -193,7 +193,7 @@ CFStringRef ai::UnicodeString::as_CFString ( CFAllocatorRef alloc ) const
 ai::UnicodeString::UnicodeString (const WCHARStr& string)
 : fImpl(0)
 {
-	AI_STATIC_CHECK(sizeof(WCHARStr::WCHAR) == sizeof(UTF16Char), WCHAR_size_does_not_match_unsigned_short);
+	AI_STATIC_CHECK(sizeof(WCHARStr::WCHAR) == sizeof(UTF16Char), WCHAR_size_does_not_match_unsigned_short); //-V503
 	*this = UnicodeString( string.as_ASUnicode() );
 }
 

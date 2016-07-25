@@ -37,7 +37,7 @@
 
 // AISwatchLibs Suite
 #define kAISwatchLibrariesSuite			"AI Swatch Libraries Suite"
-#define kAISwatchLibrariesSuiteVersion	AIAPI_VERSION(6)
+#define kAISwatchLibrariesSuiteVersion	AIAPI_VERSION(7)
 #define kAISwatchLibrariesVersion		kAISwatchLibrariesSuiteVersion
 
 /** @ingroup Callers
@@ -430,6 +430,24 @@ typedef struct
 		@return True if the color is found, false otherwise.
 	*/
 	AIBoolean ASAPI (*FindColorInBook)(const ai::UnicodeString& name, ai::int32 bookID, AICustomColor* color);
+
+	/** Counts the total number of selected swatches in the main document Swatches palette not in a selected group.
+	Use this function to allocate an appropriately sized array of AIColors before calling
+	\c #GetSelectedDocSwatchRefsNotInAnySelectedGroup().
+	(Note that this function returns an integer value, not an error code.)
+	@return The number of selected swatches.
+	*/
+	ai::int32 ASAPI(*CountSelectedDocSwatchesNotInAnySelectedGroup) ();
+
+	/** Retrieves an array of colors for the selected document swatches not in any selected group. The
+	members are ordered	as they appear in the document Swatches palette,
+	left to right and top to bottom.
+	@param colors [out] A buffer in which to return the colors.
+	Use \c #CountSelectedDocSwatches() to determine how much memory to allocate.
+	@param bufferSize The number of elements in the colors array. If there are
+	more selected colors, only this many are returned.
+	*/
+	AIErr ASAPI(*GetSelectedDocSwatchRefsNotInAnySelectedGroup) (AISwatchRef *colors, ai::int32 bufferSize);
 
 
 } AISwatchLibrariesSuite;

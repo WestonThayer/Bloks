@@ -112,9 +112,10 @@ ai::ColorSpace::ColorSpace(const ai::ColorSpace& cs)
 
 ai::ColorSpace::~ColorSpace()
 {
-	AIErr result = kNoErr;
 	if ( fImpl )
-		result = sAIColorSpace->DeleteColorSpace(*this);
+	{
+		sAIColorSpace->DeleteColorSpace(*this);
+	}
 }
 
 ai::ColorSpace& ai::ColorSpace::operator= (const ai::ColorSpace& rhs)
@@ -252,9 +253,10 @@ ai::ColorSpaceList::ColorSpaceList(const ai::ColorSpaceList& csList)
 
 ai::ColorSpaceList::~ColorSpaceList()
 {
-	AIErr result = kNoErr;
 	if ( fImpl )
-		result = sAIColorSpace->DeleteColorSpaceList(*this);
+	{
+		sAIColorSpace->DeleteColorSpaceList(*this);
+	}
 }
 
 ai::ColorSpaceList& ai::ColorSpaceList::operator= (const ai::ColorSpaceList& rhs)

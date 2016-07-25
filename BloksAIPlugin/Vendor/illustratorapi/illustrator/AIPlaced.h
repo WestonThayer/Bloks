@@ -53,8 +53,8 @@
  **/
 
 #define kAIPlacedSuite			"AI Placed Suite"
-#define kAIPlacedSuiteVersion8	AIAPI_VERSION(8)
-#define kAIPlacedSuiteVersion	kAIPlacedSuiteVersion8
+#define kAIPlacedSuiteVersion9	AIAPI_VERSION(9)
+#define kAIPlacedSuiteVersion	kAIPlacedSuiteVersion9
 #define kAIPlacedVersion		kAIPlacedSuiteVersion
 
 
@@ -147,6 +147,16 @@ typedef enum
 } AIPlacedPlateInfo;
 
 
+typedef enum 
+{
+	/*Default Place Type will be done, with no position size changed of placed art*/
+	kAIPlaceTransformTypeNone = 0,
+	/*Art will be transformed w.r.t to current zoom and fit to current view*/
+	kAIPlacedTransformTypeFitToView = 1
+
+} AIPlaceTransformType;
+
+
 /*******************************************************************************
  **
  ** Types
@@ -158,7 +168,7 @@ typedef enum
 */
 struct AIPlaceRequestData
 {
-	AIPlaceRequestData(): m_lPlaceMode(0), m_hOldArt(NULL), m_hNewArt(NULL), m_pFilePath(NULL), m_lParam(0), m_filemethod(0), m_disableTemplate(false),m_doShowParamDialog(false) {}
+	AIPlaceRequestData() : m_lPlaceMode(0), m_hOldArt(NULL), m_hNewArt(NULL), m_pFilePath(NULL), m_lParam(0), m_filemethod(0), m_disableTemplate(false), m_doShowParamDialog(false), m_PlaceTransformType(kAIPlaceTransformTypeNone){}
 
 	/** The type of placement request, a \c #PlaceRequestMode constant
 		which determines what operation is performed. */
@@ -186,6 +196,9 @@ struct AIPlaceRequestData
 
 	/** True to show the parameters dialog even when the file path is known. */
 	AIBoolean m_doShowParamDialog;
+
+	/** to trigger what kind of placement you want */
+	AIPlaceTransformType m_PlaceTransformType;
 };
 
 /*******************************************************************************

@@ -188,6 +188,7 @@ typedef enum AIFolderType
         kAIMACSupportFilesFolderType = 111,
         kAIFrameworksDllsPath = 112,
 		kAIUserLocalSupportFolderType = 113,
+        kAIAMTParentFolderType = 114,
 
 } AIFolderType;
 

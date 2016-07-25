@@ -63,7 +63,6 @@
 #define kScrollTool "Adobe Scroll Tool"
 #define kFreehandTool "Adobe Freehand Tool"
 #define kFreehandSmoothTool "Adobe Freehand Smooth Tool"
-#define kFreehandEditorTool "Adobe Freehand Editor Tool"
 #define kFreehandEraseTool "Adobe Freehand Erase Tool"
 #define kStencilTool "Adobe Stencil Tool"
 #define kNaturalJoinTool "Adobe Corner Join Tool"
@@ -149,6 +148,12 @@
 
 //New for CC Charts	
 #define kIGTool "CC Charts Tool"
+
+//New for 19.0
+#define kAdobeShaperTool "Adobe Shaper Tool"
+
+//New for 19.3 (October release)
+#define kAdobeSymmetryTool "Adobe Symmetry Tool"
 
 /** @} */
 

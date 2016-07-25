@@ -130,7 +130,8 @@ typedef enum _AISVGEmbedFontFormats
 typedef enum _AISVGRasterLocation
 {
 	kAISVGImageEmbed = 1,
-	kAISVGImagelink
+	kAISVGImagelink,
+	kAISVGImagePreserve
 } AISVGRasterLocation;
 
 //** The SVG DTD type. */
@@ -167,6 +168,14 @@ typedef struct _AISVGRect
 	float width;
 	float height;
 } AISVGRect;
+
+/** Id/Class type to be used in svg to be exported */
+typedef enum _AISVGIdType
+{
+	kAISVGIdMinimal = 0,
+	kAISVGIdRegular,
+	kAISVGIdUnique
+} AISVGIdType;
 
 #include "AIHeaderEnd.h"
 

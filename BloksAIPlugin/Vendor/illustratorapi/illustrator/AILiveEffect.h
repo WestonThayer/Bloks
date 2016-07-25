@@ -305,6 +305,8 @@ enum AIStyleFilterPreferredInputArtType {
 	kForeignInputArt			= 1 << ((ai::int32) kForeignArt - 1),
 	/** Handles legacy text. */
 	kLegacyTextInputArt			= 1 << ((ai::int32) kLegacyTextArt - 1),
+	/** Handles charts. */
+	kChartInputArt				= 1 << ((ai::int32) kChartArt - 1),
 
 	/** Handles any input art. */
 	kAnyInputArt 				= 0xFFFF,
