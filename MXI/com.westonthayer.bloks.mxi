@@ -31,6 +31,27 @@
 			  file-type="CSXS"
 			  products="Illustrator,Illustrator32,Illustrator64"
 			  minVersion="19.0" />
+        
+        <!-- MAC plugin -->
+        <file source="MAC/"
+              destination="$pluginsfolder/Bloks"
+              file-type="ordinary"
+              products="Illustrator,Illustrator32,Illustrator64"
+              platform="mac" />
+        
+        <!-- WIN plugin, 64bit -->
+        <file source="WIN_64/"
+              destination="$pluginsfolder/Bloks"
+              file-type="ordinary"
+              products="Illustrator,Illustrator64"
+              platform="win" />
+        
+        <!-- WIN plugin, 32bit -->
+        <file source="WIN_32/"
+              destination="$pluginsfolder/Bloks"
+              file-type="ordinary"
+              products="Illustrator,Illustrator32"
+              platform="win" />
  
 		<!-- Extension Manager icon -->
 		<file source="icon.png" destination="$ExtensionSpecificEMStore" />
