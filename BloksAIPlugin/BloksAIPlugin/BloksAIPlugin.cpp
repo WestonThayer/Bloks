@@ -5,6 +5,8 @@
 #include "AICSXS.h"
 #include "AIMenuCommandNotifiers.h"
 
+#define BLOKS_PING_EVENT "com.westonthayer.bloks.events.PingDownEvent"
+
 Plugin* AllocatePlugin(SPPluginRef pluginRef)
 {
 	return new BloksAIPlugin(pluginRef);
@@ -17,6 +19,7 @@ void FixupReload(Plugin* plugin)
 
 BloksAIPlugin::BloksAIPlugin(SPPluginRef pluginRef) : Plugin(pluginRef)
 {
+	fRegisterEventNotifierHandle = NULL;
 	fRegisterSelectionChangedHandle = NULL;
 	fRegisterUndoHandle = NULL;
 	fRegisterRulerHandle = NULL;
@@ -36,6 +39,17 @@ ASErr BloksAIPlugin::StartupPlugin(SPInterfaceMessage *message)
 	{
 		// Keep ourselves in memory to recieve events
 		//error = Plugin::LockPlugin(true);
+	}
+
+	if (!error)
+	{
+		// Register to be notified of when we can register for CSXS events
+		error = sAINotifier->AddNotifier(
+			fPluginRef,
+			"Register Event Notify",
+			kAICSXSPlugPlugSetupCompleteNotifier,
+			&fRegisterEventNotifierHandle
+		);
 	}
 
 	if (!error)
@@ -73,9 +87,44 @@ ASErr BloksAIPlugin::StartupPlugin(SPInterfaceMessage *message)
 	return error;
 }
 
+static void PingEventHandler(const csxs::event::Event* const eventParam, void* const context)
+{
+	csxs::event::EventErrorCode result = csxs::event::kEventErrorCode_Success;
+	SDKPlugPlug plug;
+	plug.Load(sAIFolders);
+
+	csxs::event::Event ev = {
+		"com.westonthayer.bloks.events.PingUpEvent",
+		csxs::event::kEventScope_Application,
+		"ILST",
+		"com.westonthayer.bloks",
+		"pingupevent"
+	};
+
+	result = plug.DispatchEvent(&ev);
+
+	plug.Unload();
+}
+
 ASErr BloksAIPlugin::ShutdownPlugin(SPInterfaceMessage *message)
 {
 	ASErr error = kNoErr;
+
+	if (!error)
+	{
+		// Deregister for our transform event
+		csxs::event::EventErrorCode result = csxs::event::kEventErrorCode_Success;
+		SDKPlugPlug plug;
+		plug.Load(sAIFolders);
+		result = plug.RemoveEventListener(BLOKS_PING_EVENT, PingEventHandler, NULL);
+
+		if (result != csxs::event::kEventErrorCode_Success)
+		{
+			error = 1;
+		}
+
+		plug.Unload();
+	}
 
 	if (!error)
 	{
@@ -97,7 +146,21 @@ ASErr BloksAIPlugin::Notify(AINotifierMessage* message)
 {
 	ASErr error = kNoErr;
 
-	if (message->notifier == fRegisterSelectionChangedHandle)
+	if (message->notifier == fRegisterEventNotifierHandle)
+	{
+		csxs::event::EventErrorCode result = csxs::event::kEventErrorCode_Success;
+		SDKPlugPlug plug;
+		plug.Load(sAIFolders);
+		result = plug.AddEventListener(BLOKS_PING_EVENT, PingEventHandler, NULL);
+
+		if (result != csxs::event::kEventErrorCode_Success)
+		{
+			error = 1;
+		}
+
+		plug.Unload();
+	}
+	else if (message->notifier == fRegisterSelectionChangedHandle)
 	{
 		csxs::event::EventErrorCode result = csxs::event::kEventErrorCode_Success;
 		SDKPlugPlug plug;

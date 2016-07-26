@@ -25,7 +25,7 @@
             return result;
         };
         
-        var BlokVm = (function() {        
+        var BlokVm = (function() {
             function BlokVm() {
                 this.isErrorStateVisible = ko.observable(true);
                 this.title = ko.observable("Not set");
@@ -69,6 +69,17 @@
             // TODO: how does this handle exceptions? We should crash too
 
             return {
+                /** Ask the native plugin to ping back if it's there */
+                pingDown: function() {
+                    var event = new CSEvent('com.westonthayer.bloks.events.PingDownEvent', 'APPLICATION', 'ILST', 'PingDownEvent');
+                    csInterface.dispatchEvent(event);
+                },
+                /** Register a callback for when the native plugin pings back */
+                onPingUp: function(cb) {
+                    csInterface.addEventListener("com.westonthayer.bloks.events.PingUpEvent", function(ret) {
+                        cb(ret.data);
+                    });
+                },
                 /** Register a callback for when there's an exception from JSX */
                 onException: function(cb) {
                     csInterface.addEventListener("com.westonthayer.bloks.events.JsxExceptionRaised", function(ret) {
@@ -320,8 +331,12 @@
             location.reload();
         });
         
-        // Make an initial query on first boot
-        BlokScripts.getActionsFromSelection(respondToActions);
+        // Make an initial query on first boot to see if the plugin is there
+        BlokScripts.onPingUp(function() {
+            BlokScripts.getActionsFromSelection(respondToActions);
+        });
+        
+        BlokScripts.pingDown();
     }
     catch (ex) {
         alert("CEP crashed: " + ex.toString());

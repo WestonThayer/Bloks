@@ -51,6 +51,7 @@ protected:
 	virtual ASErr Notify(AINotifierMessage* message); // override
 
 private:
+	AINotifierHandle fRegisterEventNotifierHandle;
 	AINotifierHandle fRegisterSelectionChangedHandle;
 	AINotifierHandle fRegisterUndoHandle;
 	AINotifierHandle fRegisterRulerHandle;

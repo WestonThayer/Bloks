@@ -4,6 +4,7 @@
 *.user
 
 /BloksAIPlugin.VC.db
+/BloksAIPlugin.VC.VC.opendb
 
 /.vs/
 /BloksAIPlugin/x64/
