@@ -3,6 +3,8 @@
 *.aps
 *.user
 
+/BloksAIPlugin.VC.db
+
 /.vs/
 /BloksAIPlugin/x64/
 /BloksAIPlugin/Release/

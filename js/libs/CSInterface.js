@@ -11,7 +11,7 @@
 *
 **************************************************************************************************/
 
-/** CSInterface - v6.1.0 */
+/** CSInterface - v7.0.0 */
 
 /**
  * Stores constants for the window types supported by the CSXS infrastructure.
@@ -762,7 +762,7 @@ CSInterface.prototype.getOSInformation = function()
                 winVersion = "Windows 10";
             }
 
-            if (userAgent.indexOf("WOW64") > -1)
+            if (userAgent.indexOf("WOW64") > -1 || userAgent.indexOf("Win64") > -1)
             {
                 winBit = " 64-bit";
             }
