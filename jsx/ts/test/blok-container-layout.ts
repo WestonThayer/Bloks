@@ -244,7 +244,7 @@ function testStrokes() {
     // Now layout
     blokContainer.invalidate();
 
-    Assert.isTrue(blokContainer.getRect().equals(new Rect([10, 10, 150, 100])));
+    Assert.isTrue(blokContainer.getRect().equals(new Rect([10, 10, 160, 110])));
 }
 
 function testTextFrameArea() {
