@@ -1,6 +1,6 @@
 A UX for flexbox layout within Illustrator. Work in progress.
 
-# Development
+## Development
 
 > Note: step #4 can be skipped if you don't need to change anything in the native plugin. Point Illustrator to the release .aip plugins checked into this repo.
 
@@ -28,10 +28,25 @@ To debug the BloksAIPlugin in Visual Studio, go to project > Properties > Config
 
 For more tips on CEP plugin development, see [Davide Barranca's blog](http://www.davidebarranca.com/). Adobe's [CEP-Resources](https://github.com/Adobe-CEP/CEP-Resources) repo also has some documentation.
 
-# Releasing
+## Releasing
+
+Build release versions of the native plugin for Mac, Win x86, and Win x64. With Xcode, switch to release through *Product > Scheme > Edit Scheme > Run > Info tab > Build Configuration*.
 
 Use `npm run zxp` to produce a signed ZXP extension at `release/com.westonthayer.bloks.zxp`.
 
 * You must have created `zxp-tools/certificate-creds.json` with a valid password (Ex: `{ password: "atestpassword" }`) to successfully sign it
 * Currently only works on Windows (path delimiters for script execution are Windows-style)
 * If you need a different ZXPSignCmd, try https://github.com/Adobe-CEP/CEP-Resources/tree/master/ZXPSignCMD
+
+Once the .zxp has been created, rename it to .zip.
+
+## Installation
+
+1. Unzip the com.westonthayer.bloks.zip file
+2. Copy those files to the CEP folder
+    1. Windows: `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\`
+    2. Mac: `/Library/Application Support/Adobe/CEP/extensions/`
+3. Copy the native plugin to the plugins folder
+    1. Windows (x86): copy `x86\BloksAIPlugin.aip` to `C:\Program Files\Adobe\Adobe Illustrator CC 2015.3\Plug-ins\`
+    2. Windows (x64): copy `x64\BloksAIPlugin.aip` to `C:\Program Files\Adobe\Adobe Illustrator CC 2015.3\Plug-ins\`
+    3. Mac: copy `mac/BloksAIPlugin.aip` to `/Applications/Adobe Illustrator CC 2015.3/Plug-ins/`

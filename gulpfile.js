@@ -56,57 +56,50 @@ gulp.task("build-jsx", function() {
 
 var pwd = undefined;
 
-gulp.task("zxp-get-creds", function() {
-    try {
-        var creds = require("./zxp-tools/certificate-creds.json");
-        pwd = creds.password;
+try {
+    var creds = require("./zxp-tools/certificate-creds.json");
+    pwd = creds.password;
+}
+catch (e) {
+    /*if (e.code === "MODULE_NOT_FOUND") {
+        throw new Error("./zxp-tools/certificate-creds.json doesn't exist! Please create it. Ex: { password: 'pwd' }");
     }
-    catch (e) {
-        if (e.code === "MODULE_NOT_FOUND") {
-            throw new Error("./zxp-tools/certificate-creds.json doesn't exist! Please create it. Ex: { password: 'pwd' }");
-        }
-        else {
-            throw e;
-        }
-    }
-
-    if (!pwd) {
-        throw new Error("Unable to get the certificate file's password!");
-    }
-});
+    else {
+        throw e;
+    }*/
+}
 
 gulp.task("zxp-html-extension-copy-css", function() {
    return gulp.src(["css/**/*.css"])
-       .pipe(gulp.dest("release/MXI/HTML/com.westonthayer.bloks/css/"));
+       .pipe(gulp.dest("release/com.westonthayer.bloks/css/"));
 });
 
 gulp.task("zxp-html-extension-copy-manifest", function() {
    return gulp.src(["CSXS/manifest.xml"])
-       .pipe(gulp.dest("release/MXI/HTML/com.westonthayer.bloks/CSXS/"));
+       .pipe(gulp.dest("release/com.westonthayer.bloks/CSXS/"));
 });
 
 gulp.task("zxp-html-extension-copy-icons", function() {
    return gulp.src(["icons/*.png"])
-       .pipe(gulp.dest("release/MXI/HTML/com.westonthayer.bloks/icons/"));
+       .pipe(gulp.dest("release/com.westonthayer.bloks/icons/"));
 });
 
 gulp.task("zxp-html-extension-copy-js", function() {
    return gulp.src(["js/**/*.js"])
-       .pipe(gulp.dest("release/MXI/HTML/com.westonthayer.bloks/js/"));
+       .pipe(gulp.dest("release/com.westonthayer.bloks/js/"));
 });
 
 gulp.task("zxp-html-extension-copy-jsx", function() {
    return gulp.src(["jsx/hostscript.jsx"])
-       .pipe(gulp.dest("release/MXI/HTML/com.westonthayer.bloks/jsx/"));
+       .pipe(gulp.dest("release/com.westonthayer.bloks/jsx/"));
 });
 
 gulp.task("zxp-html-extension-copy-html", function() {
    return gulp.src(["index.html"])
-       .pipe(gulp.dest("release/MXI/HTML/com.westonthayer.bloks/"));
+       .pipe(gulp.dest("release/com.westonthayer.bloks/"));
 });
 
 gulp.task("zxp-html-extension-sign", [
-    "zxp-get-creds",
     "zxp-html-extension-copy-css",
     "zxp-html-extension-copy-manifest",
     "zxp-html-extension-copy-icons",
@@ -114,43 +107,33 @@ gulp.task("zxp-html-extension-sign", [
     "zxp-html-extension-copy-jsx",
     "zxp-html-extension-copy-html"
     ],
-    shell.task("zxp-tools\\ZXPSignCmd.exe -sign release\\MXI\\HTML\\com.westonthayer.bloks release\\MXI\\HTML\\com.westonthayer.bloks.zxp zxp-tools\\selfWT.p12 " + pwd + " -tsa https://timestamp.geotrust.com/tsa")
+    shell.task("zxp-tools\\ZXPSignCmd.exe -sign release\\com.westonthayer.bloks release\\com.westonthayer.bloks.zxp zxp-tools\\selfWT.p12 " + pwd + " -tsa https://timestamp.geotrust.com/tsa")
 );
 
 gulp.task("zxp-html-extension", ["zxp-html-extension-sign"], function() {
-    return del(["release/MXI/HTML/com.westonthayer.bloks"]);
-});
-
-gulp.task("zxp-mxi-copy", function() {
-    return gulp.src(["MXI/*"])
-        .pipe(gulp.dest("release/MXI/"));
+    return del(["release/com.westonthayer.bloks"]);
 });
 
 gulp.task("zxp-plugin-mac", function() {
     return gulp.src(["BloksAIPlugin/Mac/release/**/*"])
-        .pipe(gulp.dest("release/MXI/MAC/"));
+        .pipe(gulp.dest("release/MAC/"));
 });
 
 gulp.task("zxp-plugin-win-64", function() {
     return gulp.src(["BloksAIPlugin/x64/Release/BloksAIPlugin.aip"])
-        .pipe(gulp.dest("release/MXI/WIN_64/"));
+        .pipe(gulp.dest("release/WIN_64/"));
 });
 
 gulp.task("zxp-plugin-win-32", function() {
     return gulp.src(["BloksAIPlugin/Release/BloksAIPlugin.aip"])
-        .pipe(gulp.dest("release/MXI/WIN_32/"));
+        .pipe(gulp.dest("release/WIN_32/"));
 });
 
-gulp.task("zxp-sign", [
+gulp.task("zxp",
+    [
         "zxp-html-extension",
-        "zxp-mxi-copy",
         "zxp-plugin-mac",
         "zxp-plugin-win-64",
         "zxp-plugin-win-32"
-    ],
-    shell.task("zxp-tools\\ZXPSignCmd.exe -sign release\\MXI release\\com.westonthayer.bloks.zxp zxp-tools\\selfWT.p12 " + pwd + " -tsa https://timestamp.geotrust.com/tsa")
+    ]
 );
-
-gulp.task("zxp", ["zxp-sign"], function() {
-    return del(["release/MXI"]);
-});
