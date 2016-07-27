@@ -18,3 +18,9 @@
 
 /Release/*
 !/Release/BloksAIPlugin.aip
+
+# Xcode specific
+/BloksAIPlugin.build/
+/output/
+/BloksAIPlugin.xcodeproj/*
+!/BloksAIPlugin.xcodeproj/project.pbxproj
