@@ -14,6 +14,8 @@ A UX for flexbox layout within Illustrator. [Read the blog post](http://westonth
 
 Finder/File Explorer may ask you for adminsitrator permission to copy to those folders. To uninstall, simply delete the files you copied.
 
+Get started by opening a document in Illustrator and going to *Window > Extensions > Bloks*. Select two or more objects to create a BlokGroup.
+
 ## Tutorial
 
 For a quick introduction to how Bloks works, download [BloksTutorial.ai](https://github.com/WestonThayer/Bloks/blob/master/sample-files/BloksTutorial.ai?raw=true). There are a few more [sample files](https://github.com/WestonThayer/Bloks/tree/master/sample-files) as well.
