@@ -13,3 +13,5 @@ A UX for flexbox layout within Illustrator. [Read the blog post](http://westonth
     3. Mac: copy `MAC/BloksAIPlugin.aip` to `/Applications/Adobe Illustrator CC 2015.3/Plug-ins/`
 
 Finder/File Explorer may ask you for adminsitrator permission to copy to those folders. To uninstall, simply delete the files you copied.
+
+For a quick tutorial, download [BloksTutorial.ai](https://github.com/WestonThayer/Bloks/blob/master/sample-files/BloksTutorial.ai?raw=true). There are a few more [sample files](https://github.com/WestonThayer/Bloks/tree/master/sample-files) as well.
