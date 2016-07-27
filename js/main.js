@@ -327,9 +327,10 @@
 
 
         // Helps with debugging
-        $("#reload-btn").click(function () {
+        /*$("#reload-btn").click(function () {
             location.reload();
-        });
+        });*/
+        
         
         // Make an initial query on first boot to see if the plugin is there
         BlokScripts.onPingUp(function() {

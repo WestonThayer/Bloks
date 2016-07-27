@@ -31,8 +31,8 @@
 					<Menu>Bloks</Menu>
 					<Geometry>
 						<Size>
-							<Height>600</Height>
-							<Width>300</Width>
+							<Height>440</Height>
+							<Width>280</Width>
 						</Size>
                     <!--<MinSize>
                             <Height>550</Height>
