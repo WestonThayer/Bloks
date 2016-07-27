@@ -2,6 +2,8 @@ A UX for flexbox layout within Illustrator. [Read the blog post](http://westonth
 
 ## Installation
 
+Requires **Illustrator 2015.3** (latest Creative Cloud version).
+
 1. [Download bloks.zip](https://github.com/WestonThayer/Bloks/releases/download/v0.1.0/bloks.zip)
 2. Unzip
 3. Copy the `com.westonthayer.bloks` folder to
