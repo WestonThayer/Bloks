@@ -1,5 +1,7 @@
 A UX for flexbox layout within Illustrator. [Read the blog post](http://westonthayer.com/writing/2016/07/27/layout-experiments-in-adobe-illustrator/).
 
+![Feature img](http://westonthayer.com/writing/2016/07/27/layout-experiments-in-adobe-illustrator/feature.png)
+
 ## Installation
 
 Requires **Illustrator 2015.3** (latest Creative Cloud version).
