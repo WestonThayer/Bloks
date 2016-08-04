@@ -141,6 +141,11 @@
                 <button id="spacer-hide-btn" class="topcoat-button--large hostFontSize" title="Set the opacity of all art with '.spacer' in its name to 0.0">Hide .spacer</button>
                 <button id="spacer-show-btn" class="topcoat-button--large hostFontSize" title="Set the opacity of all art with '.spacer' in its name to 1.0">Show .spacer</button>
                 <button id="layout-btn" class="topcoat-button--large hostFontSize" data-bind="disable: !isLayoutButtonVisible()" title="Manually trigger layout on the selected object">Relayout</button>
+                <label class="topcoat-checkbox hostFontSize" title="If unchecked, Bloks won't try to automatically fix layout when things change. You can use the Relayout button or CTRL/CMD + R 2x to manually layout">
+                    <input type="checkbox" data-bind="checked: isAutoLayoutOn">
+                    <div class="topcoat-checkbox__checkmark"></div>
+                    Auto relayout
+                </label>
                 
                 <!--<button id="reload-btn" class="topcoat-button--large hostFontSize">Reload</button>-->
             </div>

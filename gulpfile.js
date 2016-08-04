@@ -129,11 +129,17 @@ gulp.task("zxp-plugin-win-32", function() {
         .pipe(gulp.dest("release/WIN_32/"));
 });
 
+gulp.task("zxp-samples", function() {
+    return gulp.src("sample-files/*.ai")
+        .pipe(gulp.dest("release/samples/"));
+});
+
 gulp.task("zxp",
     [
         "zxp-html-extension",
         "zxp-plugin-mac",
         "zxp-plugin-win-64",
-        "zxp-plugin-win-32"
+        "zxp-plugin-win-32",
+        "zxp-samples"
     ]
 );

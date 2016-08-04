@@ -33,6 +33,7 @@
                 this.isChildSettingsVisible = ko.observable(false);
                 this.isCreateButtonVisible = ko.observable(false);
                 this.isLayoutButtonVisible = ko.observable(false);
+                this.isAutoLayoutOn = ko.observable(true);
 
                 // Blok settings
                 this.flex = ko.observable(undefined).extend({ positiveNumeric: 0 });
@@ -257,7 +258,7 @@
         BlokScripts.onSelectionChanged(function() {  
             BlokScripts.getActionsFromSelection(respondToActions);
             
-            if (!isUndo) {
+            if (!isUndo && viewModel.isAutoLayoutOn()) {
                 BlokScripts.checkSelectionForRelayout();
             }
             

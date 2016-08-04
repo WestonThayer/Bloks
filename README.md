@@ -4,7 +4,7 @@ A UX for flexbox layout within Illustrator. [Read the blog post](http://westonth
 
 Requires **Illustrator 2015.3** (latest Creative Cloud version).
 
-1. [Download bloks.zip](https://github.com/WestonThayer/Bloks/releases/download/v0.1.0/bloks.zip)
+1. [Download bloks.zip](https://github.com/WestonThayer/Bloks/releases/download/v0.1.1/bloks.zip)
 2. Unzip
 3. Copy the `com.westonthayer.bloks` folder to
     1. Windows: `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\`
@@ -20,4 +20,4 @@ Get started by opening a document in Illustrator and going to *Window > Extensio
 
 ## Tutorial
 
-For a quick introduction to how Bloks works, download [BloksTutorial.ai](https://github.com/WestonThayer/Bloks/blob/master/sample-files/BloksTutorial.ai?raw=true). There are a few more [sample files](https://github.com/WestonThayer/Bloks/tree/master/sample-files) as well.
+For a quick introduction to how Bloks works, open `samples/BloksTutorial.ai`.
