@@ -1,4 +1,4 @@
-A UX for flexbox layout within Illustrator. ~~[Read the blog post](http://westonthayer.com/writing/2016/07/27/layout-experiments-in-adobe-illustrator/).~~ **Site down, use [this mirror](http://westonthayer-mirror.azurewebsites.net/writing/2016/07/27/layout-experiments-in-adobe-illustrator/) for now**.
+A UX for flexbox layout within Illustrator. [Read the blog post](http://westonthayer.com/writing/2016/07/27/layout-experiments-in-adobe-illustrator/).
 
 ![Feature img](https://raw.githubusercontent.com/WestonThayer/Bloks/master/feature.png)
 
