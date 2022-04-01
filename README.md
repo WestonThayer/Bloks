@@ -16,9 +16,9 @@ v0.2.0+ Requires **Illustrator 2022**
     1. Windows: `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\`
     2. Mac(**NOT YET SUPPORTED**): `/Library/Application Support/Adobe/CEP/extensions/`
 4. Copy the native plugin to
-    1. Windows (x86): copy `WIN_32\BloksAIPlugin.aip` to `C:\Program Files\Adobe\Adobe Illustrator CC 2015.3\Plug-ins\`
-    2. Windows (x64): copy `WIN_64\BloksAIPlugin.aip` to `C:\Program Files\Adobe\Adobe Illustrator CC 2015.3\Plug-ins\`
-    3. Mac(**NOT YET SUPPORTED**): copy `MAC/BloksAIPlugin.aip` to `/Applications/Adobe Illustrator CC 2015.3/Plug-ins/`
+    1. Windows (x86): copy `WIN_32\BloksAIPlugin.aip` to `C:\Program Files\Adobe\Adobe Illustrator 2022\Plug-ins\`
+    2. Windows (x64): copy `WIN_64\BloksAIPlugin.aip` to `C:\Program Files\Adobe\Adobe Illustrator 2022\Plug-ins\`
+    3. Mac(**NOT YET SUPPORTED**): copy `MAC/BloksAIPlugin.aip` to `/Applications/Adobe Illustrator 2022/Plug-ins/`
 
 Finder/File Explorer may ask you for adminsitrator permission to copy to those folders. To uninstall, simply delete the files you copied.
 
