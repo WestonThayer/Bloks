@@ -1,5 +1,3 @@
-A humble fork of the [Bloks project](https://github.com/WestonThayer/Bloks) by [Weston Thayer](https://github.com/WestonThayer)
-
 # Bloks
 
 A UX for flexbox layout within Illustrator. [Read the blog post](http://westonthayer.com/writing/2016/07/27/layout-experiments-in-adobe-illustrator/).
