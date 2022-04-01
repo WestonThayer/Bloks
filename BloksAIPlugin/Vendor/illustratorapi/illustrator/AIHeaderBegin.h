@@ -27,13 +27,13 @@
 
 #define __AIHeaderBegin_H__ 1
 
+#include "AIExternDef.h"
+
 #ifndef __ASConfig__
 #include "ASConfig.h"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+AI_EXTERN_C_BEGIN
 
 #ifdef MAC_ENV
 	//power_gcc on MWERKS is basically equivalent to power on GCC

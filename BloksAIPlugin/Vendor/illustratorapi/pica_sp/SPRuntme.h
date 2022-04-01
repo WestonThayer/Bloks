@@ -38,8 +38,9 @@
 #include "SPHeaderBegin.h"
 
 #ifdef __cplusplus
-extern "C" {
-#endif
+extern "C"
+{
+#endif	// __cplusplus
 
 
 /*******************************************************************************
@@ -49,13 +50,17 @@ extern "C" {
  **/
 
 #define kSPRuntimeSuite					"SP Runtime Suite"
-#define kSPRuntimeSuiteVersion5			5
+#define kSPRuntimeSuiteVersion6             6
 #ifdef WIN_ENV
-	#define kSPRuntimeSuiteVersion6		6
-	#define kSPRuntimeSuiteVersion		kSPRuntimeSuiteVersion6
-#elif MAC_ENV
-	#define kSPRuntimeSuiteVersion		kSPRuntimeSuiteVersion5
+#define kSPRuntimeSuiteVersion7             7
+#define kSPRuntimeSuiteVersion              kSPRuntimeSuiteVersion7
+#elif defined(MAC_ENV)
+#define kSPRuntimeSuiteVersion              kSPRuntimeSuiteVersion6
+#elif defined(LINUX_ENV)
+#define kSPRuntimeSuiteVersion				kSPRuntimeSuiteVersion6
 #endif
+
+#define SPPerfLoggingEnabled 1
 
 /*******************************************************************************
  **
@@ -92,8 +97,8 @@ extern "C" {
  *		Note that plug-ins may start up at any time, not just during
  *		SPStartupPlugins().
  *
- *	shutdownNotify - called as each plug-in is shut down. Also intended as
- *		a way to let users know what's going on.
+ *	shutdownNotify - called just before and after each plug-in is shut down.
+ *		Also intended as a way to let users know what's going on.
  *
  *	assertTrap - called when a fatal assert is triggered. Sweet Pea does
  *		not expect execution to continue after an assert.
@@ -218,6 +223,12 @@ typedef enum {
 	/** Sent to the \c #SPStartupNotifyProc after the plug-in is started.
 		The \c notifyData value is the plug-in object, an \c #SPPluginRef. */
 	kStartingupPlugin,		/*  Internal: for filter file, received before a file is checked to see if it is a plugin, notifyData is the files SPFileRef */
+	/** Sent to the \c #SPShutdownNotifyProc just before a plug-in is shutdown.
+		The \c notifyData value is the plug-in object, an \c #SPPluginRef. */
+	kPreShutdownPlugin,
+	/** Sent to the \c #SPShutdownNotifyProc after the plug-in is shutdown.
+		The \c notifyData value is the plug-in object, an \c #SPPluginRef. */
+	kPostShutdownPlugin,
 	/** Internal */
 	kNoEvent = 0xffffffff
  } NotifyEvent;
@@ -252,6 +263,8 @@ typedef void (*SPThrowTrapProc)( SPErr error, void *hostData );
 /** Internal */
 typedef void (*SPDebugTrapProc)( const char *debugMessage, void *hostData );
 
+typedef void (*SPWarningProc)(const char *warningMessage, void *hostData);
+
 /** Internal */
 typedef SPAPI SPErr (*SPAllocateStringPoolProc)( SPStringPoolRef *pool );
 /** Internal */
@@ -272,11 +285,13 @@ typedef SPAPI SPErr (*SPAddPluginsProc)( void );
 /** Internal */
 typedef SPAPI SPBoolean (*SPOverrideStartupProc)( SPPluginRef currentPlugin );
 
+
+
 #ifdef WIN_ENV
 /** Internal */
 typedef SPAPI SPErr (*SPResolveLinkProc)(const char *shortcutFile, char *resolvedPath);
 typedef SPAPI SPErr (*SPResolveLinkProcW)(const wchar_t*shortcutFile, wchar_t *resolvedPath);
-#endif
+#endif	// WIN_ENV
     
 typedef SPAPI SPErr (*SPWideCharToPlatform)(char* destination, size_t dstSizeBytes, const ai::uint16*  src, size_t srcWcharCount);
 typedef SPAPI SPErr (*SPPlatformToWideChar)(ai::uint16* destination, size_t dstCharCount, const char* src, size_t srcSizeBytes);
@@ -286,6 +301,19 @@ typedef SPAPI SPErr (*GetNativePluginAccessProc)(SPPluginRef plugin, SPAccessRef
 
 /** Internal */
 typedef SPAPI SPBoolean (*MemoryIsCriticalProc)( void );
+
+#if SPPerfLoggingEnabled
+//Host should start timer at their end, can choose to send its data in hostLogData
+typedef SPAPI void (*SPPerfLogTimerStart)(void **hostLogData, SPBoolean pauseAtStart);
+typedef SPAPI void(*SPPerfLogTimerPause)(void *hostLogData);
+typedef SPAPI void(*SPPerfLogTimerPlay)(void *hostLogData);
+//Host should log time with given strings
+typedef SPAPI void (*SPPerfLogPut)(void *hostLogData, const char* logString1, const char* logString2);
+typedef SPAPI void(*SPPerfLogPutWithGivenTime)(ai::int64 givenTime, const char* logString1, const char* logString2);
+typedef SPAPI ai::int64(*SPGetElapsedMicroSeconds)(void *hostLogData);
+//Give opportunity to host to clear its data
+typedef SPAPI void(*SPPerfLogTimerDestroy)(void *hostLogData);
+#endif	// SPPerfLoggingEnabled
 
 /** Callback procedures provided to PICA by the application.
 	Plug-ins do not use these, except for adapters, which
@@ -310,6 +338,7 @@ typedef struct SPHostProcs {
 	SPAssertTrapProc assertTrap;
 	SPThrowTrapProc throwTrap;
 	SPDebugTrapProc debugTrap;
+	SPWarningProc   warningProc;
 
 	SPAllocateStringPoolProc allocateStringPool;
 	SPFreeStringPoolProc freeStringPool;
@@ -322,14 +351,14 @@ typedef struct SPHostProcs {
 
 #ifdef WIN_ENV
 	SPResolveLinkProc resolveLink;
-#endif
+#endif	// WIN_ENV
 
 	GetNativePluginAccessProc getPluginAccess;
 
 #ifdef MAC_ENV
 	// enable second-chance plugin loading for success-critical situations
 	MemoryIsCriticalProc memoryIsCritical;
-#endif
+#endif	// MAC_ENV
 
 	SPAllocateProc extSubAllocate; //alternate allocation mechanism: Suballocation
 	SPFreeProc extSubFree;
@@ -338,10 +367,20 @@ typedef struct SPHostProcs {
 	//Do not insert in the middle as Photoshop Adapter's SPRuntime interface's order will become different
 #ifdef WIN_ENV
 	SPResolveLinkProcW resolveLinkW;
-#endif
+#endif	// WIN_ENV
+
 	SPWideCharToPlatform wideCharToPlatform;
 	SPPlatformToWideChar platformToWideChar;
 
+#if SPPerfLoggingEnabled
+	SPPerfLogTimerStart startPerflog;
+	SPPerfLogTimerPause pausePerfLogTimer;
+	SPPerfLogTimerPlay playPerfLogTimer;
+	SPPerfLogPut putPerfLog;
+	SPPerfLogPutWithGivenTime putPerfLogWithGivenTime;
+	SPGetElapsedMicroSeconds getElapsedMicroSeconds;
+	SPPerfLogTimerDestroy clearHostLogData;
+#endif	// SPPerfLoggingEnabled
 } SPHostProcs;
 
 
@@ -425,12 +464,14 @@ SPAPI SPErr SPGetRuntimePluginsFolder( SPPlatformFileReference *pluginFolder );
 SPAPI SPErr SPSetRuntimePluginsFolder( SPPlatformFileReference *pluginFolder );
 /** Internal */
 SPAPI SPErr SPGetRuntimeHostFileRef( SPPlatformFileReference *hostFileSpec );
+
 #ifdef WIN_ENV
-	/** Internal */
-	SPAPI SPErr SPGetRuntimePluginsFolder_v5( SPPlatformFileSpecification *pluginFolder );
-	/** Internal */
-	SPAPI SPErr SPGetRuntimeHostFileRef_v5( SPPlatformFileSpecification *hostFileSpec );
-#endif
+/** Internal */
+SPAPI SPErr SPGetRuntimePluginsFolder_v5( SPPlatformFileSpecification *pluginFolder );
+/** Internal */
+SPAPI SPErr SPGetRuntimeHostFileRef_v5( SPPlatformFileSpecification *hostFileSpec );
+#endif	// WIN_ENV
+
 /** Internal */
 typedef struct
 {
@@ -442,13 +483,22 @@ typedef struct
 	SPHostProcs *gProcs;
 } SPBasicFuncStruct;
 
-/** Internal */
-void SetUpBasicFuncs(SPBasicFuncStruct *inStruct);
-
 #ifdef __cplusplus
-}
-#endif
+}	// extern "C"
+#endif	// __cplusplus
 
 #include "SPHeaderEnd.h"
 
-#endif
+#ifdef __cplusplus
+
+namespace ai
+{
+
+/** Internal */
+void SetUpBasicFuncs(SPBasicFuncStruct *inStruct);
+
+}	// namespace ai
+
+#endif	// __cplusplus
+
+#endif	// __SPRuntime__

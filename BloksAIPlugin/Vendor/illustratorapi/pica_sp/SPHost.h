@@ -118,7 +118,7 @@ SPBoolean SPInited( void );
 /*
  *	SPTerm() terminates Sweet Pea. Call this when your application quits.
  */
-SPErr SPTerm( void );
+SPErr SPTerm( bool fastExit = false );
 
 /*
  *	SPStartupPlugins() scans the list of application files and builds the list

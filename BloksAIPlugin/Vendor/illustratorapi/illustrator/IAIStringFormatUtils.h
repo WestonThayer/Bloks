@@ -26,10 +26,10 @@
 #include "IAIUnicodeString.h"
 #include "IAILocale.h"
 
-
 class CAINumberFormatImpl;
 
 namespace ai {
+
 
 /** Class used for locale-dependent number formatting. Based on the input locale, this class
 	internally handles the conversion between numbers and strings using the appropriate
@@ -56,6 +56,16 @@ public:
 			@return The new instance.
 		*/
 	NumberFormat(const NumberFormat& format);
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+	/** Move constructor.
+			@return The new instance.
+		*/
+	NumberFormat(NumberFormat&& format) AINOEXCEPT : fImpl{format.fImpl}
+	{
+		format.fImpl = nullptr;
+	}
+#endif
 
 	/** Default destructor  */
 	~NumberFormat();
@@ -135,8 +145,17 @@ public:
 	  */
 	bool parseString(const ai::UnicodeString& str, double& value);
 
-	/** Equality operator.  */
+	/** Copy assignment operator.  */
 	ai::NumberFormat& operator= (const NumberFormat& rhs);
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+	/** Move assignment operator.  */
+	ai::NumberFormat& operator= (NumberFormat&& rhs) AINOEXCEPT
+	{
+		std::swap(fImpl, rhs.fImpl);
+		return *this;
+	}
+#endif
 
 	/** Retrieves the decimal separator symbol used for the locale with which
 		this instance was created.

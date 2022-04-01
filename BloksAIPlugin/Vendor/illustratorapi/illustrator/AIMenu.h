@@ -53,7 +53,7 @@
  **/
 
 #define kAIMenuSuite					"AI Menu Suite"
-#define kAIMenuVersion11				AIAPI_VERSION(11)		// In AI14
+#define kAIMenuVersion11				AIAPI_VERSION(11)
 
 // latest version
 #define kAIMenuSuiteVersion				kAIMenuVersion11
@@ -213,7 +213,9 @@ enum AIAutoMenuUpdateObjectCriteria {
 	kIfNonTextPath						= (1<<29), // AI12
 	/** Chart. */
 	kIfChartArt							= (1<<30),	// AI19
-	/** Any art. */
+    /** Repeat art. */
+    kIfRepeatArt                        = (1<<31),  //AI25
+    /** Any art. */
 	kIfAnyArt							= (0xFFFFFFFF)	//	AI11
 };
 
@@ -274,6 +276,8 @@ typedef struct _t_MenuGroupOpaque	*AIMenuGroup;   // new for AI7.0
 	/** Platform-specific menu reference. \li In Mac OS, a \c MenuRef.
 		\li In Windows, cast to \c HMENU. */
 	typedef struct WinMenu	**AIPlatformMenuHandle;	 // can cast it to HMENU
+#elif LINUX_ENV
+	typedef void	**AIPlatformMenuHandle;
 #endif
 
 /** Menu item definition data. */
@@ -371,7 +375,7 @@ typedef struct {
 	\section menuGroups Menu Groups
 
 	Plug-in menu items are added to menu \e groups, which are predefined locations
-	within Illustrator’s menu structure. The complete list of groups is found
+	within Illustratorï¿½s menu structure. The complete list of groups is found
 	in the \c AIMenuGroups.h.  Some examples of menu groups are: <br><br>
 		\c #kOpenMenuGroup <br>
 		\c #kArrangeMoveMenuGroup <br>
@@ -539,7 +543,7 @@ typedef struct {
 				ai::int32 ifIsTrue, ai::int32 ifIsNotTrue );
 
 	/** Retrieves document and artwork state information that you can use
-		to update a menu item’s checked or enabled state.
+		to update a menu itemï¿½s checked or enabled state.
 		This is faster than scanning the artwork tree or getting specific art,
 		as Illustrator has already computed the information for automatic
 		menu updates.

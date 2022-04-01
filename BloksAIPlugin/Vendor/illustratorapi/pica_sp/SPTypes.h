@@ -113,6 +113,10 @@
 #define SPAPI
 #endif
 
+#ifdef LINUX_ENV
+#define SPAPI
+#endif
+
 #ifdef WIN_ENV
 #define SPAPI
 #endif
@@ -131,6 +135,10 @@ typedef unsigned char SPBoolean;
 /** On Windows, \c SPBoolean is \c BOOL. */
 typedef int SPBoolean;
 
+#endif
+
+#ifdef LINUX_ENV
+typedef unsigned char SPBoolean;
 #endif
 
 typedef signed long SPInt32;

@@ -64,8 +64,8 @@
  **/
 
 #define kAIPathStyleSuite			"AI Path Style Suite"
-#define kAIPathStyleSuiteVersion13	AIAPI_VERSION(13)
-#define kAIPathStyleSuiteVersion	kAIPathStyleSuiteVersion13
+#define kAIPathStyleSuiteVersion14	AIAPI_VERSION(14)
+#define kAIPathStyleSuiteVersion	kAIPathStyleSuiteVersion14
 #define kAIPathStyleVersion			kAIPathStyleSuiteVersion
 
 /** Maximum number of dash components for a stroke */
@@ -125,7 +125,7 @@ struct AIFillStyle {
 	void Init()
 	{
 		overprint = false;
-		color.kind = kNoneColor;
+		color.Init();
 	}
 };
 
@@ -138,7 +138,7 @@ struct AIFillStyleMap {
 	void Init()
 	{
 		overprint = false;
-		color.kind = false;
+		color.Init();
 	}
 };
 
@@ -198,7 +198,7 @@ struct AIStrokeStyle {
 		overprint = false;
 		width = kAIRealZero;
 		dash.Init();
-		color.kind = kNoneColor;
+		color.Init();
 		cap = kAIButtCap;
 		join = kAIMiterJoin;
 		miterLimit = kAIRealZero;
@@ -224,7 +224,7 @@ struct AIStrokeStyleMap {
 		cap = false;
 		join = false;
 		miterLimit = false;
-		color.kind = false;
+		color.Init();
 	}
 };
 
@@ -316,10 +316,11 @@ struct AIPathStyleSuite {
 	/** Retrieves the path style used to fill and/or stroke a path art object.
 			@param path The art object.
 			@param style [out] A buffer in which to return the style.
+            @param outHasAdvFill : Set to 'true' if there is advance fill applied on path e.g. smooth style shading.
 			@return The error \c #kBadParameterErr if the art object is not an
 				allowed type.
 		*/
-	AIAPI AIErr (*GetPathStyle) ( AIArtHandle path, AIPathStyle *style );
+	AIAPI AIErr (*GetPathStyle) ( AIArtHandle path, AIPathStyle *style, AIBoolean *outHasAdvFill );
 
 	/** Sets the path style used to fill and/or stroke a path art object, if
 		the object is one of these types:
@@ -348,10 +349,11 @@ struct AIPathStyleSuite {
 				the common attributes.
 			@param stylemap [out] A buffer in which to return the map indicating which
 				fields of the partial style contain valid values.
+            @param outHasAdvFill : Set to 'true' if there is advance fill applied on path e.g. smooth style shading.
 			@param advStrokeParams [out, optional] A pointer to a dictionary ref which may be created
 				and populated with common advanced stroke parameters.
 		*/
-	AIAPI AIErr (*GetCurrentPathStyle) ( AIPathStyle *style, AIPathStyleMap *stylemap, AIDictionaryRef *advStrokeParams );
+	AIAPI AIErr (*GetCurrentPathStyle) ( AIPathStyle *style, AIPathStyleMap *stylemap, AIDictionaryRef *advStrokeParams, AIBoolean *outHasAdvFill);
 
 	/** Applies a path style to any currently selected and paint-targeted objects.
 		For this function to apply, a targeted object must be a path or compound path,

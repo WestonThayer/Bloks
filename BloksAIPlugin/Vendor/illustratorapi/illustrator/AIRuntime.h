@@ -9,7 +9,7 @@
  *     Purpose:	Adobe Illustrator Runtime Environment.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2007 Adobe Systems Incorporated.
+ * Copyright 1986-2016 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file 
@@ -62,8 +62,8 @@
  **/
 
 #define kAIRuntimeSuite			"AI Runtime Suite"
-#define kAIRuntimeSuiteVersion12	AIAPI_VERSION(12)
-#define kAIRuntimeSuiteVersion	kAIRuntimeSuiteVersion12
+#define kAIRuntimeSuiteVersion14	AIAPI_VERSION(14)
+#define kAIRuntimeSuiteVersion	kAIRuntimeSuiteVersion14
 #define kAIRuntimeVersion		kAIRuntimeSuiteVersion
 
 /** @ingroup Notifiers
@@ -80,6 +80,12 @@
 #define kAIApplicationShutdownNotifier		"AI Application Shutdown Notifier"
 
 /** @ingroup Notifiers
+	Sent to plugins to persist any user data like preferences, logs, settings etc.
+ 	Do not perform any memory or resource cleanups in this notifier, as this might be sent multiple times in a session.
+ 	Use \c kAIApplicationShutdownNotifier  for cleanup. */
+#define kAISaveUserDataNotifier				"AI Save User Data Notifier"
+
+/** @ingroup Notifiers
 	Sent when the application is activated. */
 const char* const kAIApplicationActivatedNotifier = "AI Application Activated Notifier";
 
@@ -87,15 +93,13 @@ const char* const kAIApplicationActivatedNotifier = "AI Application Activated No
 	Sent when the application is deactivated. */
 const char* const kAIApplicationDeactivatedNotifier = "AI Application Deactivated Notifier";
 
-/** Operating system versions for Mac OS. */
-enum AISystemOSVersion {
-	kAIMacSystemNineOne		= 0x0910,
-	kAIMacSystemTen			= 0x1000,
-	kAIMacSystemOne			= 0x1010,
-	kAIMacSystemTwo			= 0x1020,
-	kAIMacSystemThree		= 0x1030,
-	kAIMacSystemFour		= 0x1040
-};
+/** @ingroup Notifiers
+	Sent when the application or system/OS is going to sleep. */
+const char* const kAIApplicationSuspendedNotifier = "AI Application Suspended Notifier";
+
+/** @ingroup Notifiers
+	Sent when the application or system/OS is awaking from sleep. */
+const char* const kAIApplicationResumedNotifier = "AI Application Resumed Notifier";
 
 
 /*******************************************************************************
@@ -181,11 +185,11 @@ struct AIRuntimeSuite {
 		running the plug-in.
 
 		A plug-in can create its own namespace in which to store arbitrary data,
-		but it can also use this function to access the application’s namespace.
+		but it can also use this function to access the applications namespace.
 		The application preferences (among other things) are stored in the
 		application namespace.
 
-		Your plug-in should not modify the application’s existing namespace data
+		Your plug-in should not modify the applications existing namespace data
 		directly, but it can create new data within the application namespace.
 			@param space [out] A buffer in which to return the namespace reference.
 		*/
@@ -216,7 +220,7 @@ struct AIRuntimeSuite {
 
 	/** Retrieves the version of the operating system the application is running on.
 		(Note that this function returns a constant value, not an error code.)
-			@return An #AISystemOSVersion value.
+			@return An integer value of the form: (majorVersion * 100 + minorVersion).
 		*/
 	AIAPI ai::int32 (*GetSystemVersion) ( void );
 
@@ -277,7 +281,7 @@ struct AIRuntimeSuite {
 	/**  Used internally. */
 	AIAPI AIBoolean (*GetIsProductTryAndDie) ( void );
 
-	// New in Illustrator 13
+	// Introduced in Illustrator 13
 
 	/** Used internally. Reports whether this is an executable build. */
 	AIAPI AIBoolean (*GetIsExeBuild) ( void );
@@ -302,6 +306,37 @@ struct AIRuntimeSuite {
 		@returns 0 if fails	
 	*/
 	AIAPI ai::int32 (*GetUserAdobeID) (const char **userGUID, const char **userAdobeID);
+    
+    /** Returns true, if the application is AIRobin instead of Illustrator.
+		AIRobin is the background helper process of Illustrator.
+        @returns true, if application is AIRobin. */
+    
+    AIAPI AIBoolean (*IsAIRobin) (void);
+    
+    AIAPI void (*PostQuit)(void);
+
+	/**
+		Pauses the Idle events suppression when the app is in background. This will allow plugins to perform and receive idle notifications
+	    Even when the app is in background. This must be turned back on by calling ResumeIdleEventSuspensionInBackground
+	 */
+	AIAPI AIErr (*PauseIdleEventSuspensionInBackground)();
+
+	/**
+		Resumes the Idle events suppression when the app is in the background. This must be called after PauseIdleEventSuspensionInBackground
+	 */
+	AIAPI AIErr(*ResumeIdleEventSuspensionInBackground)();
+
+	/**
+		Pauses the idle event suppression when the app is in the background for a specified number of seconds. It will automatically resume
+		after the time have elapsed after calling the API. There is no need for specifically resuming when calling this API.
+	 */
+	AIAPI AIErr(*PauseIdleEventSuspensionInBackgroundFor)(ai::uint32 seconds);
+
+	/**
+	 * Returns true if Idle events processing is suspended when the app is in the background.
+	 */
+	AIAPI AIBoolean(*AreIdleEventsSuspendedInBackground)();
+    
 };
 
 

@@ -126,12 +126,32 @@ public:
 			@return The new color space object.
 		*/
 	ColorSpace (const ai::ColorSpace &cs);
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+	/** Move constructor.
+			@param rhs the color space to move from.
+			@return The new color space object.
+		*/
+	ColorSpace (ColorSpace&& rhs) AINOEXCEPT;
+#endif
+
 	/** Destructor */
 	~ColorSpace ();
 	//@}
 
-	/** Assignment operator */
+	/** Swaps the contents of this ColorSpace with another ColorSpace.
+			@param rhs The ColorSpace to swap.
+			@return Nothing.
+		*/
+	void swap(ColorSpace& rhs) AINOEXCEPT;
+
+	/** Copy assignment operator */
 	ai::ColorSpace& operator= (const ai::ColorSpace& rhs);
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+	/** Move assignment operator */
+	ai::ColorSpace& operator= (ColorSpace&& rhs) AINOEXCEPT;
+#endif
 
 	/** Equality operator */
 	bool operator== (const ai::ColorSpace& rhs) const;
@@ -243,6 +263,33 @@ private:
 	CAIColorSpaceImpl *fImpl;
 };
 
+/**
+Inline implementations
+*/
+
+/** swap function */
+inline void ColorSpace::swap(ColorSpace& rhs) AINOEXCEPT
+{
+	std::swap(fImpl, rhs.fImpl);
+}
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+
+/** Move constructor */
+inline ColorSpace::ColorSpace(ColorSpace&& rhs) AINOEXCEPT : fImpl{rhs.fImpl}
+{
+	rhs.fImpl = nullptr;
+}
+
+/** Move assignment operator */
+inline ColorSpace& ColorSpace::operator=(ColorSpace&& rhs) AINOEXCEPT
+{
+	swap(rhs);
+	return *this;
+}
+
+#endif // AI_HAS_RVALUE_REFERENCES
+
 /**	This class represents a list of color spaces for Illustrator.
 */
 class ColorSpaceList {
@@ -250,7 +297,7 @@ class ColorSpaceList {
 
 public:
 	//----------------------------------------------------------------------
-	/** @name Constructors & Destructors */
+	/** @name Constructors & Destructor */
 	//----------------------------------------------------------------------
 	//@{
 	/** Default color space list constructor.
@@ -269,12 +316,32 @@ public:
 			@return The new list object.
 		*/
 	ColorSpaceList (const ai::ColorSpaceList &csList);
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+	/** Move constructor.
+			@param rhs The color-space list object to move from.
+			@return The new list object.
+		*/
+	ColorSpaceList (ColorSpaceList&& rhs) AINOEXCEPT;
+#endif
+
 	/** Destructor */
 	~ColorSpaceList ();
 	//@}
 
-	/** Assignment operator */
+	/** Swaps the contents of this ColorSpaceList with another ColorSpaceList.
+		@param rhs The ColorSpaceList to swap.
+		@return Nothing.
+	*/
+	void swap(ColorSpaceList& rhs) AINOEXCEPT;
+
+	/** Copy assignment operator */
 	ai::ColorSpaceList& operator= (const ai::ColorSpaceList& rhs);
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+	/** Move assignment operator */
+	ColorSpaceList& operator= (ColorSpaceList&& rhs) AINOEXCEPT;
+#endif
 
 	/* Color Space List Methods */
 
@@ -317,6 +384,33 @@ public:
 private:
 	CAIColorSpaceListImpl *fImpl;
 };
+
+/**
+Inline implementations
+*/
+
+/** swap function */
+inline void ColorSpaceList::swap(ColorSpaceList& rhs) AINOEXCEPT
+{
+	std::swap(fImpl, rhs.fImpl);
+}
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+
+/** Move constructor */
+inline ColorSpaceList::ColorSpaceList(ColorSpaceList&& rhs) AINOEXCEPT : fImpl{rhs.fImpl}
+{
+	rhs.fImpl = nullptr;
+}
+
+/** Move assignment operator */
+inline ColorSpaceList& ColorSpaceList::operator=(ColorSpaceList&& rhs) AINOEXCEPT
+{
+	swap(rhs);
+	return *this;
+}
+
+#endif // AI_HAS_RVALUE_REFERENCES
 
 } // end of namespace ai
 

@@ -1,8 +1,8 @@
 //========================================================================================
 //  
-//  $File: //ai_stream/rel_20_0/devtech/sdk/public/samplecode/common/source/Plugin.cpp $
+//  $File$
 //
-//  $Revision: #1 $
+//  $Revision$
 //
 //  Copyright 1987 Adobe Systems Incorporated. All rights reserved.
 //  
@@ -38,7 +38,7 @@ Plugin::Plugin(SPPluginRef pluginRef)
 	fSuites = NULL;
 	strncpy(fPluginName, "Plugin", kMaxStringLength);
 	fLockCount = 0;
-	fPluginAccess = nil;
+	fPluginAccess = nullptr;
 	fLastError = kNoErr;
 	fSupressDuplicateErrors = true;
 	fErrorTimeout = 5;		// seconds
@@ -82,7 +82,7 @@ ASErr Plugin::StartupPlugin(SPInterfaceMessage *message)
 	{
 		if (fSuites)
 			delete fSuites;
-		fSuites = nil;
+		fSuites = nullptr;
 	}
 
 	if (!error)
@@ -95,7 +95,15 @@ ASErr Plugin::StartupPlugin(SPInterfaceMessage *message)
 			char notifierName[kMaxStringLength];
 
 			sprintf(notifierName, "%s App Started Notifier", fPluginName);
-			error = sAINotifier->AddNotifier(message->d.self, notifierName, kAIApplicationStartedNotifier, NULL);
+			error = sAINotifier->AddNotifier(message->d.self, notifierName, kAIApplicationStartedNotifier, &fApplicationStartedNotifier);
+		}
+
+		if (!error)
+		{
+			char notifierName[kMaxStringLength];
+
+			sprintf(notifierName, "%s Application Shutdown Notifier", fPluginName);
+			error = sAINotifier->AddNotifier(message->d.self, notifierName, kAIApplicationShutdownNotifier, &fApplicationShutdownNotifer);
 		}
 	}
 	
@@ -118,10 +126,10 @@ ASErr Plugin::ShutdownPlugin(SPInterfaceMessage * /*message*/)
 
 	if(fSuites) {
 		delete fSuites;
-		fSuites = nil;
+		fSuites = nullptr;
 	}
 	
-	SetGlobal(nil);
+	SetGlobal(nullptr);
 
 	return error;
 }
@@ -140,7 +148,7 @@ ASErr Plugin::LockPlugin(ASBoolean lock)
 		if (fLockCount == 0)
 		{
 			sSPAccess->ReleasePlugin( fPluginAccess );
-			fPluginAccess = nil;
+			fPluginAccess = nullptr;
 		}
 		else if (fLockCount < 0)
 			fLockCount = 0;			// Shouldn't happen, but...
@@ -228,8 +236,10 @@ ASErr Plugin::Message(char *caller, char *selector, void *message)
 
 		AINotifierMessage *msg = (AINotifierMessage *)message;
 
-		if (strcmp(msg->type, kAIApplicationStartedNotifier) == 0)
+		if (msg->notifier == fApplicationStartedNotifier)
 			error = PostStartupPlugin();
+		else if (msg->notifier == fApplicationShutdownNotifer)
+			error = PreShutdownPlugin();
 
 		if (!error || error == kUnhandledMsgErr)
 		{
@@ -419,11 +429,11 @@ ASErr Plugin::UnloadPlugin(SPInterfaceMessage * /*message*/)
 	
 	EmptySuiteTables();
 
-	SetGlobal(nil);
+	SetGlobal(nullptr);
 
 	if (fSuites) {
 		delete fSuites;
-		fSuites = nil;
+		fSuites = nullptr;
 	}
 
 	return error;
@@ -437,7 +447,7 @@ ASErr Plugin::ReloadPlugin(SPInterfaceMessage * /*message*/)
 	if (!error)
 		error = SetGlobal(this);
 
-	// fSuites should always be nil here, but check just to be sure
+	// fSuites should always be nullptr here, but check just to be sure
 	if (!fSuites)
 		fSuites = new(std::nothrow) Suites;
 
@@ -453,7 +463,7 @@ ASErr Plugin::ReloadPlugin(SPInterfaceMessage * /*message*/)
 	{
 		if (fSuites)
 			delete fSuites;
-		fSuites = nil;
+		fSuites = nullptr;
 	}
 
 	if (!error)
@@ -468,7 +478,7 @@ void Plugin::ReportError(ASErr error, char * /*caller*/, char * /*selector*/, vo
 	if (FilterError(error))
 		return;
 		
-	time_t now = time(nil);
+	time_t now = time(nullptr);
 	
 	if (error == fLastError && fSupressDuplicateErrors &&
 		now < fLastErrorTime + fErrorTimeout)
@@ -486,12 +496,12 @@ void Plugin::DefaultError(SPPluginRef ref, ASErr error)
 		return;
 	
 	ASBoolean gotBasic = false;
-	if (sAIUser == nil) {
-		if (sSPBasic == nil)
+	if (sAIUser == nullptr) {
+		if (sSPBasic == nullptr)
 			return;
 		ASErr err = sSPBasic->AcquireSuite(kAIUserSuite, 
 			kAIUserSuiteVersion, (const void **) &sAIUser);
-		if (err || sAIUser == nil)
+		if (err || sAIUser == nullptr)
 			return;
 		gotBasic = true;
 	}
@@ -499,7 +509,7 @@ void Plugin::DefaultError(SPPluginRef ref, ASErr error)
 	char msg[128];
 	char *m;
 	m = FindMsg(ref, error, msg, sizeof(msg));
-	if (m == nil)
+	if (m == nullptr)
 		goto release;
 	
 	char mbuf[128];
@@ -524,11 +534,11 @@ void Plugin::DefaultError(SPPluginRef ref, ASErr error)
 release:
 	if (gotBasic) {
 		sSPBasic->ReleaseSuite(kAIUserSuite, kAIUserSuiteVersion);
-		sAIUser = nil;
+		sAIUser = nullptr;
 	}
 }
 
-char *Plugin::FindMsg(SPPluginRef ref, ASErr error, char *buf, int len)
+char *Plugin::FindMsg(SPPluginRef /*ref*/, ASErr /*error*/, char * /*buf*/, int /*len*/)
 {
 	//int n = 1;
 	//ASErr err;
@@ -540,7 +550,7 @@ char *Plugin::FindMsg(SPPluginRef ref, ASErr error, char *buf, int len)
 		// the default message
 		if (err || code[0] == '\0') {
 			if (n == 1)
-				return nil;		// no error strings found
+				return nullptr;		// no error strings found
 			else {
 				n--;
 				goto getString;
@@ -575,10 +585,10 @@ char *Plugin::FindMsg(SPPluginRef ref, ASErr error, char *buf, int len)
 getString:
 	err = sADMBasic->GetIndexString(ref, 16050, n, buf, len);
 	if (err || buf[0] == '\0')
-		return nil;
+		return nullptr;
 	else
 		return buf;*/
-	return nil;
+	return nullptr;
 }
 
 
@@ -635,6 +645,11 @@ ASErr Plugin::AcquireOptionalSuites()
 }
 
 ASErr Plugin::PostStartupPlugin()
+{
+	return kNoErr;
+}
+
+ASErr Plugin::PreShutdownPlugin()
 {
 	return kNoErr;
 }

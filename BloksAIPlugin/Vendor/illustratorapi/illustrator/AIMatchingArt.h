@@ -85,14 +85,17 @@
 	flag is set	in any specification, the search looks in the dictionaries
 	of art objects, as well as in the objects themselves.
 */
-typedef struct {
+struct AIMatchingArtSpec {
+    AIMatchingArtSpec(ai::int32 _type = 0, ai::int32 _whichattr = 0, ai::int32 _attr = 0):
+        type(static_cast<ai::int16>(_type)), whichAttr(_whichattr), attr(_attr) {}
+    
 	/** An \c  #AIArtType that identifies the types of art objects that match
 		the specification. Use the special type \c #kAnyArt to match any kind
 		of art object. */
 	ai::int16  type;
 	/** An attribute and value by which to further filter art of the given type. */
 	ai::int32 whichAttr, attr;
-} AIMatchingArtSpec;
+} ;
 
 
 /*******************************************************************************

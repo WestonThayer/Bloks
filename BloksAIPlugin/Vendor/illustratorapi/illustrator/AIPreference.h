@@ -57,8 +57,8 @@
  **/
 
 #define kAIPreferenceSuite		"AI Preference Suite"
-#define kAIPreferenceSuiteVersion6	AIAPI_VERSION(6)
-#define kAIPreferenceSuiteVersion	kAIPreferenceSuiteVersion6
+#define kAIPreferenceSuiteVersion7	AIAPI_VERSION(7)
+#define kAIPreferenceSuiteVersion	kAIPreferenceSuiteVersion7
 #define kAIPreferenceVersion		kAIPreferenceSuiteVersion
 
 /** @ingroup Notifiers
@@ -197,7 +197,7 @@ error = sPref->GetPointPreference(kPluginName, "dialogPosition", &g->dialogPosit
 	use the accessor for the \c AIReal type:
 	\verbatim
 AIReal r;
-error = sPref->GetRealPreference(nil, "constrain/sin", &r);
+error = sPref->GetRealPreference(nullptr, "constrain/sin", &r);
 	\endverbatim
 
 	The snap-to-point option is displayed as a checkbox in the General Preferences
@@ -209,10 +209,10 @@ error = sPref->GetRealPreference(nil, "constrain/sin", &r);
 	To retrieve the setting, use the boolean accessor:
 	\verbatim
 AIBoolean snap;
-error = sPref->GetBooleanPreference(nil, "snapToPoint", &snap);
+error = sPref->GetBooleanPreference(nullptr, "snapToPoint", &snap);
 	\endverbatim
 */
-typedef struct AIPreferenceSuite {
+struct AIPreferenceSuite {
 
 	/** Retrieves a boolean preference.
 			@param prefix The name of the plug-in, or \c NULL for an application preference.
@@ -463,8 +463,15 @@ typedef struct AIPreferenceSuite {
 	@param value The new value.
 	*/
 	AIAPI AIErr (*PutLargeIntegerPreference) ( const char *prefix, const char *suffix, ai::int64 value );
+
+	/** Checks if a Preference Exists.
+	@param prefix The name of the plug-in, or \c NULL for an application preference.
+	@param suffix The name of the preference.
+	@param doesExist[out] A buffer in which to return whether the preference exists or not.
+	*/
+	AIAPI AIErr (*PreferenceExists) (const char* prefix, const char* suffix, AIBoolean* doesExist);
     
-} AIPreferenceSuite;
+};
 
 
 #include "AIHeaderEnd.h"

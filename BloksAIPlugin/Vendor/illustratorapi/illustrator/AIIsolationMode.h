@@ -45,8 +45,8 @@
  **/
 
 #define kAIIsolationModeSuite				"AI Isolation Mode"
-#define kAIIsolationModeSuiteVersion5		AIAPI_VERSION(5)
-#define kAIIsolationModeSuiteVersion		kAIIsolationModeSuiteVersion5
+#define kAIIsolationModeSuiteVersion6		AIAPI_VERSION(6)
+#define kAIIsolationModeSuiteVersion		kAIIsolationModeSuiteVersion6
 #define kAIIsolationModeVersion				kAIIsolationModeSuiteVersion
 
 
@@ -253,6 +253,12 @@ typedef struct {
 	 			transparent and 1 is completely opaque.
 		*/
 	AIAPI AIReal (*GetNonIsolatedArtLayerOpacity)();
+
+	/** Gets the art handle from the artwork which needs to be isolated.
+			@param art [out] The art handle corresponding to the artwork that needs to be
+				passed to \c #EnterIsolationMode().
+		*/
+	AIAPI AIErr(*GetArtToIsolate) (AIArtHandle &art);
 
 } AIIsolationModeSuite;
 

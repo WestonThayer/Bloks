@@ -31,7 +31,7 @@
 
 #define kAIFilePathSuite			"AI File Path Suite"
 
-#define kAIFilePathSuiteVersion		AIAPI_VERSION(5)
+#define kAIFilePathSuiteVersion		AIAPI_VERSION(8)
 
 #define kAIFilePathVersion			kAIFilePathSuiteVersion
 
@@ -172,9 +172,12 @@ struct AIFilePathSuite
 			@param expandName When true, the function attempts to expand the
 				provided path string into a full name (for example, for	a short,
 				truncated name in Windows).
+            @param dontStripTrailingSpace When true, the function will not strip any
+                trailing whitespace in the provided path string
 			@param path The file path object.
 	*/
-	AIErr AIAPI (*Set)(const ai::UnicodeString &pathString, AIBool8 expandName, ai::FilePath &path);
+	AIErr AIAPI (*Set)(const ai::UnicodeString &pathString, AIBool8 expandName,
+                       AIBool8 dontStripTrailingSpace, ai::FilePath &path);
 
 	/** Sets a file path from a file specification.
 			@param file The new file.
@@ -189,13 +192,7 @@ struct AIFilePathSuite
 			@param path The file path object.
 	*/
 	AIErr AIAPI (*SetFromCFString)(const CFStringRef, ai::FilePath &path);
-
-	/** Sets a file path from an \c FSRef file specification (in Mac OS only).
-			@param file The new file.
-			@param path The file path object.
-	*/
-	AIErr AIAPI (*SetFromFSRef)(const FSRef&, ai::FilePath &path);
-
+    
 	/** Sets a file path from an \c CFURL URL specification (in Mac OS only).
 			@param url The new URL.
 			@param path The file path object.
@@ -274,16 +271,6 @@ struct AIFilePathSuite
 		*/
 	char AIAPI (*GetDelimiter)(void);
 
-	#ifdef MAC_ENV
-	/** Retrieves the volume and parent of a file path (in Mac OS only).
-		(Note that this function does not return an error code.)
-			@param path The file path object.
-			@param vol [out] A buffer in which to return the volume. Can be \c null.
-			@param parent [out] A buffer in which to return the parent. Can be \c null.
-	*/
-	void AIAPI (*GetVolumeAndParent)(const ai::FilePath &path, FSVolumeRefNum *vol, ai::uint32 *parent);
-	#endif
-
 	/** Retrieves the file creator and type of a file path as a four-character code
 		(in Mac OS only, outside Illustrator core).
 			@param path The file path object.
@@ -308,6 +295,12 @@ struct AIFilePathSuite
 
 	AIErr AIAPI (*GetAsSPPlatformFileRef)(const ai::FilePath &path, SPPlatformFileReference &spPlatformFileRef);
 
+	/**	Retrieves the path as a file specification from a file path object.
+	@param path	The file path object
+	return if file path is on network or not.
+	*/
+	AIBoolean AIAPI(*IsOnNetwork)(const ai::FilePath &path);
+
 	#ifdef MAC_ENV
 
 	/** Retrieves a file path as a \c CFString string specification (in Mac OS only).
@@ -317,13 +310,6 @@ struct AIFilePathSuite
 	*/
 	CFStringRef AIAPI (*GetAsCFString)(const ai::FilePath &path);
 
-	/** Retrieves a file path as an \c FSRef file specification (in Mac OS only).
-		(Note that this function returns an OS status value, not an error code.)
-			@param path The file path object.
-			@param fsRef [out] A buffer in which to return the file specification.
-			@return The OS status.
-	*/
-	OSStatus AIAPI (*GetAsFSRef)(const ai::FilePath &path, FSRef &fsRef);
 
 	/** Retrieves a file path as a \c CFURL specification (in Mac OS only).
 		(Note that this function returns a string value, not an error code.)
@@ -354,9 +340,7 @@ struct AIFilePathSuite
     
     BOOL        AIAPI (*IsAlias)                        (const ai::FilePath &path);
     
-    BOOL        AIAPI (*IsOnNetwork)                    (const ai::FilePath &path);
-    
-    BOOL        AIAPI (*IsEjectable)                    (const ai::FilePath &path);
+	BOOL        AIAPI (*IsEjectable)                    (const ai::FilePath &path);
 
 #endif //__OBJC__
 #endif //MAC_ENV

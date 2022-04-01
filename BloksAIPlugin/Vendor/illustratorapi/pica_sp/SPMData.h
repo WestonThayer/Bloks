@@ -28,7 +28,7 @@
  **/
 
 #include "SPTypes.h"
-#include "AiBasicTypes.h"
+#include "AIBasicTypes.h"
 
 #include "SPHeaderBegin.h"
 

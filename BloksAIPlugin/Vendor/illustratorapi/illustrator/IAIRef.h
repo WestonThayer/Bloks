@@ -22,7 +22,15 @@
 
  /** @file IAIRef.h */
 
-#include	"AICountedObject.h"
+#include "AICountedObject.h"
+#include <utility>
+
+#if AI_AUTO_SUITE_AVAILABLE
+	#ifndef AICOUNTEDOBJECTSUITE_DEFINED
+		#define AICOUNTEDOBJECTSUITE_DEFINED 1	
+	#endif
+#endif
+
 
 namespace ai {
 // start of namespace ai
@@ -100,7 +108,7 @@ return;
 template <class X> class Ref {
 public:
 	/** Constructs a null reference. */
-	Ref () : x(0) {}
+	Ref () AINOEXCEPT : x(nullptr) {}
 
 	/** Constructs a reference to an object and conditionally increments
 		the reference count based on 'policy'. */
@@ -110,12 +118,30 @@ public:
 		increments the reference count.  */
 	Ref (const Ref<X>& ref);
 
+	/** 
+		Swaps internal reference with other
+	*/
+	void swap(Ref<X>& other) AINOEXCEPT
+	{
+		std::swap(other.x, x);
+	}
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+	/** 
+		Move Constructor
+	*/
+	Ref(Ref<X>&& other) AINOEXCEPT
+	{
+		swap(other);
+	}
+#endif
+
 	/** Destructor. Decrements the reference count.	 */
 	~Ref ();
 
 	/** Implicit conversion to an X allows a Ref<X> to be used wherever an X
 		can appear. */
-	operator X () const
+	operator X () const AINOEXCEPT
 		{return x;}
 
 	/** Assignment function, decrements the reference count of the current
@@ -124,17 +150,23 @@ public:
 	void Assign(const X& x, IncrementPolicy policy = DoIncrement);
 
 	/** Assignment operator, decrements the reference count of the current
-		object and increments the count of the newly assigned object.  */
-	Ref<X>& operator= (const Ref<X>& ref);
+		object and increments the count of the newly assigned object.  
+		Copy and Move Assignment operator.
+	*/
+	Ref<X>& operator= (Ref<X> ref) AINOEXCEPT
+	{
+		swap(ref);
+		return *this;
+	}
 
 	/** Comparison operator, tests whether the same objects are identified
 		by both references.  */
-	bool operator== (const Ref<X>& ref) const
+	bool operator== (const Ref<X>& ref) const AINOEXCEPT
 		{return x == ref.x;}
 
 	/**	Comparison operator, tests whether the same objects are identified
 		by both references.  */
-	bool operator!= (const Ref<X>& ref) const
+	bool operator!= (const Ref<X>& ref) const AINOEXCEPT
 		{return x != ref.x;}
 
 	/** Allows a Ref<X> to be passed to a function that takes an
@@ -153,7 +185,7 @@ public:
 	Ref<X>& to();
 
 protected:
-	X x;
+	X x = nullptr;
 };
 
 
@@ -163,21 +195,30 @@ inline void Replace (const RefReplaceParam&)
 
 template <class X> Ref<X>::Ref (const X& _x, IncrementPolicy policy) : x(_x)
 {
-	AICountedObjectSuite* theSuite = GetAICountedObjectSuitePtr();
-	if (policy == DoIncrement)
-		theSuite->AddRef(x);
+	if (x)
+	{
+		AICountedObjectSuite* theSuite = GetAICountedObjectSuitePtr();
+		if (policy == DoIncrement)
+			theSuite->AddRef(x);
+	}
 }
 
 template <class X> Ref<X>::Ref (const Ref<X>& ref) : x(ref.x)
 {
-	AICountedObjectSuite* theSuite = GetAICountedObjectSuitePtr();
-	theSuite->AddRef(x);
+	if (x)
+	{
+		AICountedObjectSuite* theSuite = GetAICountedObjectSuitePtr();
+		theSuite->AddRef(x);
+	}
 }
 
 template <class X> Ref<X>::~Ref ()
 {
-	AICountedObjectSuite* theSuite = GetAICountedObjectSuitePtr();
-	theSuite->Release(x);
+	if (x)
+	{
+		AICountedObjectSuite* theSuite = GetAICountedObjectSuitePtr();
+		theSuite->Release(x);
+	}
 }
 
 template <class X> void Ref<X>::Assign(const X& _x, IncrementPolicy policy)
@@ -185,30 +226,30 @@ template <class X> void Ref<X>::Assign(const X& _x, IncrementPolicy policy)
 	if (x != _x)
 	{
 		AICountedObjectSuite* theSuite = GetAICountedObjectSuitePtr();
-		theSuite->Release(x);
-		x = _x;
-		if (policy == DoIncrement)
-			theSuite->AddRef(x);
-	}
-}
+		if (x)
+		{
+			theSuite->Release(x);
+		}
 
-template <class X> Ref<X>& Ref<X>::operator= (const Ref<X>& ref)
-{
-	if (x != ref.x)
-	{
-		AICountedObjectSuite* theSuite = GetAICountedObjectSuitePtr();
-		theSuite->Release(x);
-		x = ref.x;
-		theSuite->AddRef(x);
+		x = _x;
+
+		if (x)
+		{
+			if (policy == DoIncrement)
+				theSuite->AddRef(x);
+		}
 	}
-	return *this;
 }
 
 template <class X> X* Ref<X>::operator<< (void (*)(const RefReplaceParam &p))
 {
-	AICountedObjectSuite* theSuite = GetAICountedObjectSuitePtr();
-	theSuite->Release(x);
-	x = 0;
+	if (x)
+	{
+		AICountedObjectSuite* theSuite = GetAICountedObjectSuitePtr();
+		theSuite->Release(x);
+	}
+	
+	x = nullptr;
 	return &x;
 }
 
@@ -218,6 +259,31 @@ template <class X> Ref<X>& Ref<X>::to()
 	theSuite->AddRef(x);
 
 	return *this;
+}
+
+template <class X>
+inline bool operator==(const Ref<X>& ref, std::nullptr_t) AINOEXCEPT
+{
+	return (ref.operator X() == nullptr);
+}
+
+template <class X>
+inline bool operator==(std::nullptr_t, const Ref<X>& ref) AINOEXCEPT
+{
+	return (ref == nullptr);
+}
+
+template <class X>
+inline bool operator!=(const Ref<X>& ref, std::nullptr_t) AINOEXCEPT
+{
+	return !(ref == nullptr);
+
+}
+
+template <class X>
+inline bool operator!=(std::nullptr_t, const Ref<X>& ref) AINOEXCEPT
+{
+	return (ref != nullptr);
 }
 
 // end of namespace ai

@@ -101,7 +101,7 @@ enum AntiAliasOptions
 #define kPSDFormatName							"Photoshop psd"
 #define kPSDExportFormatName					"Photoshop PSD Export"
 #define kPSDImportFormatName					"Photoshop PSD Import"
-#define kPSDFormatExtn							"psd, pdd"
+#define kPSDFormatExtn							"psd,psb,pdd"
 
 //rbansal 20010521 Adding the keys for Import Options
 #define kPSDImportOption						"PSD Import Option"
@@ -195,26 +195,26 @@ enum AntiAliasOptions
 
 struct PSDExportPrefs		//ex. PluginPrefs
 {
-	ai::int32			mWhichProfile;
-	AntiAliasOptions			mAntiAlias;
-	AIBoolean			mWriteLayers;
-	AIReal				mResolution;	// dots per inch
-	PSDPluginColorMode  mColorModel;
-	AIBoolean			mIncludeHiddenLayers;
-	AIBoolean			mWriteNestedLayersAsLayers;	//nchandra
-	AIBoolean			mLiveText;
-	AIBoolean			mNo100LayersWarning;
-	AIBoolean			mNoImageMapsWarning;
-	AIBoolean			bHasSelectiveMerge;
-	AIBoolean			mNoSelectiveMergeWarning;	//Ac.
-	AIBoolean			mNoHiddenLayersWarning;
-	AIBoolean			mWriteSlices;			//mgupta++
-	AIBoolean			mWriteImageMaps;		//mgupta++
-	AIBoolean			mWriteCompoundShapes;	//mgupta++
-	AIReal				mOtherResolution;		//mgupta++
-	ai::int32			mExportFormat;
-	AIBoolean			mMaxEditability;
-	AIBoolean			mPreserveSpotColors;
+    ai::int32			mWhichProfile{};
+	AntiAliasOptions			mAntiAlias{};
+	AIBoolean			mWriteLayers{};
+	AIReal				mResolution{};	// dots per inch
+	PSDPluginColorMode  mColorModel{};
+	AIBoolean			mIncludeHiddenLayers{};
+	AIBoolean			mWriteNestedLayersAsLayers{};	//nchandra
+	AIBoolean			mLiveText{};
+	AIBoolean			mNo100LayersWarning{};
+	AIBoolean			mNoImageMapsWarning{};
+	AIBoolean			bHasSelectiveMerge{};
+	AIBoolean			mNoSelectiveMergeWarning{};	//Ac.
+	AIBoolean			mNoHiddenLayersWarning{};
+	AIBoolean			mWriteSlices{};			//mgupta++
+	AIBoolean			mWriteImageMaps{};		//mgupta++
+	AIBoolean			mWriteCompoundShapes{};	//mgupta++
+	AIReal				mOtherResolution{};		//mgupta++
+	ai::int32			mExportFormat{};
+	AIBoolean			mMaxEditability{};
+	AIBoolean			mPreserveSpotColors{};
 };
 
 

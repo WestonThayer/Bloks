@@ -8,8 +8,8 @@
  *        Date:
  *     Purpose: Adobe Illustrator User Utilities Suite.
  *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 2016 Adobe Systems Incorporated.
+ * ADOBE INCORPORATED
+ * Copyright 2019 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file
@@ -52,6 +52,7 @@
 #endif
 
 #include "IAIFilePath.hpp"
+#include "IAILocale.h"
 
 #include "AIHeaderBegin.h"
 
@@ -64,18 +65,11 @@
  **
  **/
 
-// v.14.0
 #define kAIUserSuite				"AI User Suite"
-#define kAIUserSuiteVersion13		AIAPI_VERSION(13)
-#define kAIUserSuiteVersion			kAIUserSuiteVersion13
+#define kAIUserSuiteVersion20		AIAPI_VERSION(20)
+#define kAIUserSuiteVersion			kAIUserSuiteVersion20
 #define kAIUserVersion				kAIUserSuiteVersion
 
-#if Macintosh || MSWindows
-#define kAIMacUserSuite				"AI Mac User Suite"
-#define kAIMacUserSuiteVersion7		AIAPI_VERSION(7)
-#define kAIMacUserSuiteVersion		kAIMacUserSuiteVersion7
-#define kAIMacUserVersion			kAIMacUserSuiteVersion
-#endif
 
 /** Unit formats for \c #AIUserSuite::GetUnitsString().*/
 enum {
@@ -143,13 +137,24 @@ typedef ai::uint32 AIUserDateTime;
 typedef struct _t_Opaque_AIResourceManagerHandle *AIResourceManagerHandle;
 
 /**	Callback function pointer passed to \c #AIUserSuite::GetInputFromUser().
-    Can be called at either of two stages: when the alert dialog OK button is pressed (\c #kAIValidationStage_onOk)
-	or when a character of text is entered in the text field (\c #kAIValidationStage_interactive).
-    The function must validate the input string, and return true if the string is valid in the context.
+    Can be called at either of the two stages: when the OK button in the alert dialog box is pressed (\c #kAIValidationStage_onOk)
+	or when a text character is entered in the text field (\c #kAIValidationStage_interactive).
+    The function must validate the input string, and return the output as true if the string is valid in the context.
     If the string fails validation, return false and set the \c errorStr output parameter to a string
     suitable for display in the alert dialog as a tool tip.
 */
 typedef AIBoolean (*IsValidInputProc) (AIValidationStage validationStage, const ai::UnicodeString &input, ai::UnicodeString &errorStr, void *userdata);
+
+/**	Progress Callback function pointer passed to \c #AIUserSuite::SetUpdateProgressCallback().
+	This can be used to implement a custom progress handler.  
+	The first parameter of the function is \c current , a number between 0 and \c max that represents
+	how far the operation has progressed and the second parameter is \c max , the maximum value,
+	representing 100% progress.
+	This progress handler must return the output as:
+		-true to cancel further processing 
+		-false to continue processing
+*/
+typedef AIBoolean (*UpdateProgressProc) (ai::int32 current, ai::int32 max);
 
 /** Global locale format.  Equivalent to the ENGLISH locale. */
 #define kAIUniversalLocaleFormat		0x0000
@@ -164,14 +169,14 @@ typedef AIBoolean (*IsValidInputProc) (AIValidationStage validationStage, const 
 /** Long date display format.   An example of a long date is "Tuesday, March 20, 2007".  The exact form is locale dependent.
 	See \c #AIUserSuite::GetDateString()  */
 #define kAILongDateFormat				0x0100
-/** Abbreviated date display format.  In Windows, equivalent to the short format except in the Japanese locale where it is the long format.
+/** Abbreviated date display format.  In Windows, equivalent to the short format except in Japanese locale, where it is the long format.
                                       In Mac OS, an abbreviated date is "Tue, Mar 20, 2007".  The exact form is locale dependent.
 	See \c #AIUserSuite::GetDateString()  */
 #define kAIAbbrevDateFormat				0x0200
 /** Short time display format.  An example is "hh:mm".  The exact form is locale dependent.
 	See \c #AIUserSuite::GetTimeString() */
 #define kAIShortTimeFormat				0x0000
-/** Long time display format.  An example is "hh:mm:ss".  the exact form is locale dependent.
+/** Long time display format.  An example is "hh:mm:ss". The exact form is locale dependent.
 	See \c #AIUserSuite::GetTimeString()  */
 #define kAILongTimeFormat				0x0100
 
@@ -182,7 +187,7 @@ typedef AIBoolean (*IsValidInputProc) (AIValidationStage validationStage, const 
  **
  **/
 
-/** Information about the kinds of names allowed for a named entity (such as
+/** Information about the kind of names allowed for a named entity (such as
 	layers, swatches, and styles). Used to generate a legal name, using
 	\c #AIUserSuite::NextName() and AIUserSuite::CopyOfName().
 
@@ -353,6 +358,15 @@ struct AIUserSuite {
 		*/
 	AIAPI void (*UpdateProgress) ( ai::int32 current, ai::int32 max );
 
+	/** Registers the progress callbacks.
+		(Note that this function does not return an error code.)
+			@param UpdateProgressProc - A function pointer to progress callback.
+				The first parameter to this call is \c current , a number between 0 and \c max that represents
+				how far the operation has progressed and the second parameter is \c max , the maximum value,
+				representing 100% progress.
+		*/
+	AIAPI void(*SetUpdateProgressCallback) (UpdateProgressProc func);
+
 	/**	Sets the text message displayed in the progress bar. If not provided,
 		the text line is blank.
 		(Note that this function does not return an error code.)
@@ -374,7 +388,7 @@ struct AIUserSuite {
 			@param string [out] A buffer in which to return the converted value, at
 				least 12 characters.
 		*/
-	AIAPI void (*AIRealToString) ( AIReal value, short precision, ai::UnicodeString& string );
+    AIAPI void (*AIRealToString) ( AIReal value, ai::int16 precision, ai::UnicodeString& string );
 
 	/**	Converts a Unicode string containing a number to an \c #AIReal value,
 		using the period as a decimal separator.
@@ -393,7 +407,31 @@ struct AIUserSuite {
 			@param string [out] A buffer in which to return the converted value, at
 				least 12 characters.
 		*/
-	AIAPI void (*IUAIRealToString) ( AIReal value, short precision, ai::UnicodeString& string );
+    AIAPI void (*IUAIRealToString) ( AIReal value, ai::int16 precision, ai::UnicodeString& string );
+    
+    /**	Converts a number of document points to a Unicode string modified according to the scale of the document, using the localized
+     international utilities (IU) decimal separator.
+     (Note that this function does not return an error code.)
+     @param value The value to convert.
+     @param precision The number of digits to the right of the decimal,
+     in the range [0..4].
+     @param string [out] A buffer in which to return the converted value, at
+     least 12 characters.
+     @param Locale unique identifying code like ai::Locale::kSystem.
+     */
+    AIAPI void (*IUAIRealToStringWithLocale) ( AIReal value, ai::int16 precision, ai::UnicodeString& string, const ai::LocaleID locale );
+    
+    /**    Converts a number of document points to a Unicode string, using the localized
+     international utilities (IU) decimal separator.
+     (Note that this function does not return an error code.)
+     @param value The value to convert.
+     @param precision The number of digits to the right of the decimal,
+     in the range [0..4].
+     @param string [out] A buffer in which to return the converted value, at
+     least 12 characters.
+     @param Locale unique identifying code like ai::Locale::kSystem.
+     */
+    AIAPI void (*IUAIRealToStringWithLocaleWithoutScale) ( AIReal value, ai::int16 precision, ai::UnicodeString& string, const ai::LocaleID locale );
 
 	/**	Converts a Unicode string containing a number to an \c #AIReal value,
 		using the localized international utilities (IU) decimal separator.
@@ -405,7 +443,7 @@ struct AIUserSuite {
 	AIAPI void (*IUStringToAIReal) ( const ai::UnicodeString& string, AIReal *value );
 
 	/**	Converts a number of document points to a formatted Unicode string containing
-		a number and ruler units, using the localized international utilities (IU)
+		a number and ruler units modified according to the scale of the document, using the localized international utilities (IU)
 		decimal separator, and the passed preference for precision. If passed precision value is -1
 		then user preference for precision is used.
 		Uses the currently set ruler units, which can be inches, points, or centimeters.
@@ -417,9 +455,23 @@ struct AIUserSuite {
 				least 12 characters.
 		*/
 	AIAPI AIErr (*IUAIRealToStringUnits) ( AIReal value, ai::int32 precision, ai::UnicodeString& string );
+    
+    /**    Converts a number of document points to a formatted Unicode string containing
+     a number and ruler units, using the localized international utilities (IU)
+     decimal separator, and the passed preference for precision. If passed precision value is -1
+     then user preference for precision is used.
+     Uses the currently set ruler units, which can be inches, points, or centimeters.
+     (Note that this function does not return an error code.)
+     @param value The value to convert.
+     @param precision The number of digits to the right of the decimal,
+     in the range [0..4]. Pass -1 if user preference for precision should be used.
+     @param string [out] A buffer in which to return the converted value, at
+     least 12 characters.
+     */
+    AIAPI AIErr (*IUAIRealToStringUnitsWithoutScale) ( AIReal value, ai::int32 precision, ai::UnicodeString& string );
 
 	/** Converts a formatted Unicode string containing a number expressed in ruler units
-		to an \c #AIReal value in points. The current ruler units for the artwork
+		to an \c #AIReal value in points according to the current scale of the document. The current ruler units for the artwork
 		are used as the original units to scale the result, and the user's
 		preferences for precision are applied.
 		(Note that this function does not return an error code.)
@@ -430,6 +482,19 @@ struct AIUserSuite {
 				If the string is not a number, this is set to \c #kAIRealUnknown.
 	  	*/
 	AIAPI void (*IUStringUnitsToAIReal) ( const ai::UnicodeString& string, AIReal *value );
+    
+    /** Converts a formatted Unicode string containing a number expressed in ruler units
+     to an \c #AIReal value in points {ignores the scale of the document}. The current ruler units for the artwork
+     are used as the original units to scale the result, and the user's
+     preferences for precision are applied.
+     (Note that this function does not return an error code.)
+     @param string The string to convert, which uses the localized international utilities (IU)
+     decimal separator. It can contain a unit specifier, one of "in", "pt", or "cm".
+     If no unit specifier is included, uses the current ruler units.
+     @param value [out] A buffer in which to return the converted value.
+     If the string is not a number, this is set to \c #kAIRealUnknown.
+     */
+    AIAPI void (*IUStringUnitsToAIRealWithoutScale) ( const ai::UnicodeString& string, AIReal *value );
 
 	/** Retrieves a string representing the current ruler units.
 			@param format The format for the result, one of:
@@ -440,7 +505,7 @@ struct AIUserSuite {
 				would be "in", "inch", or "inches".
 			@param string [out] A buffer in which to return the units string, at least 20 characters.
 		*/
-	AIAPI AIErr (*GetUnitsString) ( short format, ai::UnicodeString& string );
+    AIAPI AIErr (*GetUnitsString) ( ai::int16 format, ai::UnicodeString& string );
 
 	/**	Retrieves the base name of a global object, stripping off any additional
 		token that was added to make the name unique (by a function such as
@@ -468,13 +533,13 @@ struct AIUserSuite {
 		*/
 	AIAPI AIErr (*BuildDirectoryMenu) ( AIPlatformMenuHandle menu, const ai::FilePath &fileSpec);
 
-	/**	Retrieves a directory.  Available only in Mac OS.  Returns a filespec pertaining to the 'index' item inside of the menu returned by BuildDirectoryMenu.
+	/**	Retrieves a directory.  Available only in Mac OS. Returns a filespec pertaining to the 'index' item inside of the menu returned by BuildDirectoryMenu.
 			@param fileSpec The file object for the directory.
 			@param index The 0-based index of the directory.
 		*/
 	AIAPI AIErr (*GetIndexedDirectorySpec) ( ai::FilePath &fileSpec, ai::int32 index);
 
-	/**	Reveals a file in the Finder.  Available only in Mac OS.
+	/**	Reveals a file in the Finder. Available only in Mac OS.
 			@param fileSpec	 The file object for the file.
 		*/
 	AIAPI AIErr (*RevealTheFile) ( const ai::FilePath &fileSpec);
@@ -484,8 +549,8 @@ struct AIUserSuite {
 		*/
 	AIAPI void (*DisableProgressCancel) ( void );
 
-	/** Reports whether it is safe to allocate memory. Call when a timer
-		or other  asynchronous event triggers an action that allocates memory.
+	/** Reports whether it is safe to allocate memory. Calls when a timer
+		or other  asynchronous event trigger an action that allocates memory.
 		Not needed when handling notifications or user events; the plug-in does not receive
 		these when it is not ok to allocate memory.
 		(Note that this function returns a boolean value, not an error code.)
@@ -494,7 +559,7 @@ struct AIUserSuite {
 		*/
 	AIAPI AIBoolean (*OKToAllocateMemory) ( void );
 
-	// New for AI 11
+	// Introduced in AI 11
 	/** Retrieves the current date and time.
 			@param outValue [out] A buffer in which to return the current date-time value.
 		*/
@@ -612,7 +677,7 @@ struct AIUserSuite {
 				return the full path of the file chosen by the user.
 	  */
 	AIAPI AIErr (*GetFileDialog)(const ai::UnicodeString &title, const AIFileDialogFilters*, ai::FilePath &ioFilePath);
-
+    
 	/** Opens a platform-specific dialog for choosing a folder.
      		@param title Dialog title.
 			@param ioFilePath [in, out] A buffer in which to pass the folder to browse or \c NULL, and
@@ -696,7 +761,7 @@ struct AIUserSuite {
 	AIAPI AIBoolean (*ChooseFromOSColorPicker) (const AIPoint &inLocation,
 		const AIRGBColor& inColor, AIRGBColor* outColor);
 
-	/** Evaluates a numeric expression to create a formatted string suitable for display.
+	/** Evaluates a numeric expression to create a formatted string suitable [This had already the document scale  of the document applied] for display.
 	Call, for example, when a numeric edit control loses focus or the user presses "=".
 	If the result of evaluation is not a valid numeric value as per options specified, it is recommended that
 	the associated control display the last known-good value, or a blank string
@@ -714,6 +779,25 @@ struct AIUserSuite {
 	*/
 	AIAPI AIErr (*EvaluateExpression)(const ai::UnicodeString& expr, const AIExpressionOptions& options, ai::UnicodeString& evaluatedExpr,
 		AIBoolean & isChanged , AIDouble& numericValue);
+    
+    /** Evaluates a numeric expression to create a formatted string suitable for display.
+     Call, for example, when a numeric edit control loses focus or the user presses "=".
+     If the result of evaluation is not a valid numeric value as per options specified, it is recommended that
+     the associated control display the last known-good value, or a blank string
+     accompanied by a beep or other error indicator.
+     
+     @param expr [in] The expression to be evaluated (typically entered by the user
+     in the control).
+     @param options [in] An \c #AIExpressionOptions structure that determines how
+     a numeric result is obtained. Specifies the units for the
+     result, a range to which the result is clipped, and the precision.
+     @param evaluatedExpr [out] A buffer in which to return the formatted display string.
+     @param isChanged [out] A buffer in which to return true if the result of evaluation
+     is different from result of user input. Example in case of non numeric input or out of bounds input.
+     @param numericValue [out] A buffer in which to return the numeric value, according to the specified options.
+     */
+    AIAPI AIErr (*EvaluateExpressionWithoutScale)(const ai::UnicodeString& expr, const AIExpressionOptions& options, ai::UnicodeString& evaluatedExpr,
+                                      AIBoolean & isChanged , AIDouble& numericValue);
 
 	/** Invokes a modal dialog in which the user must input text. The dialog cannot be dismissed
 		until text is entered. If default text is provided, however, the user can dismiss the
@@ -748,6 +832,13 @@ struct AIUserSuite {
 	*/
 	AIAPI AIErr (*SetCursor)(ai::int32 cursorID, AIResourceManagerHandle inRscMgr);
 
+	/**  Sets the SVG image to be used for the plug-in's cursor.
+	@param cursorID The resource ID of the cursor. Cursor images must be
+	in 2x scaled SVG format.
+	@param inRscMgr The resource manager, as returned by \c #CreateCursorResourceMgr().
+	*/
+	AIAPI AIErr(*SetSVGCursor)(ai::int32 cursorID, AIResourceManagerHandle inRscMgr);
+
 	/**  Disposes of the plug-in's singleton resource manager. Call once when
 		 \c #kAIApplicationShutdownNotifier is received. Do not call as part of plug-in shutdown.
 		@param The resource manager handle, as returned on creation.
@@ -771,6 +862,13 @@ struct AIUserSuite {
 		(ArtScaleFactor/ ViewScaleFactor)
     */
 	AIAPI AIReal(*GetArtToViewScaleFactor)(AIDocumentViewHandle view);
+    
+    /** This API returns the actual application scale factor when Illustrator is launched.
+        If the application scale factor preference for the current OS exceeds the maximum application
+        scale factor supported by the Illustrator for the current monitor resolution, the application
+        scale factor is automatically reset to the maximum scale factor.
+     */
+    AIAPI AIReal(*GetAppScaleFactor)();
 
 
 	/** Launches a folder.
@@ -779,6 +877,22 @@ struct AIUserSuite {
 	*/
 	AIAPI AIErr(*LaunchFolder)(ai::FilePath folderPath);
 
+	/** Opens the appropriate application to edit a placed or raster object.
+	This is equivalent to right click the object and select the app for opening it.
+	@param art The placed or raster art object.
+	@param appPath The App Executable location to be used for opening the art
+	@return \c #kApplicationNotFoundErr error if the application is not found.
+		<br> \c #kObjectNotLinkedErr error if the object is not a placed or raster object.
+	*/
+	AIAPI AIErr(*EditInCustomApp) (AIArtHandle art, const ai::FilePath& appPath);
+    
+    /** Opens a platform-specific dialog for opening a file.
+             @param title Dialog title.
+            @param AIFileDialogFilters File types to open. Can be \c NULL.
+            @param iFilePath A buffer in which to pass the directory to browse or \c NULL,
+            @param oFilePaths A buffer in which to return the full paths of the files chosen by the user.
+      */
+    AIAPI AIErr (*GetFileDialogEx)(const ai::UnicodeString &title, const AIFileDialogFilters*,const ai::FilePath& iFilePath, ai::AutoBuffer<ai::FilePath> &oFilePaths);
 };
 
 

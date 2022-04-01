@@ -2,36 +2,21 @@
 
     Copyright 2000-2006 Adobe Systems Incorporated. All Rights Reserved.
 
-    NOTICE:  Adobe permits you to use, modify, and distribute this file 
-    in accordance with the terms of the Adobe license agreement accompanying 
-    it. If you have received this file from a source other than Adobe, then 
-    your use, modification, or distribution of it requires the prior written 
+    NOTICE:  Adobe permits you to use, modify, and distribute this file
+    in accordance with the terms of the Adobe license agreement accompanying
+    it. If you have received this file from a source other than Adobe, then
+    your use, modification, or distribution of it requires the prior written
     permission of Adobe.
 
- ----------------------------------------------------------------------------------
- 
-	$File: ATETypes.h $
-
-	Author: 
-
-	$Author: micheleg $
-
-	$DateTime: 2006/01/02 16:27:31 $
-
-	$Revision: #2 $
-
-	$Change: 379550 $
-	
-	Notes:	
-	
  ---------------------------------------------------------------------------------- */
+
 #ifndef __ATETypes__
 #define __ATETypes__
 
 #ifdef __MWERKS__
-	#if defined(__MC68K__) || defined(__POWERPC__)
-		#pragma enumsalwaysint on
-	#endif
+    #if defined(__MC68K__) || defined(__POWERPC__)
+        #pragma enumsalwaysint on
+    #endif
 #endif // __MWERKS__
 
 // ----------------------------------------------------------------------------------
@@ -44,8 +29,8 @@ typedef unsigned short ASUTF16;
 
     The type safety of bitflags can be strengthened by having an enum type
     specify the set of flags and be the data type for the flags field. This
-    macro defines bit operators for such enums. 
-    
+    macro defines bit operators for such enums.
+
     The macro is intended only for use with enum types. Compile errors
     will ensure against a client trying to pass in a class type or other
     C++ data type as the macro parameter.
@@ -87,7 +72,7 @@ namespace ATE
 {
 #endif
 
-typedef int	ATEGlyphID;
+typedef int ATEGlyphID;
 
 typedef unsigned char ATEBool8;
 
@@ -99,14 +84,14 @@ typedef unsigned char ATEBool8;
 
 /** @ingroup Errors Adobe Text Engine (ATE) error codes. */
 enum ATEErr {
-	kNoError = 0,
-	kBadParameter,
-	kOutOfMemory,
-	kOutOfRange,
-	kNullPointer,
-	kInternalError,
-	kMissingSpellingDictionary,
-	kMissingHyphenationDictionary
+    kNoError = 0,
+    kBadParameter,
+    kOutOfMemory,
+    kOutOfRange,
+    kNullPointer,
+    kInternalError,
+    kMissingSpellingDictionary,
+    kMissingHyphenationDictionary
 };
 #ifndef __cplusplus
 typedef enum ATEErr ATEErr;
@@ -117,19 +102,20 @@ typedef enum ATEErr ATEErr;
 /** Adobe Text Engine (ATE) stream version constants */
 enum StreamVersion
 {
-	kStreamVersion1 = 1,													// pre CS1 (ATE 1.0 )
-	kStreamVersion2,														// CS1 - (ATE 2.0)
-	kStreamVersion3,	kStreamLastNonPersistedVersion  = kStreamVersion3, 	// CS2 redux (shorter tag names) - (ATE V2.5)
-						kStreamCS2Redux					= kStreamVersion3,
-	kStreamVersion4,	kVerticalTextScaleChange		= kStreamVersion4,	// CS3 vertical text scale change (ATE 2.51)
-	kStreamVersion5,	kComplexScriptSupport			= kStreamVersion5,	// CS4 complex script support (ATE 3.0)
-	kStreamVersion6,														// CS5 (ATE 4.0)
-	kStreamVersion7,														// CS6 hyperlink support (ATE 5.0)
-	kStreamVersion8,														// CS7 (ATE 6.0)
-	// ^^^^^^^^^^^^ Add new versions above this comment ^^^^^^^^^^^^ 
-	// This allows us to have the current version always equal the last.
-	kDontUseLastPlusOne,
-	kStreamCurrentVersion = kDontUseLastPlusOne - 1
+    kStreamVersion1 = 1,                                                    // pre CS1 (ATE 1.0 )
+    kStreamVersion2,                                                        // CS1 - (ATE 2.0)
+    kStreamVersion3,    kStreamLastNonPersistedVersion  = kStreamVersion3,  // CS2 redux (shorter tag names) - (ATE V2.5)
+                        kStreamCS2Redux                 = kStreamVersion3,
+    kStreamVersion4,    kVerticalTextScaleChange        = kStreamVersion4,  // CS3 vertical text scale change (ATE 2.51)
+    kStreamVersion5,    kComplexScriptSupport           = kStreamVersion5,  // CS4 complex script support (ATE 3.0)
+    kStreamVersion6,                                                        // CS5 (ATE 4.0)
+    kStreamVersion7,                                                        // CS6 hyperlink support (ATE 5.0)
+    kStreamVersion8,                                                        // CS7 (ATE 6.0)
+    kStreamVersion9,
+    // ^^^^^^^^^^^^ Add new versions above this comment ^^^^^^^^^^^^
+    // This allows us to have the current version always equal the last.
+    kDontUseLastPlusOne,
+    kStreamCurrentVersion = kDontUseLastPlusOne - 1
 };
 #ifndef __cplusplus
 typedef enum StreamVersion StreamVersion;
@@ -140,11 +126,12 @@ typedef enum StreamVersion StreamVersion;
 /** Adobe Text Engine (ATE) stream formatting constants */
 enum StreamFormatting
 {
-	kEfficientPDFOutput,
-	kPrettyPDFOutput,
-	kBinaryPDFOutput
+    kEfficientPDFOutput,
+    kPrettyPDFOutput,
+    kBinaryPDFOutput
 #if SLO_XML
-	,kXMLUTF8Output
+    ,kXMLUTF8Output
+    ,kPrettyXMLUTF8Output
 #endif
 };
 #ifndef __cplusplus
@@ -153,11 +140,11 @@ typedef enum StreamFormatting StreamFormatting;
 
 // ----------------------------------------------------------------------------------
 
-enum FeatureSet 
+enum FeatureSet
 {
-	kLatinCJKFeatureSet, 
-	kMEFeatureSet,
-	kIndicFeatureSet
+    kLatinCJKFeatureSet,
+    kMEFeatureSet,
+    kIndicFeatureSet
 };
 
 #ifndef __cplusplus
@@ -166,11 +153,11 @@ typedef enum FeatureSet FeatureSet;
 
 // ----------------------------------------------------------------------------------
 
-enum FontLockingAllowance 
+enum FontLockingAllowance
 {
-	kAllowFontLocking, 
-	kDontAllowFontLocking,
-	kUseFontLockDocumentSetting
+    kAllowFontLocking,
+    kDontAllowFontLocking,
+    kUseFontLockDocumentSetting
 };
 
 #ifndef __cplusplus
@@ -179,12 +166,12 @@ typedef enum FontLockingAllowance FontLockingAllowance;
 
 // ----------------------------------------------------------------------------------
 
-/** Adobe Text Engine (ATE) line cap type constants */			
+/** Adobe Text Engine (ATE) line cap type constants */
 enum LineCapType {
-	kButtCap = 0,
-	kRoundCap = 1,
-	kSquareCap = 2,
-	kNumLineCapTypes
+    kButtCap = 0,
+    kRoundCap = 1,
+    kSquareCap = 2,
+    kNumLineCapTypes
 };
 #ifndef __cplusplus
 typedef enum LineCapType LineCapType;
@@ -192,16 +179,16 @@ typedef enum LineCapType LineCapType;
 
 // ----------------------------------------------------------------------------------
 
-/** Adobe Text Engine (ATE) character type constants */		
+/** Adobe Text Engine (ATE) character type constants */
 enum ASCharType {
-	/** Space character */
-	kASSpaceChar = 0,
-	/** Punctuation character */
-	kPunctuationChar,
-	/** Paragraph end character CR */
-	kParagraphEndChar,
-	/** This character is anything but space, punctuation or paragraph end */
-	kNormalChar
+    /** Space character */
+    kASSpaceChar = 0,
+    /** Punctuation character */
+    kPunctuationChar,
+    /** Paragraph end character CR */
+    kParagraphEndChar,
+    /** This character is anything but space, punctuation or paragraph end */
+    kNormalChar
 };
 #ifndef __cplusplus
 typedef enum ASCharType ASCharType;
@@ -209,15 +196,15 @@ typedef enum ASCharType ASCharType;
 
 // ----------------------------------------------------------------------------------
 
-/** Adobe Text Engine (ATE) line-join type constants */		
+/** Adobe Text Engine (ATE) line-join type constants */
 enum LineJoinType {
-	/** A mitered join */
-	kMiterJoin = 0,
-	/** A round join */
-	kRoundJoin = 1,
-	/** A beveled join */
-	kBevelJoin = 2,
-	kNumLineJoinTypes
+    /** A mitered join */
+    kMiterJoin = 0,
+    /** A round join */
+    kRoundJoin = 1,
+    /** A beveled join */
+    kBevelJoin = 2,
+    kNumLineJoinTypes
 };
 #ifndef __cplusplus
 typedef enum LineJoinType LineJoinType;
@@ -225,37 +212,83 @@ typedef enum LineJoinType LineJoinType;
 
 // ----------------------------------------------------------------------------------
 
-/** Adobe Text Engine (ATE) paragraph justification type constants */		
+/** Adobe Text Engine (ATE) paragraph justification type constants */
 enum ParagraphJustification
 {
-	kLeftJustify = 0,
-	kRightJustify,
-	kCenterJustify,
+    kLeftJustify = 0,
+    kRightJustify,
+    kCenterJustify,
 
-	kFullJustifyLastLineLeft,
-	kFullJustifyLastLineRight,
-	kFullJustifyLastLineCenter,
+    kFullJustifyLastLineLeft,
+    kFullJustifyLastLineRight,
+    kFullJustifyLastLineCenter,
 
-	kFullJustifyLastLineFull
+    kFullJustifyLastLineFull
 };
 #ifndef __cplusplus
 typedef enum ParagraphJustification ParagraphJustification;
 #endif
 
+
 // ----------------------------------------------------------------------------------
 
-/** Adobe Text Engine (ATE) composer engine type constants 
+/** Adobe Text Engine (ATE) text vertical alignment type constants */
+enum FrameAlignment
+{
+    kTopAlignment = 0,
+    kCenterAlignment,
+    kBottomAlignment,
+    kJustifyAlignment
+};
+#ifndef __cplusplus
+typedef enum FrameAlignment FrameAlignment;
+#endif
 
-	kLatinCJKComposer:	Original ATE US composer supporting Latin and CJK 
-	kOptycaComposer:		Optyca composer provided by WinSoft WRServices, supporting complex scripts 
-						e.g. Hebrew, Arabic, Thai, Vietnames, Indic. 
-						CJK is not supported by version 3.0 of WRServices
+// ----------------------------------------------------------------------------------
+
+/** Adobe Text Engine (ATE) text Frame Fitting Options */
+
+enum FrameFitPolicy
+{
+    kDontAutoFit = 0,
+
+	/*Changing the height of path for fitting*/
+	kHeightExtensionWithCursorHeight = 1,
+    kHeightExtensionWithPreciseBounds,
+    kHeightExtensionWithBaseline,
+
+/*Below option can be added as well, but for the time being
+are not supported as now*/
+#if 0
+    /*Changing the height of path for fitting*/
+	kWidthExtension,
+    /*Changing the height and width of path uniformly*/
+    kUniformExtension,
+	/*Change the Font Size of text element for Fitting rather than changing the path*/
+	kSizeExtension
+    /*we can also have a custom fitting policy which is controlled completely
+    by client of ATE*/
+#endif
+};
+
+#ifndef __cplusplus
+typedef enum FrameFitPolicy FrameFitPolicy;
+#endif
+
+// ----------------------------------------------------------------------------------
+
+/** Adobe Text Engine (ATE) composer engine type constants
+
+    kLatinCJKComposer:  Original ATE US composer supporting Latin and CJK
+    kOptycaComposer:        Optyca composer provided by WinSoft WRServices, supporting complex scripts
+                        e.g. Hebrew, Arabic, Thai, Vietnames, Indic.
+                        CJK is not supported by version 3.0 of WRServices
 */
-enum ComposerEngine 
-{ 
-	kLatinCJKComposer = 0, 
-	kOptycaComposer,
-	kAdornment
+enum ComposerEngine
+{
+    kLatinCJKComposer = 0,
+    kOptycaComposer,
+    kAdornment
 };
 #ifndef __cplusplus
 typedef enum ComposerEngine ComposerEngine;
@@ -263,11 +296,11 @@ typedef enum ComposerEngine ComposerEngine;
 
 // ----------------------------------------------------------------------------------
 
-/** Adobe Text Engine (ATE) paragraph direction type constants */	
+/** Adobe Text Engine (ATE) paragraph direction type constants */
 enum ParagraphDirection
 {
-	kLeftToRight = 0,
-	kRightToLeft
+    kLeftToRight = 0,
+    kRightToLeft
 };
 #ifndef __cplusplus
 typedef enum ParagraphDirection ParagraphDirection;
@@ -275,23 +308,23 @@ typedef enum ParagraphDirection ParagraphDirection;
 
 // ----------------------------------------------------------------------------------
 
-/** Adobe Text Engine (ATE) justification method type constants */	
+/** Adobe Text Engine (ATE) justification method type constants */
 enum JustificationMethod
 {
-	kJustifMethodDefault = 0,		//corresponds to kLatinLike in WR
-	kJustifMethodArabic,			//corresponds to kEvenKashidasStretched in WR
-	kJustifMethodNaskh,				//corresponds to kTraditionalNaskh in WR
-	kJustifMethodNaskhTatweel,		//corresponds to kTraditionalNaskhTatweel in WR
-	kJustifMethodNaskhKashida,		//corresponds to kTraditionalNaskhKashida in WR
-	kJustifMethodNaskhTatweelFrac,  //corresponds to kTraditionalNaskhTatweelFrac in WR
-	kJustifMethodNaskhKashidaFrac,  //corresponds to kTraditionalNaskhKashidaFrac in WR
-	kJustifMethodAuto				//ATE shall decide justification method on the basis of 
-									//Kashida Width. Following Logic would be used:
-									//None		: kLatinLike,
-									//Short		: kTraditionalNaskhKashidaFrac, 
-									//Medium	: kTraditionalNaskhKashidaFrac,
-									//Long		: kTraditionalNaskhKashidaFrac,
-									//Stylistic	: kTraditionalNaskhKashida,
+    kJustifMethodDefault = 0,       //corresponds to kLatinLike in WR
+    kJustifMethodArabic,            //corresponds to kEvenKashidasStretched in WR
+    kJustifMethodNaskh,             //corresponds to kTraditionalNaskh in WR
+    kJustifMethodNaskhTatweel,      //corresponds to kTraditionalNaskhTatweel in WR
+    kJustifMethodNaskhKashida,      //corresponds to kTraditionalNaskhKashida in WR
+    kJustifMethodNaskhTatweelFrac,  //corresponds to kTraditionalNaskhTatweelFrac in WR
+    kJustifMethodNaskhKashidaFrac,  //corresponds to kTraditionalNaskhKashidaFrac in WR
+    kJustifMethodAuto               //ATE shall decide justification method on the basis of
+                                    //Kashida Width. Following Logic would be used:
+                                    //None      : kLatinLike,
+                                    //Short     : kTraditionalNaskhKashidaFrac,
+                                    //Medium    : kTraditionalNaskhKashidaFrac,
+                                    //Long      : kTraditionalNaskhKashidaFrac,
+                                    //Stylistic : kTraditionalNaskhKashida,
 };
 #ifndef __cplusplus
 typedef enum JustificationMethod JustificationMethod;
@@ -299,13 +332,14 @@ typedef enum JustificationMethod JustificationMethod;
 
 // ----------------------------------------------------------------------------------
 
-/** Adobe Text Engine (ATE) digit set type constants */	
+/** Adobe Text Engine (ATE) digit set type constants */
 enum DigitSet
 {
-	kDefaultDigits = 0,
-	kArabicDigits,
-	kHindiDigits,
-	kFarsiDigits
+    kDefaultDigits = 0,
+    kArabicDigits,
+    kHindiDigits,
+    kFarsiDigits,
+    kArabicDigitsRTL
 };
 #ifndef __cplusplus
 typedef enum DigitSet DigitSet;
@@ -313,12 +347,12 @@ typedef enum DigitSet DigitSet;
 
 // ----------------------------------------------------------------------------------
 
-/** Adobe Text Engine (ATE) direction override type constants */	
+/** Adobe Text Engine (ATE) direction override type constants */
 enum DirOverride
-{ 
-	kDirOverrideDefault = 0,
-	kDirOverrideLTR,
-	kDirOverrideRTL 
+{
+    kDirOverrideDefault = 0,
+    kDirOverrideLTR,
+    kDirOverrideRTL
 };
 #ifndef __cplusplus
 typedef enum DirOverride DirOverride;
@@ -326,14 +360,14 @@ typedef enum DirOverride DirOverride;
 
 // ----------------------------------------------------------------------------------
 
-/** Adobe Text Engine (ATE) diacritic vertical position type constants */	
+/** Adobe Text Engine (ATE) diacritic vertical position type constants */
 enum DiacVPos
 {
-	kDiacVPosOff = 0,
-	kDiacVPosLoose,
-	kDiacVPosMedium,
-	kDiacVPosTight,
-	kDiacVPosOpenType 
+    kDiacVPosOff = 0,
+    kDiacVPosLoose,
+    kDiacVPosMedium,
+    kDiacVPosTight,
+    kDiacVPosOpenType
 };
 #ifndef __cplusplus
 typedef enum DiacPosition DiacPosition;
@@ -341,21 +375,21 @@ typedef enum DiacPosition DiacPosition;
 
 // ----------------------------------------------------------------------------------
 
-/** Adobe Text Engine (ATE) kashida type constants */	
+/** Adobe Text Engine (ATE) kashida type constants */
 enum Kashidas
-{ 
-	kKashidaDefault = 0,
-	kKashidaOn = kKashidaDefault,
-	kKashidaOff 
+{
+    kKashidaDefault = 0,
+    kKashidaOn = kKashidaDefault,
+    kKashidaOff
 };
 
 enum KashidaWidth
-{ 
-	kKashidaNone = 0,
-	kKashidaSmall,
-	kKashidaMedium,
-	kKashidaLong,
-	kKashidaStylistic
+{
+    kKashidaNone = 0,
+    kKashidaSmall,
+    kKashidaMedium,
+    kKashidaLong,
+    kKashidaStylistic
 };
 
 #ifndef __cplusplus
@@ -367,17 +401,17 @@ typedef enum Kashidas Kashidas;
 /** Adobe Text Engine (ATE) Wari Chu justification type constants */
 enum WariChuJustification
 {
-	kWariChuLeftJustify = 0,
-	kWariChuRightJustify,
-	kWariChuCenterJustify,
+    kWariChuLeftJustify = 0,
+    kWariChuRightJustify,
+    kWariChuCenterJustify,
 
-	kWariChuFullJustifyLastLineLeft,
-	kWariChuFullJustifyLastLineRight,
-	kWariChuFullJustifyLastLineCenter,
+    kWariChuFullJustifyLastLineLeft,
+    kWariChuFullJustifyLastLineRight,
+    kWariChuFullJustifyLastLineCenter,
 
-	kWariChuFullJustifyLastLineFull,
+    kWariChuFullJustifyLastLineFull,
 
-	kWariChuAutoJustify
+    kWariChuAutoJustify
 };
 #ifndef __cplusplus
 typedef enum WariChuJustification WariChuJustification;
@@ -388,9 +422,9 @@ typedef enum WariChuJustification WariChuJustification;
 /** Adobe Text Engine (ATE) Kinsoku order constants */
 enum PreferredKinsokuOrder
 {
-	kPushIn = 0,
-	kPushOutFirst,
-	kPushOutOnly
+    kPushIn = 0,
+    kPushOutFirst,
+    kPushOutOnly
 };
 #ifndef __cplusplus
 typedef enum PreferredKinsokuOrder PreferredKinsokuOrder;
@@ -401,9 +435,9 @@ typedef enum PreferredKinsokuOrder PreferredKinsokuOrder;
 /** Adobe Text Engine (ATE) Burasagari type constants */
 enum BurasagariType
 {
-	kBurasagariNone = 0,
-	kBurasagariStandard,
-	kBurasagariStrong
+    kBurasagariNone = 0,
+    kBurasagariStandard,
+    kBurasagariStrong
 };
 #ifndef __cplusplus
 typedef enum BurasagariType BurasagariType;
@@ -414,8 +448,8 @@ typedef enum BurasagariType BurasagariType;
 /** Adobe Text Engine (ATE) leading type constants */
 enum LeadingType
 {
-	kRomanLeadingType = 0,
-	kJapaneseLeadingType = 1
+    kRomanLeadingType = 0,
+    kJapaneseLeadingType = 1
 };
 #ifndef __cplusplus
 typedef enum LeadingType LeadingType;
@@ -426,10 +460,10 @@ typedef enum LeadingType LeadingType;
 /** Adobe Text Engine (ATE) tab type constants */
 enum TabType
 {
-	kLeftTabType = 0,
-	kCenterTabType,
-	kRightTabType,
-	kDecimalTabType
+    kLeftTabType = 0,
+    kCenterTabType,
+    kRightTabType,
+    kDecimalTabType
 };
 #ifndef __cplusplus
 typedef enum TabType TabType;
@@ -448,18 +482,18 @@ typedef enum AutoKernType AutoKernType;
 /** Adobe Text Engine (ATE) Japanese alternate feature type constants */
 enum JapaneseAlternateFeature
 {
-	kDefaultForm,
-	kTraditionalForm,
-	kExpertForm,
-	kJIS78Form,
-	kJIS83Form,
-	kHalfWidthForm,
-	kThirdWidthForm,
-	kQuarterWidthForm,
-	kFullWidthForm,
-	kProportionalWidthForm,
-	kJIS90Form,
-	kJIS04Form
+    kDefaultForm,
+    kTraditionalForm,
+    kExpertForm,
+    kJIS78Form,
+    kJIS83Form,
+    kHalfWidthForm,
+    kThirdWidthForm,
+    kQuarterWidthForm,
+    kFullWidthForm,
+    kProportionalWidthForm,
+    kJIS90Form,
+    kJIS04Form
 };
 #ifndef __cplusplus
 typedef enum JapaneseAlternateFeature JapaneseAlternateFeature;
@@ -470,10 +504,10 @@ typedef enum JapaneseAlternateFeature JapaneseAlternateFeature;
 /** Adobe Text Engine (ATE) baseline direction constants */
 enum BaselineDirection
 {
-	kNeverUseMustBeKnown = 0,				// we don't allow "unknown" like we used to
-	kBaselineWithStream = 1,	// rotate roman glyphs to vertical orientation in vertical
-	kBaselineVerticalRotated = 2,					// default baseline -- roman glyphs on side in vertical
-	kBaselineVerticalCrossStream = 3				// Tate-Chu-Yoko in vertical
+    kNeverUseMustBeKnown = 0,               // we don't allow "unknown" like we used to
+    kBaselineWithStream = 1,    // rotate roman glyphs to vertical orientation in vertical
+    kBaselineVerticalRotated = 2,                   // default baseline -- roman glyphs on side in vertical
+    kBaselineVerticalCrossStream = 3                // Tate-Chu-Yoko in vertical
 };
 #ifndef __cplusplus
 typedef enum BaselineDirection BaselineDirection;
@@ -481,12 +515,29 @@ typedef enum BaselineDirection BaselineDirection;
 
 // ----------------------------------------------------------------------------------
 
+/** Adobe Text Engine (ATE) Font Height Option Reference .
+This is also being referred as setting the reference type which will
+also guide how to evaluate reference font size value.*/
+enum FontSizeRefType
+{
+    kFontSizeRefDefault, //Embox
+    kFontSizeRef_CapHeight,
+    kFontSizeRef_XHeight,
+    kFontSizeRef_ICFBox
+};
+
+#ifndef __cplusplus
+typedef enum FontSizeRefType FontSizeRefType;
+#endif
+
+// ----------------------------------------------------------------------------------
+
 /** Adobe Text Engine (ATE) underline position constants */
 enum UnderlinePosition
 {
-	kUnderlineOff,
-	kUnderlineOn_RightInVertical,
-	kUnderlineOn_LeftInVertical
+    kUnderlineOff,
+    kUnderlineOn_RightInVertical,
+    kUnderlineOn_LeftInVertical
 };
 
 #ifndef __cplusplus
@@ -498,8 +549,8 @@ typedef enum UnderlinePosition UnderlinePosition;
 /** Adobe Text Engine (ATE) underline style constants */
 enum UnderlineStyle
 {
-	kUnderlineSolid,
-	kUnderlineDashed
+    kUnderlineSolid,
+    kUnderlineDashed
 };
 
 #ifndef __cplusplus
@@ -511,9 +562,9 @@ typedef enum UnderlineStyle UnderlineStyle;
 /** Adobe Text Engine (ATE) strike-through position constants */
 enum StrikethroughPosition
 {
-	kStrikethroughOff,
-	kStrikethroughOn_XHeight,
-	kStrikethroughOn_EMBox
+    kStrikethroughOff,
+    kStrikethroughOn_XHeight,
+    kStrikethroughOn_EMBox
 };
 
 #ifndef __cplusplus
@@ -525,15 +576,15 @@ typedef enum StrikethroughPosition StrikethroughPosition;
 /** Adobe Text Engine (ATE) style-run alignment constants */
 enum StyleRunAlignment
 {
-	kAlignStylesByBottom = 0,
-	kAlignStylesByICFBottom = 1,
-	
-	kAlignStylesByRomanHorizontalCenterVertical = 2,
-	
-	kAlignStylesByCenterHorizontalRomanVertical = 3,
-	
-	kAlignStylesByICFTop = 4,
-	kAlignStylesByTop = 5
+    kAlignStylesByBottom = 0,
+    kAlignStylesByICFBottom = 1,
+
+    kAlignStylesByRomanHorizontalCenterVertical = 2,
+
+    kAlignStylesByCenterHorizontalRomanVertical = 3,
+
+    kAlignStylesByICFTop = 4,
+    kAlignStylesByTop = 5
 };
 #ifndef __cplusplus
 typedef enum StyleRunAlignment StyleRunAlignment;
@@ -544,10 +595,10 @@ typedef enum StyleRunAlignment StyleRunAlignment;
 /** Adobe Text Engine (ATE) character case change constants */
 enum CaseChangeType
 {
-	kUppercase = 0,
-	kLowercase,
-	kTitleCase,
-	kSentenceCase
+    kUppercase = 0,
+    kLowercase,
+    kTitleCase,
+    kSentenceCase
 };
 #ifndef __cplusplus
 typedef enum CaseChangeType CaseChangeType;
@@ -557,8 +608,8 @@ typedef enum CaseChangeType CaseChangeType;
 
 struct SLOToOTLanguage
 {
-	const char* fScript;
-	const char* fLanguage;
+    const char* fScript;
+    const char* fLanguage;
 };
 
 /** Adobe Text Engine (ATE) language constants */
@@ -566,91 +617,97 @@ struct SLOToOTLanguage
 // otherwise make appropriate corrections to LinguisticSettings::GetIndex()
 enum Language
 {
-	kEnglishLanguage,
-	kFinnishLanguage,
-	kStandardFrenchLanguage,
-	kCanadianFrenchLanguage,
-	kGerman1996ReformLanguage, 			// [1996-2006] Previously kStandardGermanLanguage.  See below for latest German.
-	kOldGermanLanguage,					// As we moved from Proximity Hunspell the Old German language mapping changed to 1901 language.
-	kOldSwissGermanLanguage, 			// Pre 2006 Reform.  Previously kSwissGermanLanguage.  See below for latest Swiss German.
-	kItalianLanguage,
-	kBokmalNorwegianLanguage,
-	kNynorskNorwegianLanguage,
-	kStandardPortugueseLanguage,
-	kBrazillianPortugueseLanguage,
-	kSpanishLanguage,
-	kSwedishLanguage,
-	kUKEnglishLanguage,
-	kOldDutchLanguage,					// Pre 2006 Reform. Previously kDutchLanguage. See below for latest Dutch.
-	kDanish,
-	kCatalan,
-	kRussian,
-	kUkranian,
-	kBulgarian,
-	kSerbian,
-	kCzech,
-	kPolish,
-	kRumanian,
-	kGreek,
-	kTurkish,
-	kIcelandic,
-	kHungarian,
-	kChineseLanguage,
-	kJapaneseLanguage,
-	kCroatian,
-	kHebrew,
-	kSlovenian,
-	kBelarussian,
-	kAlbanian,
-	kLithuanian,
-	kLatvian,
-	kSlovakian,
-	kArabic,
-	kEstonian,
-	kFarsi,
-	kGerman2006ReformLanguage,			// Latest German.  Should be the default as of 2006
-	kDutch2005ReformLanguage,			// Latest Dutch.   Should be the default as of 2006
-	kSwissGerman2006ReformLanguage,		// Latest Swiss German.   Should be the default as of 2006
-	kCanadianEnglish,
-	kThai,
-	kVietnamese,
-	kLao,
-	kHindi,
-	kMarathi,
-	kBengaliIndia,
-	kPunjabi,
-	kGujarati,
-	kOriya,
-	kTamil,
-	kTelugu,
-	kKannada,
-	kMalayalam,
-	// Add all scripts supported by WRServices
-	kNumberOfLanguages,
-	kInvalidLanguage = 1000		// LILO need us to have an invalid language
+    kEnglishLanguage,
+    kFinnishLanguage,
+    kStandardFrenchLanguage,
+    kCanadianFrenchLanguage,
+    kGerman1996ReformLanguage,          // [1996-2006] Previously kStandardGermanLanguage.  See below for latest German.
+    kOldGermanLanguage,                 // As we moved from Proximity Hunspell the Old German language mapping changed to 1901 language.
+    kOldSwissGermanLanguage,            // Pre 2006 Reform.  Previously kSwissGermanLanguage.  See below for latest Swiss German.
+    kItalianLanguage,
+    kBokmalNorwegianLanguage,
+    kNynorskNorwegianLanguage,
+    kStandardPortugueseLanguage,
+    kBrazillianPortugueseLanguage,
+    kSpanishLanguage,
+    kSwedishLanguage,
+    kUKEnglishLanguage,
+    kOldDutchLanguage,                  // Pre 2006 Reform. Previously kDutchLanguage. See below for latest Dutch.
+    kDanish,
+    kCatalan,
+    kRussian,
+    kUkranian,
+    kBulgarian,
+    kSerbian,
+    kCzech,
+    kPolish,
+    kRumanian,
+    kGreek,
+    kTurkish,
+    kIcelandic,
+    kHungarian,
+    kChineseLanguage,
+    kJapaneseLanguage,
+    kCroatian,
+    kHebrew,
+    kSlovenian,
+    kBelarussian,
+    kAlbanian,
+    kLithuanian,
+    kLatvian,
+    kSlovakian,
+    kArabic,
+    kEstonian,
+    kFarsi,
+    kGerman2006ReformLanguage,          // Latest German.  Should be the default as of 2006
+    kDutch2005ReformLanguage,           // Latest Dutch.   Should be the default as of 2006
+    kSwissGerman2006ReformLanguage,     // Latest Swiss German.   Should be the default as of 2006
+    kCanadianEnglish,
+    kThai,
+    kVietnamese,
+    kLao,
+    kHindi,
+    kMarathi,
+    kBengaliIndia,
+    kPunjabi,
+    kGujarati,
+    kOriya,
+    kTamil,
+    kTelugu,
+    kKannada,
+    kMalayalam,
+
+    kBurmese,
+    kSinhalese,
+    kKhmer,
+    kIndonesian,
+
+    // Add all scripts supported by WRServices
+    kNumberOfLanguages,
+    kInvalidLanguage = 1000     // LILO need us to have an invalid language
 };
 
 //list of dictionary providers
 enum DictionaryProvider
 {
-	kHunspellProvider,
-	kWinSoftProvider,
-	kWinSoftExtendedProvider,
-	kUserDictionaryOnlyProvider,
-	kProximityProvider,
-	kMaxNumProviders,
-	kInvalidProvider = 1000
+    kHunspellProvider,
+    kWinSoftProvider,
+    kWinSoftExtendedProvider,
+    kUserDictionaryOnlyProvider,
+    kProximityProvider,
+    kMaxNumProviders,
+    kInvalidProvider = 1000
 };
 
 //
 // DictionaryServiceType defines the types of services that are available from the dictionary provider
 //
 typedef ASUTF16 DictionaryServiceType;
-enum 
+enum
 {
-	kSpellingService,
-	kHyphenationService,
-	kInvalidService
+    kSpellingService,
+    kHyphenationService,
+    kInvalidService
 };
 
 #ifndef __cplusplus
@@ -662,10 +719,10 @@ typedef enum Language Language;
 /** Adobe Text Engine (ATE) synthetic font type constants */
 enum SyntheticFontType
 {
-	kNoSynthetic = 0,
-	kItalicSynthetic,
-	kBoldSynthetic,
-	kBoldItalicSynthetic
+    kNoSynthetic = 0,
+    kItalicSynthetic,
+    kBoldSynthetic,
+    kBoldItalicSynthetic
 };
 #ifndef __cplusplus
 typedef enum SyntheticFontType SyntheticFontType;
@@ -674,11 +731,11 @@ typedef enum SyntheticFontType SyntheticFontType;
 /** Adobe Text Engine (ATE) figure style constants */
 enum FigureStyle
 {
-	kDefaultFigureStyle = 0,
-	kTabularLining,
-	kProportionalOldStyle,
-	kProportionalLining,
-	kTabularOldStyle
+    kDefaultFigureStyle = 0,
+    kTabularLining,
+    kProportionalOldStyle,
+    kProportionalLining,
+    kTabularOldStyle
 };
 #ifndef __cplusplus
 typedef enum FigureStyle FigureStyle;
@@ -689,10 +746,10 @@ typedef enum FigureStyle FigureStyle;
 /** Adobe Text Engine (ATE) font capitalization constants */
 enum FontCapsOption
 {
-	kFontNormalCaps = 0,
-	kFontSmallCaps,
-	kFontAllCaps,
-	kFontAllSmallCaps
+    kFontNormalCaps = 0,
+    kFontSmallCaps,
+    kFontAllCaps,
+    kFontAllSmallCaps
 };
 #ifndef __cplusplus
 typedef enum FontCapsOption FontCapsOption;
@@ -703,9 +760,9 @@ typedef enum FontCapsOption FontCapsOption;
 /** Adobe Text Engine (ATE) baseline option constants */
 enum FontBaselineOption
 {
-	kFontNormalBaseline = 0,
-	kFontFauxedSuperScript,
-	kFontFauxedSubScript
+    kFontNormalBaseline = 0,
+    kFontFauxedSuperScript,
+    kFontFauxedSubScript
 };
 
 #ifndef __cplusplus
@@ -717,11 +774,11 @@ typedef enum FontBaselineOption FontBaselineOption;
 /** Adobe Text Engine (ATE) OpenType font position constants */
 enum FontOpenTypePositionOption
 {
-	kFontOTNormalPosition,
-	kFontOTSuperscriptPosition,
-	kFontOTSubscriptPosition,
-	kFontOTNumeratorPosition,
-	kFontOTDenominatorPosition
+    kFontOTNormalPosition,
+    kFontOTSuperscriptPosition,
+    kFontOTSubscriptPosition,
+    kFontOTNumeratorPosition,
+    kFontOTDenominatorPosition
 };
 
 #ifndef __cplusplus
@@ -733,8 +790,8 @@ typedef enum FontOpenTypePositionOption FontOpenTypePositionOption;
 /** Adobe Text Engine (ATE) memory management constants */
 enum MakeEmptyMemoryHint
 {
-	kMakeEmptyAndFreeAllocations,
-	kMakeEmptyAndPreserveAllocations
+    kMakeEmptyAndFreeAllocations,
+    kMakeEmptyAndPreserveAllocations
 };
 
 #ifndef __cplusplus
@@ -754,8 +811,8 @@ typedef enum Direction Direction;
 /** Adobe Text Engine (ATE) flattening options */
 enum FlattenWithParentStyles
 {
-	kDoNotFlattenWithParent = 0,
-	kFlattenWithParent = 1
+    kDoNotFlattenWithParent = 0,
+    kFlattenWithParent = 1
 };
 #ifndef __cplusplus
 typedef enum FlattenWithParentStyles FlattenWithParentStyles;
@@ -766,8 +823,8 @@ typedef enum FlattenWithParentStyles FlattenWithParentStyles;
 /** Adobe Text Engine (ATE) search options */
 enum SearchScope
 {
-	kSearchEntireDocument = 0,
-	kSearchStory = 1
+    kSearchEntireDocument = 0,
+    kSearchStory = 1
 };
 #ifndef __cplusplus
 typedef enum SearchScope SearchScope;
@@ -778,8 +835,8 @@ typedef enum SearchScope SearchScope;
 /** Adobe Text Engine (ATE) collapse direction options */
 enum CollapseDirection
 {
-	CollapseEnd,
-	CollapseStart
+    CollapseEnd,
+    CollapseStart
 };
 #ifndef __cplusplus
 typedef enum CollapseDirection CollapseDirection;
@@ -791,24 +848,24 @@ typedef enum CollapseDirection CollapseDirection;
 /** Adobe Text Engine (ATE) Moji Kumi constants */
 enum
 {
-	kOpenParenthesis_MojiKumiCharacterClass = 1,
-	kCloseParenthesis_MojiKumiCharacterClass = 2,
-	kCantBeginLineCharacters_MojiKumiCharacterClass = 3,
-	kBreakingPunctuation_MojiKumiCharacterClass = 4,
-	kMiddlePunctuation_MojiKumiCharacterClass = 5,
-	kPeriods_MojiKumiCharacterClass = 6,
-	kComma_MojiKumiCharacterClass = 7,
-	kIndivisibleCharacters_MojiKumiCharacterClass = 8,
-	kPreAbbreviationSymbols_MojiKumiCharacterClass = 9,
-	kPostAbbreviationSymbols_MojiKumiCharacterClass = 10,
-	kJapaneseSpace_MojiKumiCharacterClass = 11,
-	kHiragana_MojiKumiCharacterClass = 12,
-	kDoubleByteNumber_MojiKumiCharacterClass = 13,
-	kOtherJapaneseCharacters_MojiKumiCharacterClass = 14,
-	kSingleByteNumber_MojiKumiCharacterClass = 15,
-	kRomanNonSpaceCharacters_MojiKumiCharacterClass = 16,
-	kTopOrEndOfLine_MojiKumiCharacterClass = 17,
-	kTopOfParagraph_MojiKumiCharacterClass = 18
+    kOpenParenthesis_MojiKumiCharacterClass = 1,
+    kCloseParenthesis_MojiKumiCharacterClass = 2,
+    kCantBeginLineCharacters_MojiKumiCharacterClass = 3,
+    kBreakingPunctuation_MojiKumiCharacterClass = 4,
+    kMiddlePunctuation_MojiKumiCharacterClass = 5,
+    kPeriods_MojiKumiCharacterClass = 6,
+    kComma_MojiKumiCharacterClass = 7,
+    kIndivisibleCharacters_MojiKumiCharacterClass = 8,
+    kPreAbbreviationSymbols_MojiKumiCharacterClass = 9,
+    kPostAbbreviationSymbols_MojiKumiCharacterClass = 10,
+    kJapaneseSpace_MojiKumiCharacterClass = 11,
+    kHiragana_MojiKumiCharacterClass = 12,
+    kDoubleByteNumber_MojiKumiCharacterClass = 13,
+    kOtherJapaneseCharacters_MojiKumiCharacterClass = 14,
+    kSingleByteNumber_MojiKumiCharacterClass = 15,
+    kRomanNonSpaceCharacters_MojiKumiCharacterClass = 16,
+    kTopOrEndOfLine_MojiKumiCharacterClass = 17,
+    kTopOfParagraph_MojiKumiCharacterClass = 18
 };
 
 // ----------------------------------------------------------------------------------
@@ -816,29 +873,29 @@ enum
 /** Adobe Text Engine (ATE) composite font class constants */
 enum CompositeFontClassType
 {
-	kCompositeFontClassOverride = 0,
+    kCompositeFontClassOverride = 0,
 
-	// Following are predefined composite font class types
-	kCompositeFontClassBase,					// Kanji class
-	kCompositeFontClassKana,					// Full Width
-	kCompositeFontClassPunctuation,
-	kCompositeFontClassFWSymbolsAndAlphabetic,	// Full Width
-	kCompositeFontClassHWSymbolsAndAlphabetic,	// Half Width
-	kCompositeFontClassHWNumerals,				// Half Width
-	kCompositeFontClassGaiji0,
-	kCompositeFontClassGaiji1,
-	kCompositeFontClassGaiji2,
-	kCompositeFontClassGaiji3,
-	kCompositeFontClassGaiji4,
-	kCompositeFontClassGaiji5,
-	kCompositeFontClassGaiji6,
-	kCompositeFontClassGaiji7,
-	kCompositeFontClassGaiji8,
-	kCompositeFontClassGaiji9,
-	kCompositeFontClassGaiji10,
-	kCompositeFontClassGaiji11,
+    // Following are predefined composite font class types
+    kCompositeFontClassBase,                    // Kanji class
+    kCompositeFontClassKana,                    // Full Width
+    kCompositeFontClassPunctuation,
+    kCompositeFontClassFWSymbolsAndAlphabetic,  // Full Width
+    kCompositeFontClassHWSymbolsAndAlphabetic,  // Half Width
+    kCompositeFontClassHWNumerals,              // Half Width
+    kCompositeFontClassGaiji0,
+    kCompositeFontClassGaiji1,
+    kCompositeFontClassGaiji2,
+    kCompositeFontClassGaiji3,
+    kCompositeFontClassGaiji4,
+    kCompositeFontClassGaiji5,
+    kCompositeFontClassGaiji6,
+    kCompositeFontClassGaiji7,
+    kCompositeFontClassGaiji8,
+    kCompositeFontClassGaiji9,
+    kCompositeFontClassGaiji10,
+    kCompositeFontClassGaiji11,
 
-	kEndOfCompositeFontClassType
+    kEndOfCompositeFontClassType
 };
 #ifndef __cplusplus
 typedef enum CompositeFontClassType CompositeFontClassType;
@@ -849,26 +906,26 @@ typedef enum CompositeFontClassType CompositeFontClassType;
 /** Adobe Text Engine (ATE) Moji Kumi code-class constants */
 enum MojiKumiCodeClass
 {
-	kOpen = 1,
-	kClose,
-	kNoBegin,
-	kEndPunctuation,
-	kMiddlePunctuation,
-	kPeriodPunctuation,
-	kCommaPunctuation,
-	kNotSeparatePunctuation,
-	kSymbolsPrecedingNumbers,
-	kSymbolsFollowingNumbers,
-	kIdeographic,
-	kHiragana,
-	kDoubleByteNumbers,
-	kOtherJapaneseCharacters,
-	kSingleByteNumbers,
-	kRomanNonSpace,
-	kLineEdgeClass,
-	kParagraphStartClass,
+    kOpen = 1,
+    kClose,
+    kNoBegin,
+    kEndPunctuation,
+    kMiddlePunctuation,
+    kPeriodPunctuation,
+    kCommaPunctuation,
+    kNotSeparatePunctuation,
+    kSymbolsPrecedingNumbers,
+    kSymbolsFollowingNumbers,
+    kIdeographic,
+    kHiragana,
+    kDoubleByteNumbers,
+    kOtherJapaneseCharacters,
+    kSingleByteNumbers,
+    kRomanNonSpace,
+    kLineEdgeClass,
+    kParagraphStartClass,
 
-	kEndOfCodeClasses
+    kEndOfCodeClasses
 };
 #ifndef __cplusplus
 typedef enum MojiKumiCodeClass MojiKumiCodeClass;
@@ -879,13 +936,13 @@ typedef enum MojiKumiCodeClass MojiKumiCodeClass;
 /** Adobe Text Engine (ATE) class metric restrictions for a composite font component. */
 enum ClassMetricRestriction
 {
-	// class metric restrictions for a composite font component.
-	kClassMetricRestrictionNone = 0,
-	kClassMetricRestrictionSize = 1 << 0,
-	kClassMetricRestrictionBaseline =  1 << 1,
-	kClassMetricRestrictionHorizontalScale =  1 << 2,
-	kClassMetricRestrictionVerticalScale =  1 << 3,
-	kClassMetricRestrictionCenterGlyph = 1 << 4
+    // class metric restrictions for a composite font component.
+    kClassMetricRestrictionNone = 0,
+    kClassMetricRestrictionSize = 1 << 0,
+    kClassMetricRestrictionBaseline =  1 << 1,
+    kClassMetricRestrictionHorizontalScale =  1 << 2,
+    kClassMetricRestrictionVerticalScale =  1 << 3,
+    kClassMetricRestrictionCenterGlyph = 1 << 4
 };
 #ifndef __cplusplus
 typedef enum ClassMetricRestriction ClassMetricRestriction;
@@ -896,10 +953,10 @@ typedef enum ClassMetricRestriction ClassMetricRestriction;
 /** Adobe Text Engine (ATE) line orientation options */
 enum LineOrientation
 {
-	kHorizontalLines = 0,
-	/** Not supported by Illustrator */
-	kVerticalLeftToRight = 1,	
-	kVerticalRightToLeft = 2
+    kHorizontalLines = 0,
+    /** Not supported by Illustrator */
+    kVerticalLeftToRight = 1,
+    kVerticalRightToLeft = 2
 };
 #ifndef __cplusplus
 typedef enum LineOrientation LineOrientation;
@@ -911,14 +968,14 @@ typedef enum LineOrientation LineOrientation;
 /** Adobe Text Engine (ATE) glyph orientation constants */
 enum GlyphOrientation
 {
-	/** Horizontal left to right. */
-	kHorizontalGlyphs,				
-	/** Standard vertical, straight from the font as vertical glyphs.	 */
-	kVerticalGlyphs,			
-	/** Horizontal glyphs rotated 90 degrees to be on side in vertical.	 */
-	kHorizontalGlyphsRotated,
-	/** Not used; we are no longer setting this constant but it may exist in files. */
-	kVerticalUprightRomanGlyphs
+    /** Horizontal left to right. */
+    kHorizontalGlyphs,
+    /** Standard vertical, straight from the font as vertical glyphs.    */
+    kVerticalGlyphs,
+    /** Horizontal glyphs rotated 90 degrees to be on side in vertical.  */
+    kHorizontalGlyphsRotated,
+    /** Not used; we are no longer setting this constant but it may exist in files. */
+    kVerticalUprightRomanGlyphs
 };
 #ifndef __cplusplus
 typedef enum GlyphOrientation GlyphOrientation;
@@ -927,9 +984,9 @@ typedef enum GlyphOrientation GlyphOrientation;
 /** Adobe Text Engine (ATE) frame type constants */
 enum FrameType
 {
-	kPointTextFrame = 0,
-	kInPathTextFrame = 1,
-	kOnPathTextFrame = 2
+    kPointTextFrame = 0,
+    kInPathTextFrame = 1,
+    kOnPathTextFrame = 2
 };
 #ifndef __cplusplus
 typedef enum FrameType FrameType;
@@ -940,11 +997,11 @@ typedef enum FrameType FrameType;
 /** Adobe Text Engine (ATE) spell-checking result constants */
 enum SpellCheckingResult
 {
-	kNoProblems = 0,
-	kUnknownWord = 1,	
-	kRepeatedWords = 2,
-	kUncappedStartOfSentence = 3,
-	kUncappedUnknownStartOfSentence = 4
+    kNoProblems = 0,
+    kUnknownWord = 1,
+    kRepeatedWords = 2,
+    kUncappedStartOfSentence = 3,
+    kUncappedUnknownStartOfSentence = 4
 };
 #ifndef __cplusplus
 typedef enum SpellCheckingResult SpellCheckingResult;
@@ -955,9 +1012,9 @@ typedef enum SpellCheckingResult SpellCheckingResult;
 /** Adobe Text Engine (ATE) Kinsoku predefined tag constants */
 enum KinsokuPredefinedTag
 {
-	kUserDefinedKinsokuTag = 0,
-	kPredefinedHardKinsokuTag = 1,
-	kPredefinedSoftKinsokuTag = 2
+    kUserDefinedKinsokuTag = 0,
+    kPredefinedHardKinsokuTag = 1,
+    kPredefinedSoftKinsokuTag = 2
 };
 #ifndef __cplusplus
 typedef enum KinsokuPredefinedTag KinsokuPredefinedTag;
@@ -968,11 +1025,11 @@ typedef enum KinsokuPredefinedTag KinsokuPredefinedTag;
 /** Adobe Text Engine (ATE) Moji Kumi predefined tag constants */
 enum MojikumiTablePredefinedTag
 {
-	kUserDefinedMojikumiTableTag = 0,
-	kPredefinedYakumonoHankakuMojikumiTableTag = 1,
-	kPredefinedYakumonoZenkakuMojikumiTableTag = 2,
-	kPredefinedGyomatsuYakumonoHankakuMojikumiTableTag = 3,
-	kPredefinedGyomatsuYakumonoZenkakuMojikumiTableTag = 4
+    kUserDefinedMojikumiTableTag = 0,
+    kPredefinedYakumonoHankakuMojikumiTableTag = 1,
+    kPredefinedYakumonoZenkakuMojikumiTableTag = 2,
+    kPredefinedGyomatsuYakumonoHankakuMojikumiTableTag = 3,
+    kPredefinedGyomatsuYakumonoZenkakuMojikumiTableTag = 4
 };
 #ifndef __cplusplus
 typedef enum MojikumiTablePredefinedTag MojikumiTablePredefinedTag;
@@ -983,69 +1040,150 @@ typedef enum MojikumiTablePredefinedTag MojikumiTablePredefinedTag;
 /** Adobe Text Engine (ATE) List Style predefined tag constants */
 enum ListStylePredefinedTag
 {
-	kUserDefinedListStyleTag = 0,
-	kPredefinedNumericListStyleTag = 1,
-	kPredefinedUppercaseAlphaListStyleTag = 2,
-	kPredefinedLowercaseAlphaListStyleTag = 3,
-	kPredefinedUppercaseRomanNumListStyleTag = 4,
-	kPredefinedLowercaseRomanNumListStyleTag = 5,
-	kPredefinedBulletListStyleTag = 6
+    kUserDefinedListStyleTag = 0,
+    kPredefinedNumericListStyleTag = 1,
+    kPredefinedUppercaseAlphaListStyleTag = 2,
+    kPredefinedLowercaseAlphaListStyleTag = 3,
+    kPredefinedUppercaseRomanNumListStyleTag = 4,
+    kPredefinedLowercaseRomanNumListStyleTag = 5,
+    kPredefinedBulletListStyleTag = 6
 };
+
+// ----------------------------------------------------------------------------------
+
+/** Adobe Text Engine (ATE) text list label alignment type constants */
+// ----------------------------------------------------------------------------------
+// [aburago 10-22-08] We use "start" and "end" here to emphasize logical alignment
+//                      w.r.t. RTL placement
+enum BNListAlignment
+{
+    kBN_AlignStart = 0,
+    kBN_AlignCenter,
+    kBN_AlignEnd
+};
+#ifndef __cplusplus
+typedef enum BNListAlignment BNListAlignment;
+#endif
+
+// ----------------------------------------------------------------------------------
+
+/** Adobe Text Engine (ATE) text list indent units  */
+enum IndentUnits
+{
+    kEms = 0,
+    kPoints,
+};
+#ifndef __cplusplus
+typedef enum IndentUnits IndentUnits;
+#endif
 
 /** ATE Document policies regarding streaming data and predefined resources during Read/Write operation.
 
-	This allows bitwise operation. For example, if one would like to write a document and omit both predefined data and 
-	RenderedText, kOmitPredefinedData |kOmitRenderedText should be passed as a streaming policy to Document::Write.
+    This allows bitwise operation. For example, if one would like to write a document and omit both predefined data and
+    RenderedText, kOmitPredefinedData |kOmitRenderedText should be passed as a streaming policy to Document::Write.
 
-	kAll:: stream in/out all data
+    kAll:: stream in/out all data
 
-	kOmitPredefinedData: do not stream out predefined data (only for Write operation)
-		This significantly reduces the size of the written data. However, fidelity between versions may suffer
-		if the omitted predefined data changes from version to version.
-		
-		Without specifying this flag, all predefined data will be streamed out; this provides maximum fidelity 
-		but increases the file size.
+    kOmitPredefinedData: do not stream out predefined data (only for Write operation)
+        This significantly reduces the size of the written data. However, fidelity between versions may suffer
+        if the omitted predefined data changes from version to version.
 
-	kOmitRenderedText: do not stream in/out RenderedText data 
-		This reduces the size of the written data. Text will be recomposed and the view will be re-rendered 
-		when streamed back in. This policy needs to be consistent across read and write.
+        Without specifying this flag, all predefined data will be streamed out; this provides maximum fidelity
+        but increases the file size.
 
-		Without specifying this flag, all RenderedText data will be streamed out and the view will be maintained
-		when streamed back in, until before the text is recomposed.
+    kOmitRenderedText: do not stream in/out RenderedText data
+        This reduces the size of the written data. Text will be recomposed and the view will be re-rendered
+        when streamed back in. This policy needs to be consistent across read and write.
 
-	kOmitMostDocumentSettings: do not stream in/out document settings like smart quote settings for every language.
-		This reduces the size of the written data. However, if settings were changed by a user action, these changes
-		will be rolled back to the default state. Use this option only if your application does not allow user changes
-		to these settings.
-		
+        Without specifying this flag, all RenderedText data will be streamed out and the view will be maintained
+        when streamed back in, until before the text is recomposed.
+
+    kOmitMostDocumentSettings: do not stream in/out document settings like smart quote settings for every language.
+        This reduces the size of the written data. However, if settings were changed by a user action, these changes
+        will be rolled back to the default state. Use this option only if your application does not allow user changes
+        to these settings.
+
+    kRefResourcesByUUID: By default, streamed objects and resources refer the resource by its index in resource set.
+        But by this policy, resources will be referred by their UUIDs instead of indexes.
+
+    kIncludeOnlyGivenStream: Adding this policy will stream only the passed streamable object :both while reading and writing
+
+    kIncludeOnlyResources : This will include only the Test Global resources in the streaming , omitting the text objects
+
+    kOmitTextFrameAsResource :  Till kStreamVersion8 , text frames were referred via resource ids from within the stream of
+        SLORenderedText. With policy ATE::kOmitTextFrameAsResource , text frames instead of being written as part of text
+        global resources , they will be embedded into the stream of the sloRenderedText itself in place of the frames resource ids.
+
+
 */
 
 enum StreamingPolicy
-{ 
-	kAll						= 0,
-	kOmitPredefinedData 		= 1 << 0,
-	kOmitRenderedText 			= 1 << 1,
-	kOmitMostDocumentSettings	= 1 << 2,
-	kOmitDictionaryProviders	= 1 << 3
-	/* WARNING: New policy value has to be a power of 2, to allow bitwise operation */
+{
+    kAll                        = 0,
+    kOmitPredefinedData         = 1 << 0,
+    kOmitRenderedText           = 1 << 1,
+    kOmitMostDocumentSettings   = 1 << 2,
+    kOmitDictionaryProviders    = 1 << 3,
+    kOmitTextFrameAsResource    = 1 << 4,
+    kIncludeOnlyGivenStream     = 1 << 5,
+    kIncludeOnlyResources       = 1 << 6,
+    kRefResourcesByUUID         = 1 << 7
+    /* WARNING: New policy value has to be a power of 2, to allow bitwise operation */
 };
 
-//This mask shall be used in MundoNotifier::SelectionOwnedItemChanged() call back function 
+//This mask shall be used in MundoNotifier::SelectionOwnedItemChanged() call back function
 //to let the client know what has changed.
 enum OwnedItemChangeIndicator
 {
-	/* WARNING: New OwnedItemChangeIndicator value has to be a power of 2, to allow bitwise operation */
-	kNoneOwnedItem		= 0,
-	kHyperlinkOwnedItem = 1 << 0,
-	//In future Add other items here,update kAll accordingly.
-	//kAllOwnedItems is bitwise OR of all the OwnedItemIndicator
-	kAllOwnedItems		= kHyperlinkOwnedItem
+    /* WARNING: New OwnedItemChangeIndicator value has to be a power of 2, to allow bitwise operation */
+    kNoneOwnedItem      = 0,
+    kHyperlinkOwnedItem = 1 << 0,
+    //In future Add other items here,update kAll accordingly.
+    //kAllOwnedItems is bitwise OR of all the OwnedItemIndicator
+    kAllOwnedItems      = kHyperlinkOwnedItem
 };
+
+/* To retrieve the text outlines for given range selectively determined by these policies  */
+enum OutlineExtractionPolicy
+{
+    /* All the text outlines are retrieved - This is the default case */
+    kExtractAll                 = 0,
+
+    /* This policy will retrieve all the text outlines omitting the Glyph Outlines */
+    kOmitGlyphs                 = 1 << 0,
+
+    /* This policy will retrieve all the text outlines omitting the Underline Annotation Outlines */
+    kOmitUnderlines             = 1 << 1,
+
+    /* This policy will retrieve all the text outlines omitting the StrikeThrough Annotation Outlines */
+    kOmitStrikeThrough          = 1 << 2,
+
+    /* This policy will forcefully extract the Underline Annotation Outlines of the given range as if the
+     entire text has been underlined */
+    kForceIncludeUnderlines     = 1 << 3,
+
+    /* This policy will retrieve the text annotation (underlines/StrikeThrough) in the form of Path Only.
+     (without stroke) It will not convert the annnotations paths to full polygons.*/
+    kAnnotationNoStrokePath     = 1 << 4
+};
+
+// ----------------------------------------------------------------------------------
+
+/*
+ SLOLilo enums
+ To retrieve or check word based on equivalent forms or Not */
+enum AddEquivalentFormsSetting { kDoNotAddEquivalentForms, kAddEquivalentForms };
+enum CheckEquivalentFormsSetting { kDoNotCheckEquivalentForms, kCheckEquivalentForms };
+enum AddOriginalWordSetting { kDoNotAddOriginalWord, kAddOriginalWord };
+
+// ----------------------------------------------------------------------------------
 
 #ifdef __cplusplus
 ATE_ENUM_BIT_OPERATORS(StreamingPolicy)
+ATE_ENUM_BIT_OPERATORS(OutlineExtractionPolicy)
 #else
 typedef enum StreamingPolicy StreamingPolicy;
+typedef enum OutlineExtractionPolicy OutlineExtractionPolicy;
 #endif
 
 // ----------------------------------------------------------------------------------
@@ -1055,9 +1193,9 @@ typedef enum StreamingPolicy StreamingPolicy;
 #endif
 
 #ifdef __MWERKS__
-	#if defined(__MC68K__) || defined(__POWERPC__)
-		#pragma enumsalwaysint reset
-	#endif
+    #if defined(__MC68K__) || defined(__POWERPC__)
+        #pragma enumsalwaysint reset
+    #endif
 #endif // __MWERKS__
 
 #endif //__ATETypes__

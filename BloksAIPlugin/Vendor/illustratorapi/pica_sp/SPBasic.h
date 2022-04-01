@@ -33,7 +33,8 @@
 #include "SPHeaderBegin.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 
@@ -155,6 +156,25 @@ sBasic->AcquireSuite( kAIRandomSuite, kAIRandomVersion, &sRandom );
 
 } SPBasicSuite;
 
+/*******************************************************************************
+ **
+ **	Errors
+ **
+ **/
+
+#include "SPErrorCodes.h"
+
+#ifdef __cplusplus
+}	// extern "C"
+#endif	// __cplusplus
+
+#include "SPHeaderEnd.h"
+
+
+#ifdef __cplusplus
+
+namespace ai
+{
 
 /** Internal */
 SPAPI SPErr SPBasicAcquireSuite( const char *name, ai::int32 version, const void **suite );
@@ -177,19 +197,8 @@ SPAPI SPErr SPSubFreeBlock( void *block );
 /** Internal */
 SPAPI SPErr SPSubReallocateBlock( void *block, size_t newSize, void **newblock );
 
+}	// namespace ai
 
-/*******************************************************************************
- **
- **	Errors
- **
- **/
+#endif	// __cplusplus
 
-#include "SPErrorCodes.h"
-
-#ifdef __cplusplus
-}
-#endif
-
-#include "SPHeaderEnd.h"
-
-#endif
+#endif	// __SPBasic__

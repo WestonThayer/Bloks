@@ -1,31 +1,28 @@
-/*
- *        Name:	IAIUnicodeString.cpp
- *   $Revision: 1 $
- *      Author:	 
- *        Date:	   
- *     Purpose:	Plug-in side implementation of the
- *				ai::UnicodeString object interface.
- *				This file should NOT be included in the 
- *				core application.
- *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 2004-2007 Adobe Systems Incorporated.
- * All rights reserved.
- *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file 
- * in accordance with the terms of the Adobe license agreement 
- * accompanying it. If you have received this file from a source other 
- * than Adobe, then your use, modification, or distribution of it 
- * requires the prior written permission of Adobe.
- *
- */
+/*************************************************************************
+*
+* ADOBE CONFIDENTIAL
+*
+* Copyright 2004 Adobe
+*
+* All Rights Reserved.
+*
+* NOTICE: Adobe permits you to use, modify, and distribute this file in
+* accordance with the terms of the Adobe license agreement accompanying
+* it. If you have received this file from a source other than Adobe,
+* then your use, modification, or distribution of it requires the prior
+* written permission of Adobe.
+*
+**************************************************************************/
 
 #include "IAIUnicodeString.h"
 #include "AIUnicodeString.h"
 
 #include "IAIUnicodeString.inl"
 
-#ifdef _IAIUNICODESTRING_SUITE_INCLUDE_H_
+#if AI_AUTO_SUITE_AVAILABLE
+	#include "AutoSuite.h"
+	use_suite_required(AIUnicodeString)
+#elif defined (_IAIUNICODESTRING_SUITE_INCLUDE_H_)
     #include _IAIUNICODESTRING_SUITE_INCLUDE_H_
 #else
     #ifndef _IAIUNICODESTRING_SUITE_USE_C_LINKAGE_
@@ -47,19 +44,6 @@
 
 #endif
 
-/** Checks the result.  If @a result indicates an error, it is
-	thrown as an ai::Error exception.  If result does not indicate
-	an error, this function simply returns.
-	@param result result code to check. */
-static void check_result(AIErr result)
-{
-	if ( result != kNoErr )
-	{
-		throw ai::Error(result);
-	}
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Constant declaration/definition
 //
@@ -68,97 +52,97 @@ const ai::UnicodeString::size_type ai::UnicodeString::npos = ai::UnicodeString::
 ///////////////////////////////////////////////////////////////////////////////
 // Constructors/Destructor
 //
-ai::UnicodeString::UnicodeString (void) AINOTHROW
-: fImpl(0)
+ai::UnicodeString::UnicodeString () AINOTHROW
+: fImpl(nullptr)
 {
 }
 
+ai::UnicodeString::UnicodeString (const char* string, ai::UnicodeString::offset_type srcByteLen,
+								  AICharacterEncoding encoding)
+: fImpl(nullptr)
+{
+	if (string)
+	{
+		AIErr result = sAIUnicodeString->Initialize(*this, string, srcByteLen, encoding);
+		check_ai_error(result);
+	}
+}
+
 ai::UnicodeString::UnicodeString (ai::UnicodeString::size_type count, ai::UnicodeString::UTF32TextChar ch)
-: fImpl(0)
+: fImpl(nullptr)
 {
 	if ( count > 0 )
 	{
 		AIErr result = sAIUnicodeString->InitializeUTF32Char(*this, count, ch);
-		check_result(result);
-	}
-}
-
-ai::UnicodeString::UnicodeString (const char* string, ai::UnicodeString::offset_type srcByteLen, 
-										   AICharacterEncoding encoding)
-: fImpl(0)
-{
-	if ( string )
-	{
-		AIErr result = sAIUnicodeString->Initialize(*this, string, srcByteLen, encoding);
-		check_result(result);
+		check_ai_error(result);
 	}
 }
 
 ai::UnicodeString::UnicodeString (const char* string, AICharacterEncoding encoding)
-:fImpl(0)
+: fImpl(nullptr)
 {
 	if ( string )
 	{
 		AIErr result = sAIUnicodeString->Initialize(*this, string, strlen(string), encoding);
-		check_result(result);
+		check_ai_error(result);
 	}
 }
 
+ai::UnicodeString::UnicodeString (const std::string& string, AICharacterEncoding encoding)
+: fImpl(nullptr)
+{
+	AIErr result = sAIUnicodeString->Initialize(*this, string.c_str(), string.length(), encoding);
+	check_ai_error(result);
+}
+
 ai::UnicodeString::UnicodeString (const ASUnicode* string)
-: fImpl(0)
+: fImpl(nullptr)
 {
 	if ( string )
 	{
 		AIErr result = sAIUnicodeString->InitializeUTF16(*this, string, npos);
-		check_result(result);
+		check_ai_error(result);
 	}
 }
 
+ai::UnicodeString::UnicodeString (const ZRef zStringKey)
+: fImpl(nullptr)
+{
+	AIErr result = sAIUnicodeString->InitializeZString(*this, zStringKey);
+	check_ai_error(result);
+}
+
 ai::UnicodeString::UnicodeString (const ASUnicode* string, size_type srcUTF16Count)
-: fImpl(0)
+: fImpl(nullptr)
 {
 	if ( string )
 	{
 		AIErr result = sAIUnicodeString->InitializeUTF16(*this, string, srcUTF16Count);
-		check_result(result);
+		check_ai_error(result);
 	}
-}
-ai::UnicodeString::UnicodeString (const std::string& string, AICharacterEncoding encoding)
-: fImpl(0)
-{
-	AIErr result = sAIUnicodeString->Initialize(*this, string.c_str(), string.length(), encoding);
-	check_result(result);
-}
-
-ai::UnicodeString::UnicodeString (const ZRef zStringKey)
-: fImpl(0)
-{
-	AIErr result = sAIUnicodeString->InitializeZString(*this, zStringKey);
-	check_result(result);
 }
 
 ai::UnicodeString::UnicodeString (const std::basic_string<ASUnicode>& string)
-: fImpl(0)
+: fImpl(nullptr)
 {
 	AIErr result = sAIUnicodeString->InitializeUTF16(*this, string.data(), string.length());
-	check_result(result);
+	check_ai_error(result);
 }
 
 ai::UnicodeString::UnicodeString (const UnicodeString& s)
-: fImpl(0)
+: fImpl(nullptr)
 {
 	AIErr result = sAIUnicodeString->Copy(*this, s);
-	check_result(result);
+	check_ai_error(result);
 }
 
-ai::UnicodeString::~UnicodeString (void)
+ai::UnicodeString::~UnicodeString ()
 {
-	if ( fImpl )
+	if ( fImpl && sAIUnicodeString)
 	{
 		sAIUnicodeString->Destroy(*this);
 	}
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // append ops
@@ -167,7 +151,7 @@ ai::UnicodeString::~UnicodeString (void)
 ai::UnicodeString& ai::UnicodeString::append (const UnicodeString& str)
 {
 	AIErr result = sAIUnicodeString->Append(*this, str);
-	check_result(result);
+	check_ai_error(result);
 	return *this;
 }
 
@@ -175,7 +159,7 @@ ai::UnicodeString& ai::UnicodeString::append (const UnicodeString& str, ai::Unic
 	ai::UnicodeString::size_type count)
 {
 	AIErr result = sAIUnicodeString->AppendSubString(*this, str, startOffset, count);
-	check_result(result);
+	check_ai_error(result);
 	return *this;
 }
 
@@ -183,7 +167,7 @@ ai::UnicodeString& ai::UnicodeString::append (const UnicodeString& str, ai::Unic
 ai::UnicodeString& ai::UnicodeString::assign (const UnicodeString& str)
 {
 	AIErr result = sAIUnicodeString->Assign(*this, str);
-	check_result(result);
+	check_ai_error(result);
 	return *this;
 }
 
@@ -191,7 +175,7 @@ ai::UnicodeString::UTF32TextChar ai::UnicodeString::at (ai::UnicodeString::size_
 {
 	ai::UnicodeString::UTF32TextChar ch;
 	AIErr result = sAIUnicodeString->GetChar(*this, offset, ch);
-	check_result(result);
+	check_ai_error(result);
 	return ch;
 }
 
@@ -228,13 +212,13 @@ ai::int32 ai::UnicodeString::compare (ai::UnicodeString::size_type pos,
 
 ai::UnicodeString& ai::UnicodeString::toLower() {
 	AIErr result = sAIUnicodeString->toLower(*this);
-	check_result(result);
+	check_ai_error(result);
 	return *this;
 }
 
 ai::UnicodeString& ai::UnicodeString::toUpper() {
 	AIErr result = sAIUnicodeString->toUpper(*this);
-	check_result(result);
+	check_ai_error(result);
 	return *this;
 }
 
@@ -250,7 +234,7 @@ ai::int32 ai::UnicodeString::canonicalCompare (const UnicodeString& str) const
 {
 	ai::int32 compareResult = 0;
 	AIErr result = sAIUnicodeString->CanonicalCompare(*this, str, compareResult);
-	check_result(result);
+	check_ai_error(result);
 
 	return compareResult;
 }
@@ -259,7 +243,7 @@ ai::int32 ai::UnicodeString::canonicalCaseCompare (const UnicodeString& str) con
 {
 	ai::int32 compareResult = 0;
 	AIErr result = sAIUnicodeString->CanonicalCaseCompare(*this, str, compareResult);
-	check_result(result);
+	check_ai_error(result);
 
 	return compareResult;
 }
@@ -267,7 +251,7 @@ ai::int32 ai::UnicodeString::canonicalCaseCompare (const UnicodeString& str) con
 ai::UnicodeString& ai::UnicodeString::normalize (ai::UnicodeString::NormalizedForm form)
 {
 	AIErr result = sAIUnicodeString->Normalize(*this, form);
-	check_result(result);
+	check_ai_error(result);
 
 	return *this;
 }
@@ -288,7 +272,7 @@ ai::UnicodeString& ai::UnicodeString::erase (ai::UnicodeString::size_type pos,
 										  ai::UnicodeString::size_type count)
 {
 	AIErr result = sAIUnicodeString->Erase( *this, pos, count );
-	check_result(result);
+	check_ai_error(result);
 	return *this;
 }
 
@@ -389,7 +373,17 @@ ai::UnicodeString::size_type ai::UnicodeString::find_last_not_of (const UnicodeS
 void ai::UnicodeString::resize (ai::UnicodeString::size_type count, ai::UnicodeString::UTF32TextChar ch)
 {
 	AIErr result = sAIUnicodeString->Resize(*this, count, ch);
-	check_result(result);
+	check_ai_error(result);
+}
+
+ai::UnicodeString::size_type ai::UnicodeString::capacity () const
+{
+	return sAIUnicodeString->Capacity(*this);
+}
+
+void ai::UnicodeString::reserve (ai::UnicodeString::size_type count)
+{
+	sAIUnicodeString->Reserve(*this, count);
 }
 
 ai::UnicodeString ai::UnicodeString::substr (ai::UnicodeString::size_type offset, 
@@ -397,22 +391,14 @@ ai::UnicodeString ai::UnicodeString::substr (ai::UnicodeString::size_type offset
 {
 	ai::UnicodeString subString;
 	AIErr result = sAIUnicodeString->SubStr(subString, *this, offset, count);
-	check_result(result);
+	check_ai_error(result);
 	return subString;
 }
-
-
-void ai::UnicodeString::swap (UnicodeString& str)
-{
-	AIErr result = sAIUnicodeString->SwapStr(*this, str);
-	check_result(result);
-}
-
 
 ai::UnicodeString& ai::UnicodeString::operator= (const UnicodeString& rhs)
 {
 	AIErr result = sAIUnicodeString->Assign(*this, rhs);
-	check_result(result);
+	check_ai_error(result);
 	return *this;
 }
 
@@ -427,12 +413,6 @@ ai::UnicodeString::UTF32TextChar ai::UnicodeString::operator[] (ai::UnicodeStrin
 
 	return ch;
 }
-
-//void ai::UnicodeString::foldCase()
-//{
-//	AIErr result = sAIUnicodeString->FoldCase(*this);
-//	check_result(result);
-//}
 
 bool ai::UnicodeString::hasSurrogates () const
 {
@@ -456,7 +436,7 @@ ai::UnicodeString::size_type ai::UnicodeString::getAs (AICharacterEncoding encod
 	AIErr result = sAIUnicodeString->GetAs(*this, encoding, b, 
 		bufferByteCount);
 
-	check_result(result);
+	check_ai_error(result);
 
 	return bufferByteCount;
 }

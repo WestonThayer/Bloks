@@ -37,7 +37,7 @@
 
 // AISwatchLibs Suite
 #define kAISwatchLibrariesSuite			"AI Swatch Libraries Suite"
-#define kAISwatchLibrariesSuiteVersion	AIAPI_VERSION(7)
+#define kAISwatchLibrariesSuiteVersion	AIAPI_VERSION(8)
 #define kAISwatchLibrariesVersion		kAISwatchLibrariesSuiteVersion
 
 /** @ingroup Callers
@@ -448,6 +448,19 @@ typedef struct
 	more selected colors, only this many are returned.
 	*/
 	AIErr ASAPI(*GetSelectedDocSwatchRefsNotInAnySelectedGroup) (AISwatchRef *colors, ai::int32 bufferSize);
+    
+    /** Retrieves the absolute path of any swatch library in the list, whether it has been opened
+     or not.
+     @param num The 0-based position index of the library.
+     @param path [out] returns the path of the nth Swatch Library
+     */
+    AIErr ASAPI(*GetNthLibraryPath)(ai::int32 num, ai::FilePath& path);
+    
+    /** Open the SwatchLibrary using library path.
+     To support open as swatches library from the script api.
+     @param path [in] the path of file containing Swatch Library
+     */
+    AIErr ASAPI(*OpenLibraryByPath)(const ai::FilePath& path);
 
 
 } AISwatchLibrariesSuite;

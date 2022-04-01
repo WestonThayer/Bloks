@@ -5,23 +5,23 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
-	<string>$(PROJECTNAME)</string>
+	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundleExecutable</key>
-	<string>$(PROJECTNAME)</string>
+	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundleGetInfoHTML</key>
-	<string>$(PROJECTNAME) version kSDKDefAIMajorVersionNum.kSDKDefAIMinorVersionNum.kSDKDefAIRevisionVersionNum.kSDKDefBuildNumber, kSDKDefCopyrightString</string>
+	<string>$(PRODUCT_NAME) version kSDKDefAIMajorVersionNum.kSDKDefAIMinorVersionNum.kSDKDefAIRevisionVersionNum.kSDKDefBuildNumber, kSDKDefCopyrightString</string>
 	<key>CFBundleGetInfoString</key>
-	<string>$(PROJECTNAME) version kSDKDefAIMajorVersionNum.kSDKDefAIMinorVersionNum.kSDKDefAIRevisionVersionNum.kSDKDefBuildNumber, kSDKDefCopyrightString</string>
+	<string>$(PRODUCT_NAME) version kSDKDefAIMajorVersionNum.kSDKDefAIMinorVersionNum.kSDKDefAIRevisionVersionNum.kSDKDefBuildNumber, kSDKDefCopyrightString</string>
 	<key>CFBundleIdentifier</key>
-	<string>kSDKDefAIBundlePrefix.plugins.$(PROJECTNAME)</string>
+	<string>kSDKDefAIBundlePrefix.plugins.$(PRODUCT_NAME)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>$(PROJECTNAME)</string>
+	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>ARPI</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(PROJECTNAME) version kSDKDefAIMajorVersionNum.kSDKDefAIMinorVersionNum.kSDKDefAIRevisionVersionNum.kSDKDefBuildNumber</string>
+	<string>$(PRODUCT_NAME) version kSDKDefAIMajorVersionNum.kSDKDefAIMinorVersionNum.kSDKDefAIRevisionVersionNum.kSDKDefBuildNumber</string>
 	<key>CFBundleSignature</key>
 	<string>ART5</string>
 	<key>CFBundleVersion</key>

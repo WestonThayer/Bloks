@@ -1,23 +1,22 @@
 #ifndef __OverrideColorConversion__
 #define __OverrideColorConversion__
 
-/*
- *        Name:	AIOverrideColorConversion.h
- *   $Revision: 13 $
- *     Purpose:	Adobe Illustrator Suite to replace internal color
- *              conversion functionality.
+/*************************************************************************
+ * ADOBE CONFIDENTIAL
+ * ___________________
  *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 2002-2007 Adobe Systems Incorporated.
- * All rights reserved.
+ * Copyright 2002 Adobe
+ * All Rights Reserved.
  *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file
- * in accordance with the terms of the Adobe license agreement
- * accompanying it. If you have received this file from a source other
- * than Adobe, then your use, modification, or distribution of it
- * requires the prior written permission of Adobe.
- *
- */
+ * NOTICE: All information contained herein is, and remains
+ * the property of Adobe and its suppliers, if any. The intellectual
+ * and technical concepts contained herein are proprietary to Adobe
+ * and its suppliers and are protected by all applicable intellectual
+ * property laws, including trade secret and copyright laws.
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained
+ * from Adobe.
+ **************************************************************************/
 
 
 /*******************************************************************************
@@ -41,8 +40,8 @@
  **/
 
 #define kAIOverrideColorConversionSuite			"Override AI Color Conversion Suite"
-#define kAIOverrideColorConversionSuiteVersion7	AIAPI_VERSION(7)
-#define kAIOverrideColorConversionSuiteVersion	kAIOverrideColorConversionSuiteVersion7
+#define kAIOverrideColorConversionSuiteVersion8	AIAPI_VERSION(8)
+#define kAIOverrideColorConversionSuiteVersion	kAIOverrideColorConversionSuiteVersion8
 #define kAIOverrideColorConversionVersion		kAIOverrideColorConversionSuiteVersion
 
 
@@ -66,28 +65,12 @@ enum AIRGBPixelFormat {
 	kRGB                = 1
 };
 
-
 /* CMYK separations/channels */
-
-#ifndef kCyan
-#define kCyan                   0x00000001
-#endif
-
-#ifndef kMagenta
-#define kMagenta                0x00000002
-#endif
-
-#ifndef kYellow
-#define kYellow                 0x00000004
-#endif
-
-#ifndef kBlack
-#define kBlack                  0x00000008
-#endif
-
-#ifndef kCMYK
-#define kCMYK                   0x0000000f
-#endif
+constexpr ai::uint32 kCyan		= 0x00000001;
+constexpr ai::uint32 kMagenta	= 0x00000002;
+constexpr ai::uint32 kYellow	= 0x00000004;
+constexpr ai::uint32 kBlack		= 0x00000008;
+constexpr ai::uint32 kCMYK		= 0x0000000f;
 
 /** Rendering intents */
 enum AIRenderingIntent {
@@ -411,6 +394,14 @@ typedef struct {
 			@param profileName [out] A buffer in which to return the descriptive name string.
 		*/
 	AIAPI AIErr ( *GetProfileName) (const AIColorProfile profile, ai::UnicodeString& profileName ) ;
+
+	/** Retrieves the color profile from the color profile name. When you retrieve a profile this way, you must
+		free it with \c #FreeProfile() when you no longer need it.
+			@param profileName [out] A buffer in which to return the descriptive name string.
+			@param profile The color profile name.
+			@param profile[out] A buffer in which to return the color profile.
+		*/
+	AIAPI AIErr(*GetProfileByName) (const ai::UnicodeString& profileName, AIColorProfile *profile);
 
 	/** Creates and caches transforms to be used for all internal color conversions and those
 		performed with the \c #AIColorConversionSuite.

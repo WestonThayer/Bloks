@@ -1,15 +1,13 @@
-#ifndef __AIDataFilter__
-#define __AIDataFilter__
+#pragma once
 
 /*
  *        Name:	AIDataFilter.h
- *   $Revision: 7 $
  *      Author:
  *        Date:
  *     Purpose:	Adobe Illustrator Data Filter Suite.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2007 Adobe Systems Incorporated.
+ * Copyright 1986-2018 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file 
@@ -46,10 +44,10 @@
 /** Data filter suite name. */
 #define kAIDataFilterSuite				"AI Data Filter Suite"
 /** Data filter suite version. */
-#define kAIDataFilterSuiteVersion8		AIAPI_VERSION(8)
+#define kAIDataFilterSuiteVersion9		AIAPI_VERSION(9)
 
 /** Data filter suite version. */
-#define kAIDataFilterSuiteVersion		kAIDataFilterSuiteVersion8
+#define kAIDataFilterSuiteVersion		kAIDataFilterSuiteVersion9
 #define kAIDataFilterVersion			kAIDataFilterSuiteVersion
 
 
@@ -233,7 +231,7 @@ struct AIDataFilterSuite {
 			@param shift The number of tab characters to insert before each line.
 			@param filter [out] A buffer in which to return the new filter reference.
 		*/
-	AIAPI AIErr (*NewHexdecDataFilter) ( char *state, ai::int32 shift, AIDataFilter **filter );
+	AIAPI AIErr (*NewHexdecDataFilter) ( const char *state, ai::int32 shift, AIDataFilter **filter );
 
 	/** Creates a new block data filter that reads from and writes to
 		a specified block of memory.
@@ -263,7 +261,7 @@ struct AIDataFilterSuite {
 			@param prefix The string to insert at the start of each line.
 			@param filter [out] A buffer in which to return the new filter reference.
 		*/
-	AIAPI AIErr (*NewA85DataFilter) ( char *statestr, const char* prefix, AIDataFilter **filter );
+	AIAPI AIErr (*NewA85DataFilter) ( const char *statestr, const char* prefix, AIDataFilter **filter );
 
 	/** Creates a new ZLib data filter that compresses or decompresses data from a linked filter.
 			@param statestr Whether the filter is compressing or decompressing, one of:
@@ -274,7 +272,14 @@ struct AIDataFilterSuite {
 		*/
 	AIAPI AIErr (*NewZDataFilter) ( const char *statestr, AIDataFilter **filter );
 
-	/* New in Illustrator 10.0 */
+	/** Creates a new Zstandard data filter that compresses or decompresses data from a linked filter.
+			@param statestr Whether the filter is compressing or decompressing, one of:
+				\li \c "write" (compressing)
+				\li \c "read" (decompressing)
+
+			@param filter [out] A buffer in which to return the new filter reference.
+		*/
+	AIAPI AIErr (*NewZStdDataFilter) ( const char *statestr, AIDataFilter **filter );
 
 	/** Creates a new data filter for a stream with specified methods.
 		It is typically at one end of a filter chain, to act as a data source or
@@ -284,8 +289,6 @@ struct AIDataFilterSuite {
 			@param filter  [out] A buffer in which to return the new filter reference, .
 		*/
 	AIAPI AIErr (*NewPluginStream) ( AIPluginStream* stream, AIDataFilter **filter );
-
- 	/* New in Illustrator 13.0 */
 
  	/** Creates a data filter for streaming data from a plug-in resource.
 		Searches for a resource of a given type in the plug-in's resource file.
@@ -299,10 +302,21 @@ struct AIDataFilterSuite {
  		*/
 	AIAPI AIErr (*NewResourceDataFilter) ( SPPluginRef plugin, ai::int32 type, ai::int32 id, const char *name, AIDataFilter **filter);
 
+	/** Creates a new Asnyc data filter that Takes a AIDataFilter *asyncFilter and runs it on Background thread.
+		execution of asyncFilter should be possible on a background thread
+			@param [in] asyncFilter the filters that will be running on a background thread.This filter should not be linked to any other filter.
+					asyncFilter's ownership will be with the filter returned by this API
+			@param statestr [in] Whether the filter is compressing or decompressing, one of:
+				\li \c "write" (compressing) [Not Supported for this version]
+				\li \c "read" (decompressing)
+
+			@param prefetchSize [in] size of a buffer typically fetched from the next filter(next of the filter returned by this API).
+			@param outputSize   [in] size of a buffer typically asked from this filter.
+			@param filter [out] A buffer in which to return the new filter reference.
+		*/
+	AIAPI AIErr (*NewAsyncDataFilter) (const char *statestr, AIDataFilter *asyncFilter, const ai::uint32 prefetchSize, const ai::uint32 outputSize, AIDataFilter **filter);
 };
 
 
 #include "AIHeaderEnd.h"
 
-
-#endif

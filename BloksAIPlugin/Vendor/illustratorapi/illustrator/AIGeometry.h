@@ -95,6 +95,10 @@ typedef enum {
 	/** A Plugin Art Object.
 		@note AI19.2 and later */
 	kAIGeometryOrganizePluginArt,
+	/** A Graph Object.	*/
+	kAIGeometryOrganizeGraph,
+    /** A repeat object */
+    kAIGeometryOrganizeRepeat,
 	/** Internal */
 	kAIGeometryOrganizeDummy = 0xFFFFFFFF
 
@@ -288,10 +292,10 @@ typedef ai::int16 (*AIGeometrySetGradientColorProc)(AIGeometryUserData userData,
 	See \c #AIGeometrySuite
 		@param userData Developer-defined data.
 		@param pattern The pattern object.
-		@param shiftDistance  Pattern style value.
+		@param shiftDistance Pattern style value.
 		@param shiftAngle Pattern style value.
 		@param scale  Pattern style value.
-		@param rotateAngle	Pattern style value.
+		@param rotateAngle Pattern style value.
 		@param reflect Pattern style value.
 		@param reflectAngle	Pattern style value.
 		@param shearAngle Pattern style value.
@@ -310,8 +314,8 @@ typedef ai::int16 (*AIGeometrySetPatternColorProc)(AIGeometryUserData userData,
 											   AIReal shearAngle,
 											   AIReal shearAxis,
 											   AIRealMatrix *matrix);
-/** Callback prototype for \c #AIGeometryStateProcs.  Called when an outline
-	within the  art tree being iterated is filled with an image.
+/** Callback prototype for \c #AIGeometryStateProcs. Called when an outline
+	within the art tree being iterated is filled with an image.
 	See \c #AIGeometrySuite
 		@param userData Developer-defined data.
 		@param alpha The alpha channel value.
@@ -323,7 +327,7 @@ typedef ai::int16 (*AIGeometryImageCallback)(AIGeometryUserData userData,
 										 AITile *workTile,
 										 AISlice *workSlice);
 
-/** Callback prototype for \c #AIGeometryStateProcs.  Called for the
+/** Callback prototype for \c #AIGeometryStateProcs. Called for the
 	stroke of each element within the art tree being iterated.
 	See \c #AIGeometrySuite
 		@param userData Developer-defined data.
@@ -476,7 +480,7 @@ typedef struct {
 		calling the procedures iteratively for each member of an artwork tree whose
 		root is a specified art object.
 			@param art The root art object.
-			@param organizationProcs For each object in the tree, calls the begin and end procedure
+			@param organizationProcs For each object in the tree, calls the start and the end procedure
 				associated the type before and after enumerating the object.
 			@param constructionProcs Contains pointers to callbacks that receive a geometric
 				description of each leaf art object.

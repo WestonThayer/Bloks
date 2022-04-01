@@ -203,7 +203,7 @@ typedef struct {
 								   AIReal				total_length ,
 								   AIReal				flatness,
 								   AIReal*				t );
-
+    
 } AIRealBezierSuite;
 
 

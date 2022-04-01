@@ -21,11 +21,18 @@
 */
 #include "AITypes.h"
 #include "IAIUnicodeString.h"
+#if defined(ILLUSTRATOR_MINIMAL)
+	#include "IAIUUID.h"
+#endif
+
+#include <vector>
+#ifdef AI_HAS_RVALUE_REFERENCES
+#include <utility>
+#endif //AI_HAS_RVALUE_REFERENCES
+
 class CAIArtboardProperties;
 class CAIArtboardList;
 
-/** Constant for maximum number of artboard that can be defined. */
-#define kAIMAX_ARTBOARD_LIMIT				100
 /** @ingroup Errors
 	@see ArtboardProperties */
 #define kAICantDeleteLastArtboardErr		'CDLC'
@@ -34,7 +41,14 @@ class CAIArtboardList;
 #define kAIExceededMaxArtboardLimitErr		'EMxL'
 /** @ingroup Errors
 	@see ArtboardProperties */
+
+/** @ingroup Notifiers
+ Sent when the document ruler origin has been changed or reset. See \c #AIArtboardSuite. */
+#define kAIArtboardRulerOriginChangedNotifier "AI Artboard Ruler Origin Changed Notifier"
+
 #define kNotFoundErr		'!FND'
+
+#define kAIArtboardOutOfCanvasErr			'AOoC'
 
 #define kActiveArtboard -1
 
@@ -46,6 +60,9 @@ namespace ai
 	typedef CAIArtboardProperties* ArtboardRef;
 	/** Artboard list object. */
 	typedef CAIArtboardList* ArtboardListRef;
+#if defined(ILLUSTRATOR_MINIMAL)
+    typedef ai::uuid ArtboardUUID;
+#endif
 
 	/** The \c ArtboardProperties object encapsulates all the attributes associated with
 	an artboard. These are not live objects but a snapshot at any given time.
@@ -69,10 +86,33 @@ namespace ai
 		/** Copy Constructor */
 		ArtboardProperties(const ArtboardProperties&);
 
+#ifdef AI_HAS_RVALUE_REFERENCES
+		/** Move Constructor */
+		ArtboardProperties(ArtboardProperties&& rhs) AINOEXCEPT : fImpl{rhs.fImpl}
+		{
+			rhs.fImpl = nullptr;
+		}
+#endif
+
 		/** Destructor */
 		~ArtboardProperties();
-		/** Assignment operator */
+
+		void swap(ArtboardProperties& rhs) AINOEXCEPT
+		{
+			std::swap(fImpl, rhs.fImpl);
+		}
+
+		/** Copy assignment operator */
 		ArtboardProperties& operator=(const ArtboardProperties&);
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+		/** Move assignment operator */
+		ArtboardProperties& operator=(ArtboardProperties&& rhs) AINOEXCEPT
+		{
+			swap(rhs);
+			return *this;
+		}
+#endif
 
 		/** Checks for a valid object, Invalid objects return an error on
 		every operation.
@@ -145,10 +185,33 @@ namespace ai
 		/** Internal. Do not use. */
 		AIErr SetIsDefaultName(const AIBoolean& isDefault);
 
+		AIErr IsSelected(AIBoolean& isSelected) const;
+		
+#if defined(ILLUSTRATOR_MINIMAL)
+        /** Gets the UUID associated with the artboard.
+        @param uuid [out] A buffer in which to return the UUID.
+        */
+        AIErr GetUUID(ArtboardUUID& uuid) const;
+        
+        /** Gets the UUID associated with the artboard.
+        @param source [out] A buffer in which to return the UUID.
+        */
+        
+        /** Clones the artboard properties along with assigning unique uuid to the properties.
+        @param source  The properties which is to be cloned.
+        */
+        AIErr CloneWithUniqueUUID(const ArtboardProperties& source);
+#endif
+
+		AIErr GetUUIDAsString(ai::UnicodeString& uuid) const;
+
 	public: // internal use public interface
 		ArtboardProperties(const ArtboardRef ref);
 		void deleteImpl();
 	private:
+#if defined(ILLUSTRATOR_MINIMAL)
+        AIErr SetUUID(const ArtboardUUID& uuid);
+#endif
 		friend class ArtboardList;
 		ArtboardRef fImpl;
 	};
@@ -159,6 +222,12 @@ namespace ai
 	class ArtboardList
 	{
 	public:
+#ifdef AI_HAS_RVALUE_REFERENCES
+		class Artboard;
+		class iterator;
+		friend class iterator;
+		using value_type = Artboard;
+#endif
 		/* Constructs an ArtboardList object for the current document*/
 		ArtboardList();
 
@@ -185,15 +254,30 @@ namespace ai
 		@param artboard The new artboard's properties.
 		@param index 0-based index position of the new artboard.
 		@return The error \c #kAIExceededMaxArtboardLimitErr if the number of artboards exceeds  \c #kAIMAX_ARTBOARD_LIMIT.
+		Note : It will override the UUID in artboardProperties. In case you want to preserve the UUID in artboard properties use \c #InsertUsingArtboardPropertiesUUID()
 		*/
 
 		AIErr Insert(ArtboardProperties& artboard, ArtboardID& index);
+
+		/** Inserts a new artboard to the document at the specified location using the UUID in artboard properties.
+		@param artboard The new artboard's properties.
+		@param index 0-based index position of the new artboard.
+		@return The error \c #kAIExceededMaxArtboardLimitErr if the number of artboards exceeds  \c #kAIMAX_ARTBOARD_LIMIT.
+		*/
+
+		AIErr InsertUsingArtboardPropertiesUUID(ArtboardProperties& artboard, ArtboardID& index);
 
 		/** Deletes an artboard from the document list, makes the next one in the list active.
 		@param index The 0-based index position of the artboard to delete.
 		@return The error \c #kAICantDeleteLastArtboardErr if this is the last artboard in the list.
 		*/
 		AIErr Delete(ArtboardID index);
+
+		// Delete multiple artboards
+		// It's more efficient to use this method, if multiple artboards are to be deleted simultaneously, 
+		// than looping for each artboard and calling Delete for that one
+		AIErr Delete(const std::vector<ai::ArtboardID>& artboardIDs);
+
 		/** Retrieves the number of artboards defined in the artboard list.
 		@param count [out] A buffer in which to return the number of artboards.
 		*/
@@ -224,15 +308,193 @@ namespace ai
 		*/
 		AIErr SetActive(ArtboardID index);
 
+		// TODO: documentation [dkhandel]
+		AIErr Select(ai::ArtboardID artboardID, bool exclusively);
+
+		// Set selection for multiple artboards
+		// It's more efficient to use this method, if multiple artboards are to be selected, 
+		// than looping for each artboard and calling SetSelection for that one
+		AIErr Select(const std::vector<ai::ArtboardID>& artboardIDs, bool exclusively);
+
+		// Select all artboards
+		AIErr SelectAll();
+
+		AIErr Deselect(ai::ArtboardID artboardID);
+		AIErr DeselectAll();
+
 	public: // internal use public interface
 		ArtboardList(const ArtboardList&);
 		ArtboardList& operator=(const ArtboardList&);
 		ArtboardList(ArtboardListRef);
 		void deleteImpl();
 
+		void swap(ArtboardList& rhs) AINOEXCEPT
+		{
+			std::swap(fImpl, rhs.fImpl);
+		}
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+		ArtboardList(ArtboardList&& rhs) AINOEXCEPT : fImpl{rhs.fImpl}
+		{
+			rhs.fImpl = nullptr;
+		}
+
+		ArtboardList& operator=(ArtboardList&& rhs) AINOEXCEPT
+		{
+			swap(rhs);
+			return *this;
+		}
+
+		/** 
+			//Range loop support
+			ai::ArtboardList artboardList;
+			for (const auto& artboard: artboardList)
+			{
+				auto artboardID = artboard.GetID();
+				auto& props = artboard.GetProps();
+			}
+		*/
+		iterator begin();
+		iterator end();
+
+		/**
+			Index-based accessor method.
+
+			Usage Example:
+			ai::ArtboardList artboardList;
+			auto artboard = artboardList.at(0);
+			
+			AIRealRect artboardPos{};
+			artboard.GetProps().GetPosition(artboardPos);
+
+			artboardPos.left += 100.0;
+			artboardPos.right += 100.0;
+			artboard.GetProps().SetPosition(artboardPos);
+
+			artboard.Update():
+		*/
+		value_type at(ArtboardID artboardID);
+
+		ArtboardID size() const AINOEXCEPT;
+#endif
 	private:
 		ArtboardListRef fImpl;
 	};
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+	class ArtboardList::Artboard
+	{
+	public:
+		using container_type = ArtboardList*;
+
+		/** 
+			Create an artboard object
+		*/
+		Artboard(ArtboardID artboardID, container_type artboardListPtr);
+		
+		/** 
+			Movable but not copyable
+		*/
+		Artboard(Artboard&& other) AINOEXCEPT :
+			mArtboardID(other.mArtboardID),
+			mProps(std::move(other.mProps)),
+			mArtboardListPtr(other.mArtboardListPtr)
+		{
+			other.mArtboardListPtr = nullptr;
+		}
+
+		Artboard& operator=(Artboard&& other) AINOEXCEPT
+		{
+			swap(other);
+			return (*this);
+		}
+
+		Artboard(const Artboard&) = delete;
+		Artboard& operator=(const Artboard&) = delete;
+
+		void swap(Artboard& other) AINOEXCEPT
+		{
+			std::swap(mArtboardID, other.mArtboardID);
+			mProps.swap(other.mProps);
+			std::swap(mArtboardListPtr, other.mArtboardListPtr);
+		}
+
+		/** Update the current value of the properties for an artboard in document
+			#ArtboardList::Update
+		*/
+		AIErr Update();
+
+		/** 
+			Returns the ArtbardID of the artboard object
+		*/
+		ArtboardID GetID() const AINOEXCEPT { return mArtboardID; }
+
+		/** 
+			Returns the properties of this artboard object, which can be changed and updated later with #Update
+		*/
+		ArtboardProperties& GetProps() { return mProps; }
+
+		/** 
+			Returns the read-only properties of the artboard object.
+		*/
+		const ArtboardProperties& GetProps() const { return mProps; }
+
+	private:
+		ArtboardID mArtboardID = 0;
+		ArtboardProperties mProps;
+		container_type mArtboardListPtr;
+	};
+
+	class ArtboardList::iterator
+	{
+	public:
+		using value_type = ArtboardList::Artboard;
+		using container_type = ArtboardList*;
+		using size_type = ArtboardID;
+
+		iterator(size_type index, container_type artboardListPtr);
+
+		iterator(iterator&& other) AINOEXCEPT : 
+			mValue(std::move(other.mValue)),
+			mArtboardListPtr(other.mArtboardListPtr),
+			mArtboardCount(other.mArtboardCount)
+		{
+			other.mArtboardListPtr = nullptr;
+		}
+
+		iterator& operator=(iterator&& other) AINOEXCEPT
+		{
+			swap(other);
+			return (*this);
+		}
+
+		iterator(const iterator&) = delete;
+		iterator& operator=(const iterator&) = delete;
+
+		void swap(iterator& other) AINOEXCEPT
+		{
+			mValue.swap(other.mValue);
+			std::swap(mArtboardCount, other.mArtboardCount);
+			std::swap(mArtboardListPtr, other.mArtboardListPtr);
+		}
+
+		iterator& operator++();
+
+		value_type& operator*() { return mValue; }
+		const value_type& operator*() const { return mValue; }
+
+		bool operator==(const iterator& rhs) const;
+		bool operator!=(const iterator& rhs) const { return !(*this == rhs); }
+
+	private:
+		bool compatible(const iterator& rhs) const;
+
+	private:
+		value_type mValue;
+		container_type mArtboardListPtr;
+		size_type mArtboardCount = 1;
+	};
+#endif //AI_HAS_RVALUE_REFERENCES
 
 	/** The \c ArtboardUtils object is a collection of utility functions for common operations.
 	*/
@@ -246,6 +508,7 @@ namespace ai
 			ArtboardList list;
 			return list.GetCount(count);
 		}
+
 		/** Retrieves the position and bounds of an artboard.
 		@param index The 0-based index position of the artboard in the document list.
 		@param rect [out] A buffer in which to return the value.
@@ -269,16 +532,31 @@ namespace ai
 			GetPosition(index,rect);
 			return error;
 		}
+
 		/** Retrieves the index of the currently active artboard.
 		@param index [out] A buffer in which to return the value.
 		*/
 		inline AIErr GetActiveArtboardIndex(ArtboardID& index)
 		{
-			AIErr error = kNoErr;
 			ArtboardList list;
-			error = list.GetActive(index);
-			return error;
+			return list.GetActive(index);
 		}
+
+		/* Selects all artboards..
+		*/
+		inline AIErr SelectAllArtboards()
+		{
+			ArtboardList list;
+			return list.SelectAll();
+		}
+
+		inline AIErr IsSelected(ai::ArtboardID id, AIBoolean& isSelected)
+		{
+			ArtboardList list;
+			const auto properties = list.GetArtboardProperties(id);
+			return properties.IsSelected(isSelected);
+		}
+
 		/** Retrieves the name of the specified artboard.
 		@param name [out] A buffer in which to return the name.
 		@param isDefault [out] True if the name is the default name.
@@ -291,6 +569,10 @@ namespace ai
 		@param index [out] The artboard index .
 		*/
 		AIErr GetArtboardIndexByName(const ai::UnicodeString& name, ai::ArtboardID& index);
+
+		/** Tells if there is any overlap between the artboards in the artboard list
+		*/
+		AIErr AreAnyArtboardsOverlapping(ai::ArtboardList &artboardList, AIBoolean &isOverlapping);
 	}
 }
 

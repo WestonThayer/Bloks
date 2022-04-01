@@ -73,25 +73,26 @@ enum {
  */
 typedef ai::uint32	ActionParamUnitID;
 
-#ifndef unitNone
+#ifndef _PIUnits
+#define _PIUnits
 /** Allowed values for \c ::ActionParamUnitID  */
 enum {
-	// The Photoshop APIs also define these constants. If a plug-in includes both
-	// the Photoshop APIs and the Illustrator APIs then there would be compilation
-	// problems. We let the Photoshop definitions win.
+    // The Photoshop APIs also define these constants. If a plug-in includes both
+    // the Photoshop APIs and the Illustrator APIs then there would be compilation
+    // problems. We let the Photoshop definitions win.
 
-	/** unit value - coerced */
-	unitNone =		'#Nne',
-	/** unit value - base 72ppi */
-	unitDistance =	'#Rlt',
-	/** unit value - base degrees */
-	unitAngle =		'#Ang',
-	/** unit value - base per inch */
-	unitDensity =	'#Rsl',
-	/** tagged unit value, document points */
-	unitPoints =	'#Pxl',
-	/** tagged unit value, percentage */
-	unitPercent =	'#Prc'
+    /** unit value - coerced */
+    unitNone =        '#Nne',
+    /** unit value - base 72ppi */
+    unitDistance =    '#Rlt',
+    /** unit value - base degrees */
+    unitAngle =        '#Ang',
+    /** unit value - base per inch */
+    unitDensity =    '#Rsl',
+    /** tagged unit value, document points */
+    unitPoints =    '#Pxl',
+    /** tagged unit value, percentage */
+    unitPercent =    '#Prc'
 
 };
 #endif

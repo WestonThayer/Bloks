@@ -58,7 +58,7 @@
 
 /** Identifies the planar object plug-in as the current plug-in selection */
 #define kPlanarObjectPluginSelection "Planar FaceEdgeSelection"
-
+#define kPlanarGroupObject           "Adobe Planar Group"
 
 /*******************************************************************************
  **

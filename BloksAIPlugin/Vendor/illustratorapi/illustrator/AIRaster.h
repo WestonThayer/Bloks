@@ -37,7 +37,7 @@
 
 #include "IAIFilePath.hpp"
 #include "IAIColorSpace.hpp"
-
+#include "AIRasterTypes.h"
 #include "AIHeaderBegin.h"
 
 /** @file AIRaster.h */
@@ -54,6 +54,29 @@
 #define kAIRasterSuiteVersion	kAIRasterSuiteVersion10
 #define kAIRasterVersion		kAIRasterSuiteVersion
 
+/*******************************************************************************/
+using AIRasterColorSpace = ai::RasterColorSpace;
+using AIRasterDataState = ai::RasterDataState;
+using ai::kColorSpaceHasAlpha;
+using ai::kGrayColorSpace;
+using ai::kRGBColorSpace;
+using ai::kCMYKColorSpace;
+using ai::kLabColorSpace;
+using ai::kSeparationColorSpace;
+using ai::kNChannelColorSpace;
+using ai::kIndexedColorSpace;
+using ai::kAlphaGrayColorSpace;
+using ai::kAlphaRGBColorSpace;
+using ai::kAlphaCMYKColorSpace;
+using ai::kAlphaLabColorSpace;
+using ai::kAlphaSeparationColorSpace;
+using ai::kAlphaNChannelColorSpace;
+using ai::kAlphaIndexedColorSpace;
+using ai::kInvalidColorSpace;
+using ai::kAIRasterNoData;
+using ai::kAIRasterLinkData;
+using ai::kAIRasterEditedData;
+ /**/
 
 /** Options for raster data, bit flags for \c #AIRasterRecord::flags. */
 enum AIRasterFlags {
@@ -76,59 +99,6 @@ enum AIRasterFlags {
 
 /** Maximum number of spot color channels per image pixel */
 #define kMaxSpotChannels	27
-
-/** Color models for raster data */
-enum AIRasterColorSpace {
-	/** Flag indicating that the color model has an alpha channel. The alpha
-		component appears after the color components. */
-	kColorSpaceHasAlpha			= 0x10,
-
-	/** Each pixel value for a gray color space has a single component
-		describing a grayscale value. The gray color space is additive so the minimum
-		value represents black and the maximum represents white. */
-	kGrayColorSpace				= 0,
-	/** Each pixel value for a RGB color space has three components which
-		represent red, green and blue respectively. The RGB color space is additive. */
-	kRGBColorSpace				= 1,
-	/** Each pixel value for a CMYK color space has four components which
-		represent cyan, magenta, yellow and black respectively. The CMYK color space
-		is subtractive. */
-	kCMYKColorSpace				= 2,
-	/** Not valid as an image type; can occur only in placed linked
-		files. See \c #AIPlacedSuite::GetRasterInfo(). */
-	kLabColorSpace				= 3,
-	/** Each pixel value for a separation color space has a single component
-		describing a tint value. The separation color space is subtractive so the minimum
-		value represents white and the maximum represents black. */
-	kSeparationColorSpace		= 4,
-	/** Each pixel value for an NChannel color space has of a variable number of
-		components which represent individual channels in the NChannel color space.
-		The process components of the color space could be either additive or subtractive.
-		The spot components of the color space are subtractive. */
-	kNChannelColorSpace			= 5,
-	/** Each pixel value for an indexed color space has a single component
-		describing an index value into a color lookup table. The number of components
-		in the color lookup table depends on the base color space of the indexed
-		color space. */
-	kIndexedColorSpace			= 6,
-
-	/** A gray color space with an alpha channel. */
-	kAlphaGrayColorSpace		= (kGrayColorSpace | kColorSpaceHasAlpha),
-	/** An RGB color space with an alpha channel. */
-	kAlphaRGBColorSpace			= (kRGBColorSpace  | kColorSpaceHasAlpha),
-	/** A CMYK color space with an alpha channel. */
-	kAlphaCMYKColorSpace		= (kCMYKColorSpace | kColorSpaceHasAlpha),
-	/** A LAB color space with an alpha channel. */
-	kAlphaLabColorSpace			= (kLabColorSpace | kColorSpaceHasAlpha),
-	/** A separation color space with an alpha channel. */
-	kAlphaSeparationColorSpace	= (kSeparationColorSpace | kColorSpaceHasAlpha),
-	/** An NChannel color space with an alpha channel. */
-	kAlphaNChannelColorSpace	= (kNChannelColorSpace | kColorSpaceHasAlpha),
-	/** An indexed color space with an alpha channel. */
-	kAlphaIndexedColorSpace		= (kIndexedColorSpace | kColorSpaceHasAlpha),
-
-	kInvalidColorSpace			= 0xFF
-};
 
 /** @ingroup Errors
 	See \c #AIRasterSuite */
@@ -159,20 +129,6 @@ enum AIRasterLinkState {
 	/** The image is embedded; when saving native round-trip information,
 		image data is saved with the file. */
 	kAIRasterEmbedded			= 1
-};
-
-/** Data states for \c #AIRasterLink::datastate. Direct linking of images is deprecated
-	(although still supported). Create linked objects using the \c #AIPlacedSuite. */
-enum AIRasterDataState {
-	/** No data is available for the image (for example, when a
-		document is opened and the linked file cannot be found). */
-	kAIRasterNoData				= 0,
-	/** Data is available and is the same data that was read from
-		the linked file (that is, it has not been modified since being read). */
-	kAIRasterLinkData			= 1,
-	/** Data is available and it has been modified since it was read from
-		the file (for example, a Photoshop filter might have been run on the image). */
-	kAIRasterEditedData			= 2
 };
 
 /** Flags for \c #AIRasterSuite::ResolveRasterLink(). Direct linking of images is deprecated
@@ -231,6 +187,10 @@ enum AIResolveRasterLinkFlags {
  */
 typedef struct AISlice {
 	ai::int32 top, left, bottom, right, front, back;
+	void Init()
+	{
+		top = left = bottom = right = front = back = 0;
+	}
 } AISlice;
 
 
@@ -263,6 +223,16 @@ typedef struct AITile {
 		the order of bytes making up a pixel when transferring between
 		a raster art object and the tile data. See @ref ChannelInterleaving.*/
 	ai::int16		channelInterleave[kMaxChannels];
+	void			Init()
+	{
+		data = nullptr;
+		bounds.Init();
+		rowBytes = colBytes = planeBytes = 0;
+		for (size_t i = 0; (i < kMaxChannels); ++i)
+		{
+			channelInterleave[i] = 0;
+		}
+	}
 } AITile;
 
 
@@ -841,7 +811,6 @@ typedef struct AIRasterSuite {
 			@see \c #SplitChannels()
  		*/
 	 AIAPI AIErr (*InterleaveChannels) ( AIArtHandle *rasterArray, ai::int32 numRasters, AIArtHandle *raster, ai::uint32 flags );
-
 } AIRasterSuite;
 
 

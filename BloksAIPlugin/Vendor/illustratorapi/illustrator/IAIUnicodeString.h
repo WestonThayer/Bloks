@@ -28,6 +28,8 @@
 #include "IAIAutoBuffer.h"
 
 #include <string>
+#include <iterator>
+#include <stdexcept>
 
 #if defined(MAC_ENV)
 	#import <CoreFoundation/CFString.h>
@@ -168,6 +170,11 @@ public:
 	*/
 	WCHARStr (const WCHARStr& p) : fConstStr(p.fConstStr) {}
 
+#if defined(AI_HAS_RVALUE_REFERENCES) && defined(AI_HAS_DEFAULTED_FUNCTIONS)
+	/** Move constructor */
+	WCHARStr (WCHARStr&&) = default;
+#endif
+
 	/** Destructor */
 	virtual ~WCHARStr() {}
 
@@ -178,6 +185,11 @@ public:
 		fConstStr = rhs.fConstStr;
 		return *this;
 	}
+
+#if defined(AI_HAS_RVALUE_REFERENCES) && defined(AI_HAS_DEFAULTED_FUNCTIONS)
+	/** Assignment operator */
+	WCHARStr& operator= (WCHARStr&&) = default;
+#endif
 
 	/** Converts the contents of this object to \c LPCWSTR.
 		The returned value is only valid for the lifetime of this object.
@@ -234,12 +246,16 @@ public:
 	typedef ai::sizediff_t offset_type;
 	/** A numeric value type (unsigned integer). */
 	typedef size_t size_type;
-	/** The maximum number of characters possible in a string. This also indicates a failure if used as return value. */
-	static const size_type npos;
 	/** Value type for a UTF-32 character code. */
 	typedef ASUInt32 UTF32TextChar;
 	/** Value type for a UTF-16 character code. */
 	typedef ASUnicode UTF16Char;
+
+	typedef UTF32TextChar value_type;
+
+
+	/** The maximum number of characters possible in a string. This also indicates a failure if used as return value. */
+	static const size_type npos;
 
 	/** Normalization forms for use with the \c #normalize() method.
 		See http://www.unicode.org/reports/tr15/ for more information. */
@@ -260,14 +276,149 @@ public:
 	/** TBD */
 	class Collator;
 
+	// ai::UnicodeString doesn't support non-const iterators because
+	// its operator[] or at() doesn't return a reference to value_type
+	// and for the same reason const_iterator doesn't overload operator->()
+	class const_iterator;
+	friend class const_iterator;
+
 public:
+	class const_iterator 
+		: public std::iterator<std::random_access_iterator_tag, UnicodeString::value_type>
+	{
+	public:
+		typedef const_iterator self_type;
+		typedef UnicodeString::size_type size_type;
+		typedef const UnicodeString* container_type;
+
+		// default construct NULL iterator
+		// can't be dereferenced, incremented or decremented
+		const_iterator() : fIndex(0), fStringContainer(nullptr)
+		{ 
+		}
+
+		// construct iterator corresponding to a given index in the container
+		const_iterator(size_type index, container_type container) 
+			: fIndex(index), fStringContainer(container) 
+		{
+		}
+
+		const_iterator(const self_type& rhs) = default; // copy constructor
+		self_type& operator=(const self_type& rhs) = default; // copy assignment
+
+		value_type operator*() const
+		{
+			if (!fStringContainer || fIndex >= fStringContainer->size())
+			{
+				throw std::out_of_range{"string iterator not dereferencable"};
+			}
+
+			return (*fStringContainer)[fIndex];
+		}
+
+		self_type& operator++() // preincrement
+		{
+			++fIndex;
+			return (*this);
+		}
+		
+		self_type operator++(int) // postincrement
+		{
+			auto temp = *this;
+			++(*this);
+			return temp;
+		}
+
+		self_type& operator--() // predecrement
+		{
+			--fIndex;
+			return (*this);
+		}
+
+		self_type operator--(int) // postdecrement
+		{
+			auto temp = *this;
+			--(*this);
+			return temp;
+		}
+
+		self_type& operator+=(difference_type offset) // increment by integer
+		{
+			fIndex += offset;
+			return (*this);
+		}
+
+		self_type operator+(difference_type offset) const // return this + integer
+		{
+			self_type temp = *this;
+			return (temp += offset);
+		}
+
+		self_type& operator-=(difference_type offset) // decrement by integer
+		{
+			fIndex -= offset;
+			return (*this);
+		}
+
+		self_type operator-(difference_type offset) const // return this - integer
+		{
+			self_type temp = *this;
+			return (temp -= offset);
+		}
+
+		difference_type operator-(const self_type& rhs) const // return difference of iterators
+		{
+			return (fIndex - rhs.fIndex);
+		}
+		
+		bool operator==(const self_type& rhs) const // test for iterator equality
+		{
+			return (fIndex == rhs.fIndex);
+		}
+
+		bool operator!=(const self_type& rhs) const // test for iterator inequality
+		{
+			return !(*this == rhs);
+		}
+
+		bool operator<(const self_type& rhs) const // test if this < rhs
+		{	
+			return (fIndex < rhs.fIndex);
+		}
+
+		bool operator>(const self_type& rhs) const // test if this > rhs
+		{	
+			return (rhs < *this);
+		}
+
+		bool operator<=(const self_type& rhs) const // test if this <= rhs
+		{	
+			return (!(rhs < *this));
+		}
+
+		bool operator>=(const self_type& rhs) const // test if this >= rhs
+		{	
+			return (!(*this < rhs));
+		}
+
+	private:
+		bool compatible(const self_type& rhs) const
+		{
+			return (fStringContainer->fImpl == rhs.fStringContainer->fImpl);
+		}
+
+	private:
+		size_type fIndex = 0;
+		container_type fStringContainer;
+	};
+
 	//----------------------------------------------------------------------
-	/** @name Constructors & Destructors */
+	/** @name Constructors & Destructor */
 	//----------------------------------------------------------------------
 	//@{
 	/** Empty string constructor.  Creates a valid, empty string.  This method is guaranteed
 		to not throw any exceptions. */
-	explicit UnicodeString (void) AINOTHROW;
+	explicit UnicodeString () AINOTHROW;
 	/** Constructs a UnicodeString from an encoded byte array.
 			@param string Array of bytes to construct from.
 			@param srcByteLen Length of the array.
@@ -324,8 +475,15 @@ public:
 		*/
 	UnicodeString (const UnicodeString& s);
 
+#ifdef AI_HAS_RVALUE_REFERENCES
+	/** Move Constructor
+			@param other The string to move from.
+		*/
+	UnicodeString(UnicodeString&& other) AINOEXCEPT;
+#endif // AI_HAS_RVALUE_REFERENCES
+
 	/** Destructor */
-	~UnicodeString (void);
+	~UnicodeString ();
 	//@}
 
 	//----------------------------------------------------------------------
@@ -524,6 +682,30 @@ public:
 			@return A reference to this Unicode string object.
 		*/
 	UnicodeString&  erase (size_type pos=0, size_type count = npos);
+
+	/** Erase character from this string
+			@param position iterator to the character to remove
+			@return iterator pointing to the character immediately following the character erased,
+					or end() if no such character exists
+		*/
+	const_iterator  erase (const_iterator position)
+	{
+		size_type index = position - begin();
+		erase(index, 1);
+		return (begin() + index);
+	}
+
+	/** Erase substring [first, last) from this string
+			@param first, last Range of the characters to remove
+			@return iterator pointing to the character last pointed to before the erase, 
+					or end() if no such character exists
+		*/
+	const_iterator  erase (const_iterator first, const_iterator last)
+	{
+		size_type index = first - begin();
+		erase(index, last - first);
+		return (begin() + index);
+	}
 
 	/** Searches for a character in this string.
 			@param ch The character to search for.
@@ -769,12 +951,27 @@ public:
 			@return Nothing.
 		*/
 	void resize (size_type count, UTF32TextChar ch = UTF32TextChar());
+	
+	/** Retrieves number of characters (UTF code points) that this string can hold without reallocation.
+		This may be the same as or more than \c #length().
+			@return The number of characters that can be held in this string without reallocation.
+		*/
+	ai::UnicodeString::size_type capacity () const;
+
+	/** Request to change the capacity of this string to accommodate at least the specified number of characters.
+	 	If new capacity is greater than the current \c #capacity(), new storage is allocated, and \c #capacity()
+	 	is made equal or greater than new capacity.
+	 	If new capacity is less than or equal to the current \c #capacity(), there is no effect.
+			@param count The new desired capacity of this string in number of characters.
+			@return Nothing.
+		*/
+	void reserve (size_type count);
 
 	/** Retrieves the number of characters (UTF code points) in this string.
 		This is the same as \c #length().
 			@return The number of UTF code points in this string.
 		*/
-	ai::UnicodeString::size_type size (void) const
+	ai::UnicodeString::size_type size () const
 	{ return length(); }
 
 	/** Creates a copy of a substring of this string.
@@ -789,7 +986,7 @@ public:
 			@param str The string to swap.
 			@return Nothing.
 		*/
-	void swap (UnicodeString& str);
+	void swap (UnicodeString& str) AINOEXCEPT;
 
 	/* Operators */
 
@@ -798,6 +995,14 @@ public:
 			@return A reference to this string.
 		*/
 	UnicodeString& operator= (const UnicodeString& rhs);
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+	/** Move Assignment operator.
+			@param rhs The Unicode string object to be moved from.
+			@return A reference to this string.
+		*/
+	UnicodeString& operator= (UnicodeString&& rhs) AINOEXCEPT;
+#endif // AI_HAS_RVALUE_REFERENCES
 
 	/** Append operator.
 			@param ch The character to append to this string.
@@ -847,6 +1052,22 @@ public:
 		*/
 	bool operator< (const UnicodeString& rhs) const
 	{ return compare(rhs) < 0; }
+
+	/** iterator support
+			@return iterator to the first character
+	*/
+	const_iterator begin() const
+	{
+		return const_iterator(0, this);
+	}
+
+	/** iterator support
+			@return iterator to the character following the last character
+	*/
+	const_iterator end() const
+	{
+		return const_iterator(this->size(), this);
+	}
 
 	/* non-std::basic_string based functionality */
 
@@ -1128,8 +1349,18 @@ protected:
 	explicit UnicodeString(class CAIUnicodeStringImpl* impl);
 
 private:
-	CAIUnicodeStringImpl* fImpl;
+	mutable CAIUnicodeStringImpl* fImpl;
 };
+
+/** Append operator.
+@param lhs The Unicode string object to append to.
+@param rhs The Unicode string object which is to be appended.
+@return A new Unicode string object.
+*/
+inline UnicodeString operator+(UnicodeString lhs, const UnicodeString& rhs)
+{
+	return lhs.append(rhs);
+}
 
 ///////////////////////////////////////////////////////////
 // Inline implementations  - Yes, some of these could cause code bloat.  
@@ -1139,6 +1370,29 @@ private:
 ///////////////////////////////////////////////////////////
 // UnicodeString inlines
 ///////////////////////////////////////////////////////////
+
+inline void UnicodeString::swap(UnicodeString& str) AINOEXCEPT
+{
+	std::swap(fImpl, str.fImpl);
+}
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+
+// Move Constructor
+inline UnicodeString::UnicodeString(UnicodeString&& other) AINOEXCEPT
+	: fImpl{other.fImpl}
+{
+	other.fImpl = nullptr;
+}
+
+// Move Assignment operator
+inline UnicodeString& UnicodeString::operator=(UnicodeString&& rhs) AINOEXCEPT
+{
+	swap(rhs);
+	return *this;
+}
+
+#endif // AI_HAS_RVALUE_REFERENCES
 
 inline UnicodeString& UnicodeString::insert (size_type insertOffset, const UnicodeString& str,
 		size_type offset, size_type count)

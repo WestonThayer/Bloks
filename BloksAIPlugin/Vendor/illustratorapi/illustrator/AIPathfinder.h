@@ -62,9 +62,9 @@
 /** Pathfinder suite name */
 #define kAIPathfinderSuite			"AI Pathfinder Suite"
 /** Pathfinder suite version */
-#define kAIPathfinderSuiteVersion6	AIAPI_VERSION(6)
+#define kAIPathfinderSuiteVersion7	AIAPI_VERSION(7)
 /** Pathfinder suite name */
-#define kAIPathfinderSuiteVersion	kAIPathfinderSuiteVersion6
+#define kAIPathfinderSuiteVersion	kAIPathfinderSuiteVersion7
 /** Pathfinder suite version */
 #define kAIPathfinderVersion		kAIPathfinderSuiteVersion
 
@@ -123,7 +123,6 @@ enum AIOptionsFlagValues {
 	/** When set, result objects are deselected.
 		Available in AI 13 and later. */
 	kDeselectResultArts			= 0x80000
-
 };
 
 /*******************************************************************************
@@ -136,32 +135,47 @@ enum AIOptionsFlagValues {
 typedef double			dbl;
 
 /** Options that control how pathfinder operations are performed. */
-typedef struct {
+struct AIOptions {
 	/** Pathfinding precision, in microns.
 		The number of microns in a point is given by \c #pointsPerMicron.
 		Default value is \c #kDefaultPrecision */
 	double				ipmPrecision;
+	bool				allowNonOptimizedDeletion;
 	/** Nonzero to remove redundant points. Default value is \c #kRemoveRedundantPointsDefault */
 	ai::int32				removeRedundantPoints;
 	/** Option flags, a logical OR of \c #AIOptionsFlagValues. */
 	ai::int32			flags;
-} AIOptions;
+	/** Initializes members to their default value. */
+	void Init()
+	{
+		ipmPrecision = kDefaultPrecision;
+		removeRedundantPoints = kRemoveRedundantPointsDefault;
+		flags = 0;
+		allowNonOptimizedDeletion = false;
+	}
+};
 
 /** Mixing parameters for \c #AIParameters */
-typedef struct {
+struct AIMixParameters {
 	/** The percentage of visibility in overlapping colors.
 		Default value is \c #kSoftRateDefault */
 	double				softRate;
 	/** Nonzero to convert custom colors when mixing.
 		Default value is \c #kMixConvertCustomColorsDefault */
 	ai::int32				convertCustomColors;
-} AIMixParameters;
+	/** Initializes members to their default value. */
+	void Init()
+	{
+		softRate = kSoftRateDefault;
+		convertCustomColors = kMixConvertCustomColorsDefault;
+	}
+};
 
 /** Trapping parameters for \c #AIParameters.
 	These correspond to UI values offered in the Pathfinder
 	palette's Trap dialog; see user documentation for
 	explanations. */
-typedef struct {
+struct AITrapParameters {
 	/** Trap thickness, in points.
 		Default value is \c #kTrapThicknessDefault */
 	double				trapThickness;
@@ -183,18 +197,35 @@ typedef struct {
 	/** Nonzero to convert custom colors.
 		Default value is \c #kTrapConvertCustomColorsDefault */
 	ai::int32				convertCustomColors;
-} AITrapParameters;
+	/** Initializes members to their default value. */
+	void Init()
+	{
+		trapThickness = kTrapThicknessDefault;
+		heightWidthAspectRatio = kHeightWidthAspectRatioDefault;
+		trapTint = kTrapTintDefault;
+		maximumTint = kMaximumTintDefault;
+		tintTolerance = kTintToleranceDefault;
+		reverseTrap = kReverseTrapDefault;
+		convertCustomColors = kTrapConvertCustomColorsDefault;
+	}
+};
 
 /** Mixing and trapping parameters for \c #AIPathfinderData::parameters */
-typedef struct {
+struct AIParameters {
 	/** Parameters for mixing operations. */
 	AIMixParameters		mixParameters;
 	/** Parameters for trapping operations. */
 	AITrapParameters		trapParameters;
-} AIParameters;
+	/** Initializes members to their default value. */
+	void Init()
+	{
+		mixParameters.Init();
+		trapParameters.Init();
+	}
+};
 
 /** Defines how to perform a pathfinder operation. */
-typedef struct {
+struct AIPathfinderData {
 	/** Options that control how pathfinder operations are performed. */
 	AIOptions				options;
 	/** Parameters for mixing and trapping operations. */
@@ -204,23 +235,36 @@ typedef struct {
 	AIArtHandle					*fSelectedArt;
 	/** The number of members of the \c fSelectedArt array. */
 	ai::int32						fSelectedArtCount;
+	/* output art after executing the effect*/
+	AIArtHandle					 fOutputArt;
+
 	/** Not used. Pass 0. */
 	ai::int32					fAlertInfoID;
-} AIPathfinderData;
+	/** Initializes members to their default value. */
+	void Init()
+	{
+		options.Init();
+		parameters.Init();
+		fSelectedArt = nullptr;
+		fSelectedArtCount = 0;
+		fAlertInfoID = 0;
+		fOutputArt = nullptr;
+	}
+};
 
 
 /** The contents of a Pathfinder message. */
-typedef struct {
+struct AIPathfinderMessage {
 	/** The message data. */
 	SPMessageData				d;
 	/** How to perform the pathfinder operation. */
 	AIPathfinderData			pathfinderData;
-} AIPathfinderMessage;
+};
 
 /** Compound shape modes. These control how objects inside a compound
 	shape group interact with each other.  Shapes are drawn from the bottom
 	object up. See \c #AIPathfinderSuite::SetShapeMode(). */
-typedef enum AIShapeMode
+enum AIShapeMode
 {
 	/** Applies the Unite effect to each succeeding object and the previous shape. */
 	kAIShapeModeAdd = 0,
@@ -230,8 +274,38 @@ typedef enum AIShapeMode
 	kAIShapeModeIntersect,
 	/** Applies the Exclude effect to each succeeding object and the previous shape. */
 	kAIShapeModeExclude
-} AIShapeMode;
+};
 
+
+/** For internal use.  */
+struct PathfinderLiveEffectParamsStruct
+{
+	enum PathfinderEffectType
+	{
+		kUniteEffectType,
+		kIntersectEffectType,
+		kExcludeEffectType,
+		kBackMinusFrontEffectType,
+		kFrontMinusBackEffectType,
+		kDivideEffectType,
+		kOutlineEffectType,
+		kTrimEffectType,
+		kMergeEffectType,
+		kCropEffectType,
+		kHardEffectType,
+		kSoftEffectType,
+		kTrapEffectType,
+	} fEffectType;
+	AIOptions fOptions;
+	AIParameters fParameters;
+	/** Initializes members to their default value. */
+	void Init()
+	{
+		fEffectType = kUniteEffectType;
+		fOptions.Init();
+		fParameters.Init();
+	}
+};
 
 /*******************************************************************************
  **
@@ -253,7 +327,7 @@ typedef enum AIShapeMode
   	\li Acquire this suite using \c #SPBasicSuite::AcquireSuite() with the constants
 		\c #kAIPathfinderSuite and \c #kAIPathfinderVersion.
 	*/
-typedef struct {
+struct AIPathfinderSuite {
 
 	/** Applies a Unite effect to selected art.
 			@param data The structure containing the selected art and operation parameters.
@@ -394,7 +468,7 @@ typedef struct {
 		*/
 	AIAPI AIErr (*FlattenArt) ( AIArtHandle *inOutArt );
 
-} AIPathfinderSuite;
+};
 
 
 #include "AIHeaderEnd.h"

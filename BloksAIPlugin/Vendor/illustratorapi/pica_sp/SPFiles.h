@@ -86,7 +86,7 @@ extern "C" {
     typedef struct OpaqueSPPlatformFileRef SPPlatformFileRef;
     
     
-#ifdef MAC_ENV
+#if  defined(MAC_ENV)  || defined(LINUX_ENV)
 #define kMaxPathLength 1024
 #pragma options align=power
     
@@ -129,7 +129,7 @@ extern "C" {
     SPErr FileReftoFileSpec(const SPPlatformFileReference *fileRef, const SPPlatformFileSpecification *fileSpec);
 #endif
     
-#ifdef WIN_ENV
+#if defined(WIN_ENV)
 #define kMaxPathLength 300
     /** A file specification in Windows. */
     typedef struct SPPlatformFileSpecification {

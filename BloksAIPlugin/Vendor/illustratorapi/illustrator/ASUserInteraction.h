@@ -27,16 +27,13 @@
  **
  **/
 
-#ifndef __ASTypes__
-#include "ASTypes.h"
-#endif
-
-
 #include "SPBasic.h"
 
 #ifndef  __UserInteractionCheckerDefined__
 #include "IAIUnicodeString.h"
+#include "AIErrorHandler.h"
 #endif
+
 
 #include "AIHeaderBegin.h"
 
@@ -193,21 +190,25 @@ public:
 	{
 		ASErr err = kNoErr;
 
-		if (m_SuitePtr && !InteractWithUser())
+		try
 		{
-			if (msg2)
+			if (m_SuitePtr && !InteractWithUser())
 			{
-				ai::UnicodeString::UTF32TextChar c = ' ';
-				ai::UnicodeString msg = msg1;
-				msg += ai::UnicodeString(1,c);
-				msg.append(*msg2);
-				err = m_SuitePtr->LogInteraction(msg.as_UTF8().c_str());
-			}
-			else
-			{
-				err = m_SuitePtr->LogInteraction(msg1.as_UTF8().c_str());
+				if (msg2)
+				{
+					ai::UnicodeString::UTF32TextChar c = ' ';
+					ai::UnicodeString msg = msg1;
+					msg += ai::UnicodeString(1,c);
+					msg.append(*msg2);
+					err = m_SuitePtr->LogInteraction(msg.as_UTF8().c_str());
+				}
+				else
+				{
+					err = m_SuitePtr->LogInteraction(msg1.as_UTF8().c_str());
+				}
 			}
 		}
+		AI_CATCH_RETURN;
 
 		return err;
 	}
@@ -218,20 +219,28 @@ public:
 		*/
 	void logError(const ai::UnicodeString& msg1, const ai::UnicodeString *msg2=NULL)
 	{
-		ai::UnicodeString msg("Error: ");
-		msg += msg1;
-		logInfo(msg, msg2);
+		try
+		{
+			ai::UnicodeString msg("Error: ");
+			msg += msg1;
+			logInfo(msg, msg2);
+		}
+		AI_CATCH_NO_RETURN;
 	}
 	/** Sets the message to write to the user-interaction log
 		when a Warning alert occurs, if user interactivity is turned off.
 			@param msg1 The message string.
 			@param msg2 Optional. Another message string.
 		*/
-	void logWarning(const ai::UnicodeString& msg1, const ai::UnicodeString *msg2=NULL)
+	void logWarning(const ai::UnicodeString& msg1, const ai::UnicodeString *msg2 = NULL)
 	{
-		ai::UnicodeString msg("Warning: ");
-		msg += msg1;
-		logInfo(msg, msg2);
+		try
+		{
+			ai::UnicodeString msg("Warning: ");
+			msg += msg1;
+			logInfo(msg, msg2);
+		}
+		AI_CATCH_NO_RETURN;
 	}
 	/** Destructor */
 	~ASUserInteractionChecker()
@@ -246,6 +255,47 @@ public:
 private:
 	SPBasicSuite *m_SPBasic;
 	ASUserInteractionSuite *m_SuitePtr;
+};
+
+
+class AutoInteractionLevel
+{
+public:
+    AutoInteractionLevel(SPBasicSuite *spBasic,ASInteractionAllowed interactionLevel)
+    {
+        m_SPBasic = spBasic;
+        if (m_SPBasic)
+        {
+            mError = m_SPBasic->AcquireSuite(kASUserInteractionSuite,
+                                        kASUserInteractionVersion,
+                                        (const void **)&m_SuitePtr);
+            if(mError != kNoErr)
+            {
+                m_SuitePtr = nullptr;
+            }
+        }
+        if(m_SuitePtr && mError == kNoErr)
+        {
+            mInteractionAllowed = m_SuitePtr->GetInteractionAllowed();
+            mError = m_SuitePtr->SetInteractionAllowed(interactionLevel);
+        }
+    }
+    ~AutoInteractionLevel()
+    {
+        if(m_SuitePtr && mError == kNoErr)
+            mError = m_SuitePtr->SetInteractionAllowed(mInteractionAllowed);
+        
+        if (m_SuitePtr && m_SPBasic)
+        {
+            m_SPBasic->ReleaseSuite(kASUserInteractionSuite, kASUserInteractionVersion);
+            m_SuitePtr = nullptr;
+        }
+    }
+private:
+    ASInteractionAllowed mInteractionAllowed{};
+    SPBasicSuite *m_SPBasic = nullptr;
+    ASUserInteractionSuite *m_SuitePtr = nullptr;
+    ASErr mError = kBadParameterErr;
 };
 
 #endif // __UserInteractionCheckerDefined__

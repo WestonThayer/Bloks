@@ -1,6 +1,7 @@
 #ifndef __BloksAIPlugin_h__
 #define __BloksAIPlugin_h__
 
+#include "IllustratorSDK.h"
 #include "Plugin.hpp"
 #include "BloksAIPluginID.h"
 

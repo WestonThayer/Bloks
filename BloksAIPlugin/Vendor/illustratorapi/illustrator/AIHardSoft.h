@@ -1,25 +1,18 @@
-#ifndef __AIHardSoft__
-#define __AIHardSoft__
+#pragma  once
 
 /*
-*        Name:	AIHardSoft.h
-*   $Revision: 3 $
-*      Author:
-*        Date:
-*     Purpose:	Adobe Illustrator Hard/Soft Suite.
+* ADOBE CONFIDENTIAL
 *
-* ADOBE SYSTEMS INCORPORATED
-* Copyright 1986-2009 Adobe Systems Incorporated.
-* All rights reserved.
+* Copyright 2009 Adobe
+* All Rights Reserved.
 *
-* NOTICE:  Adobe permits you to use, modify, and distribute this file
-* in accordance with the terms of the Adobe license agreement
-* accompanying it. If you have received this file from a source other
-* than Adobe, then your use, modification, or distribution of it
-* requires the prior written permission of Adobe.
+* NOTICE:  Adobe permits you to use, modify, and distribute this file in
+* accordance with the terms of the Adobe license agreement accompanying
+* it. If you have received this file from a source other than Adobe,
+* then your use, modification, or distribution of it requires the prior
+* written permission of Adobe.
 *
 */
-
 
 /*******************************************************************************
 **
@@ -43,8 +36,8 @@
 **/
 
 #define kAIHardSoftSuite			"AI Hard Soft Suite"
-#define kAIHardSoftSuiteVersion5	AIAPI_VERSION(5)
-#define kAIHardSoftSuiteVersion		kAIHardSoftSuiteVersion5
+#define kAIHardSoftSuiteVersion6	AIAPI_VERSION(6)
+#define kAIHardSoftSuiteVersion		kAIHardSoftSuiteVersion6
 #define kAIHardSoftVersion			kAIHardSoftSuiteVersion
 
 /** @ingroup Notifiers
@@ -119,7 +112,7 @@ public page space.
 \c #kAIHardSoftSuite and \c #kAIHardSoftVersion.
 */
 
-typedef struct {		// AI 8.0
+typedef struct {		
 
 	/** Converts a point in public page coordinates to a point in internal
 	artboard coordinates.
@@ -203,11 +196,23 @@ typedef struct {		// AI 8.0
 	*/
 	AIAPI AIErr (*ConvertCoordinates)(AIRealPoint& point,ai::int32 src,ai::int32 dest, AIBoolean convertForDisplay);
 
+	/** Converts an AIRealRect to a AIRealRect in internal artboard coordinates space.
+	@param inRect  Input rect in public page coordinates.
+	@param outRect [out] A rect which shall have the values in  internal
+					artboard coordinates.
+	*/
+	AIAPI AIErr(*AIRealRectHarden)(const AIRealRect& inRect, AIRealRect& outRect);
+
+
+	/** Converts an AIRealRect in internal artboard coordinates to a AIRealRect in public
+	page coordinates.
+	@param inRect  Input rect in internal artboard coordinates.
+	@param outRect [out] A rect which shall have the values in public page coordinates
+	*/
+	AIAPI AIErr(*AIRealRectSoften)(const AIRealRect& inRect, AIRealRect& outRect);
 
 } AIHardSoftSuite;
 
 
 #include "AIHeaderEnd.h"
 
-
-#endif

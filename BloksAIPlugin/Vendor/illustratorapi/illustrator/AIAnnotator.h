@@ -91,14 +91,12 @@
 #define kAnnotateArtObject			5
 
 
-#if defined(MAC_ENV) || defined(WIN_ENV)
 /**  Port type for the \c #kSelectorAIInvalAnnotation message. */
 #define kAnnotateNoPortType			0
 /**  Port type for the \c #kSelectorAIDrawAnnotation message. */
 #define kAnnotateWindowPortType		1
 /**  Not used */
 #define kAnnotateGWorldPortType		2
-#endif
 
 
 /*******************************************************************************
@@ -258,7 +256,7 @@ struct AIAnnotatorSuite
 	/** Adds a new annotator to your plug-in. Typically called during startup.
 
 		@param self The startup plug-in.
-		@param name The annotator’s display name.
+		@param name The annotatorï¿½s display name.
 		@param notifier [out] A buffer in which to return a unique identifier for the new annotator.
 		*/
 

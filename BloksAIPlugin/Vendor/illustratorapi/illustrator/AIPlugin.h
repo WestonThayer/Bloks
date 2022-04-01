@@ -89,9 +89,23 @@ enum AIPluginOptions {
  		and the edit is undone, Illustrator does not retain the partial selection
  		state that existed prior to the edit.
  	*/
- 	kPluginWantsPartialPathSelectionOption	= (1<<2)
+ 	kPluginWantsPartialPathSelectionOption	= (1<<2),
 
+	/**
+		When true, Plugin will participate in the Ai'Fast Exit framework and all shutdown sequence notifiers and messages are not sent to the plugin.
+		e.g. kAIPluginStoppingNotifier and kAIApplicationShutdownNotifier Notifiers 
+		and Messages 
+		with (caller = kSPInterfaceCaller, selector = kSPInterfaceCaller) and
+		with (caller = kSPAccessCaller, selector = kSPAccessUnloadSelector)
+		are not sent to the plugin.
 
+		It is expected that these plugins registers for kAISaveUserDataNotifier notifier and only saves persistent data in this notifier.
+		Plugin *must not* cleanup any resource in this notifier handler. e.g. Plugin must not delete any object, 
+		destroy any thread or free up memory etc. in this notifier.
+
+		After kAISaveUserDataNotifier message is sent, app will quit immediately and resources will be released to the OS automatically.
+	*/
+	kPluginWantsFastExitOption = (1 << 3)
 };
 
 /** @ingroup Suites

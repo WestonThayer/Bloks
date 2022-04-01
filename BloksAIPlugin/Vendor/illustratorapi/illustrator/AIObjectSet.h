@@ -1,5 +1,4 @@
-#ifndef __AIObjectSet__
-#define __AIObjectSet__
+#pragma once
 
 /*
  *        Name:	AIObjectSet.h
@@ -9,7 +8,7 @@
  *     Purpose:	Adobe Illustrator Object Set Suite.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2007 Adobe Systems Incorporated.
+ * Copyright 1986 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file 
@@ -68,8 +67,8 @@
     that offset must be either a valid object handle of the appropriate type, or \c NULL.
 */
 #define kAIObjectSetSuite				"AI ObjectSet Suite"
-#define kAIObjectSetSuiteVersion4		AIAPI_VERSION(4)
-#define kAIObjectSetSuiteVersion		kAIObjectSetSuiteVersion4
+#define kAIObjectSetSuiteVersion5		AIAPI_VERSION(5)
+#define kAIObjectSetSuiteVersion		kAIObjectSetSuiteVersion5
 #define kAIObjectSetVersion				kAIObjectSetSuiteVersion
 
 /** @ingroup Notifiers
@@ -108,7 +107,7 @@
 	see \c #AIDictionarySuite
 		 @internal
 	 		Mark all objects managed by this plug-in that are used in the
-	 		current document by calling AIObjectSetSuite::MarkObjectInUse().  If markArt is not nil, just
+	 		current document by calling AIObjectSetSuite::MarkObjectInUse().  If markArt is not nullptr, just
 	 		mark all objects within that sub-tree.  Set, object, subobject, and change fields are unused.
 */
 #define kSelectorObjectSetMarkUsage "AI Object Set Mark Usage"
@@ -257,7 +256,7 @@ struct AIReplaceColorNotifierData {
  		Do not free the internal or external memory (the suite will do this) but dispose
  		of any referred-to memory.  Subobject and change fields are unused.
  	<br>\c #kSelectorObjectSetMarkUsage. Mark all objects managed by this plug-in that are used in the
- 		current document by calling AIObjectSetSuite::MarkObjectInUse().  If markArt is not nil, just
+ 		current document by calling AIObjectSetSuite::MarkObjectInUse().  If markArt is not nullptr, just
  		mark all objects within that sub-tree.  Set, object, subobject, and change fields are unused.
  	<br>\c #kSelectorObjectSetUpdateInternal. Fetch the external representation for this object and update
  		the internal. Also serves to notify of a new object; this will be the first selector received
@@ -335,13 +334,7 @@ struct AIObjectSetSuite {
 	AIAPI AIErr (*GetExternalObjectName) (AIObjectSetHandle setHandle, AIObjectHandle object,
 		AIVersion aiVersion, char *buf, ai::int32* bufLen );
 
-	AIAPI AIErr (*SetObjectExternalAlternate) ( AIObjectSetHandle setHandle, AIObjectHandle object, const char *data,
-		ai::uint32 majorVersion, ai::uint32 minorVersion);
-
 };
 
 
 #include "AIHeaderEnd.h"
-
-
-#endif

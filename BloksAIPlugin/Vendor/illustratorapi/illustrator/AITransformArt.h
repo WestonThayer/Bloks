@@ -62,6 +62,14 @@
  **
  **/
 
+enum FastTransformMode
+{
+    /** In static mode of FastTransform, graphic images are created only once in the start.*/
+    kStatic,
+    /** In dynamic mode of FastTransform, graphic images are created/modified start as well as during the operation. */
+    kDynamic
+};
+
 /** Options that control the behavior of \c #AITransformArtSuite::TransformArt() */
 enum AITransformArtOptions {
 	/** Transform object geometry */
@@ -92,6 +100,8 @@ enum AITransformArtOptions {
 	kPreserveCornersMaintainingRadii		  = ((ai::int32) (1<<11)),
 	/** Preserve corners during transformations while scaling radii values*/
 	kPreserveCornersScalingRadii		  = ((ai::int32) (1<<12)),
+    /** Scale the text wrap offsets by the linescale factor */
+    kScaleTextWrapOffset          = ((ai::int32) (1<<13)),
 	/** Transform all aspects of the art style */
 	kTransformEntireArtStyle = kTransformFillGradients | kTransformFillPatterns | kTransformStrokePatterns | kScaleLines | kTransformStrokeGradients,
 	/** Transform all aspects of the art style that are not affected by transformation preferences. */
@@ -131,6 +141,8 @@ typedef struct {
 				in the range [0..1], where 1 is 100%, meaning no scaling. Calculate the
                 appropriate linescale as a function of the horizontal and vertical scale
 				factors of the matrix: <code>lineScale = sqrt(Sx) * sqrt(Sy)</code>.
+                Also, if the object is a text wrap, and \c #kScaleTextWrapOffset
+                option is set, ,the lineScale is applied to the text wrap offset as well.
 			@param flags Behavior options, a logical OR of \c #AITransformArtOptions constants.
 			@note This function does not do a "deep" transform; that is, it does not
 				automatically traverse into the members of group or compound art objects.

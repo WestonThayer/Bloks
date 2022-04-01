@@ -152,6 +152,16 @@ public:
 				does not map to a valid type.
 	  	*/
 	static Locale::ID getID(const std::string& locale);
+	
+#if defined(ILLUSTRATOR_MINIMAL)
+	/**	Retrieves the locale identifier from a Language Code
+		@param locale	language Code String
+		@return	The locale ID constant or \c ai::Locale::kUS if the string
+			does not map to "ja", "en", "de" and "us".
+	        Example: param = "ja", return = ja_JP.
+	*/
+	static Locale::ID GetLocaleFromLangCode(const std::string& langCode);
+#endif
 
 };
 

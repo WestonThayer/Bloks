@@ -167,7 +167,7 @@ enum AIFXGAssetTypeEnum
 {
 	/** Main File
 	*/
-	kAIFXGAssetTypeMasterFile = 0,
+	kAIFXGAssetTypePrimaryFile = 0,
 
 	/** Artboard specific file
 	*/
@@ -233,7 +233,7 @@ enum AIFXGExportFlagEnum
 {
 	/** Export the main file
 	*/
-	kAIFXGExportFlagMasterFile = 1,
+	kAIFXGExportFlagPrimaryFile = 1,
 
 	/**	Export the Artboard- specific files.
 	*/
@@ -241,11 +241,11 @@ enum AIFXGExportFlagEnum
 
 	/** Export Main file as well as Artboard-specific files.
 	*/
-	kAIFXGExportFlagBoth = kAIFXGExportFlagMasterFile | kAIFXGExportFlagArtboards,
+	kAIFXGExportFlagBoth = kAIFXGExportFlagPrimaryFile | kAIFXGExportFlagArtboards,
 
 	/** Default value of this flag that can be used if you are not sure.
 	*/
-	kAIFXGExportFlagDefault = kAIFXGExportFlagMasterFile,
+	kAIFXGExportFlagDefault = kAIFXGExportFlagPrimaryFile,
 
 	/** Maximum allowed value 	*/
 	kAIFXGExportFlagMax = 0xFFFF
@@ -544,7 +544,7 @@ struct AIFXGFileFormatSuite{
 	/**
 		Generates FXG to a file.
 		@param art [in] Art which you want to export as FXG. Pass NULL to generate FXG for entire document.
-		@param filepath [in] The file path for the master document FXG
+		@param filepath [in] The file path for the Primary document FXG
 		@param fxgSaveParams [in] The FXG save options parameters. See \c #AIFXGFileFormatSaveParams
 		@param fxgExportFlags [in]  The export flags. See \c #AIFXGExportFlagEnum
 		@param artBoardRange [in] If the export flag \c #kAIFXGExportFlagArtboards is passed, the artboard range.

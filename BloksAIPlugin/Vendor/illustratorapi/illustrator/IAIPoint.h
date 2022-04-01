@@ -22,7 +22,7 @@
 * Includes
 */
 
-#include "AITypes.h"
+#include "AIBasicTypes.h"
 #include <cmath>
 #include <cfloat>
 
@@ -45,7 +45,10 @@ namespace ai
 	#endif
 	#ifdef MAC_ENV
 				typedef short Coordinates_t;
-	#endif
+    #endif
+    #ifdef LINUX_ENV
+                typedef short Coordinates_t;
+    #endif
 		};
 		template<>
 		struct PointStruct_Traits <AIRealPoint>

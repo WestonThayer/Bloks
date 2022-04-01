@@ -1,23 +1,21 @@
+/*************************************************************************
+*
+* ADOBE CONFIDENTIAL
+*
+* Copyright 1986 Adobe
+*
+* All Rights Reserved.
+*
+* NOTICE: Adobe permits you to use, modify, and distribute this file in
+* accordance with the terms of the Adobe license agreement accompanying
+* it. If you have received this file from a source other than Adobe,
+* then your use, modification, or distribution of it requires the prior
+* written permission of Adobe.
+*
+**************************************************************************/
+
 #ifndef __AILiveEffect__
 #define __AILiveEffect__
-
-/*
- *        Name:	AILiveEffect.h
- *      Author:
- *        Date:
- *     Purpose:	Adobe Illustrator Effect Suite.
- *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2007 Adobe Systems Incorporated.
- * All rights reserved.
- *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file 
- * in accordance with the terms of the Adobe license agreement 
- * accompanying it. If you have received this file from a source other 
- * than Adobe, then your use, modification, or distribution of it 
- * requires the prior written permission of Adobe.
- *
- */
 
 
 /*******************************************************************************
@@ -67,7 +65,7 @@
  **/
 
 #define kAILiveEffectSuite					"AI Live Effect Suite"
-#define kAILiveEffectSuiteVersion			AIAPI_VERSION(6)
+#define kAILiveEffectSuiteVersion			AIAPI_VERSION(7)
 #define kAILiveEffectVersion				kAILiveEffectSuiteVersion
 
 /** @ingroup Callers
@@ -122,7 +120,9 @@
 /** @ingroup Selectors
 	Sends an \c #AILiveEffectIsCompatibleMessage */
 #define kSelectorAILiveEffectIsCompatible		"AI Live Effect Is Compatible"
-
+/** @ingroup Selectors
+ Sends an \c #AILiveEffectScaleParamMessage. */
+#define kSelectorAILiveEffectDocScaleConvertParameters    "AI Live Effect Doc Scale Convert Parameters"
 
 /** @ingroup DictKeys
 	Dictionary key for a Live Effect parameter. See \c #AILiveEffectSuite.
@@ -196,6 +196,9 @@
 	the values in the actual parameter dictionary. */
 #define kScaleFactorKey "ScaleFactorString"
 
+/** It can be used as \c #options in \c #AddLiveEffectMenuData to indicate that 
+	menu item is a sub group.*/
+#define kAILiveEffectMenuSubGroup 1
 
 /*******************************************************************************
  **
@@ -216,7 +219,7 @@ struct AddLiveEffectMenuData {
 	char *category;
 	/** The localizable display string for the menu item */
 	char *title;
-	/** Not used. Pass 0. */
+	/** To add menu item as sub group, pass \c #kAILiveEffectMenuSubGrou otherwise pass 0.*/
 	ai::int32 options;
 };
 
@@ -259,7 +262,9 @@ enum AIStyleFilterFlags {
 	/** Has parameters that can be modified by a \c #kSelectorAILiveEffectAdjustColors message. */
 	kHandlesAdjustColorsMsg	= 1 << 20,
 	/** Handles \c #kSelectorAILiveEffectIsCompatible messages. If this flag is not set the message will not be sent. */
-	kHandlesIsCompatibleMsg = 1 << 21
+	kHandlesIsCompatibleMsg = 1 << 21,
+    /*Parameters can be converted during Document Scale Conversion*/
+    kHasDocScaleConvertibleParams = 1 << 22
 };
 
 
@@ -398,6 +403,9 @@ struct AILiveEffectGoMessage {
 		does not return any art; in this case, Illustrator disposes of
 		the input art. */
 	AIArtHandle	art;
+	/** [in] This is source art on which effect is applied
+		This if for storing any information which needs to be used later after executing the effect*/
+	AIArtHandle	srcArt;
 };
 
 /** Sent when the user chooses a your registered effect from the Effects menu,
@@ -811,6 +819,18 @@ struct AILiveEffectSuite {
 		*/
 	AIAPI AIErr (*MergeLiveEffectIntoSelection) ( AILiveEffectHandle effect, AILiveEffectMergeAction action );
 
+	/** Creates a new art style by merging live effect into an existing art style.
+			@param artStyle The input art style.
+			@param effect The effect object.
+			@param params The Live Effect parameters.
+			@param action The merge method (append, or replace fill and/or stroke),
+				and whether to send a \c #kSelectorAILiveEffectHandleMerge message
+				to handle the parameters for a replacement method.
+			@param newArtStyle [out] A buffer in which to return the new art style reference.
+		*/
+	AIAPI AIErr (*NewArtStyleByMergingLiveEffect) ( AIArtStyleHandle artStyle, AILiveEffectHandle effect,
+		AILiveEffectParameters params, AILiveEffectMergeAction action, AIArtStyleHandle *newArtStyle );
+
 	/** While handling an \c #AILiveEffectEditParamMessage, retrieves the menu item used
 		to invoke the effect.
 		(Note that this function returns an object value, not an error code.)
@@ -862,11 +882,16 @@ struct AILiveEffectSuite {
 	 	*/
 	AIAPI AIErr (*SetLiveEffectAppVersion) ( AILiveEffectHandle effect, AIVersion appVersionRGB, AIVersion appVersionCMYK );
 
+	/*
+	Searches for a given live effect and returns its Handle. If no live effect corresponding to the name exists then nullptr is returned.
+	@param liveEffectName name of live effect to search for 
+	@param outLiveEffect[out] the live effect whose name is same as the input name.
+	*/
+	AIAPI AIErr (*GetLiveEffectHandleByName) (const char* liveEffectName, AILiveEffectHandle* outLiveEffect);
 };
 
 
 #include "AIHeaderEnd.h"
-
 
 
 #endif

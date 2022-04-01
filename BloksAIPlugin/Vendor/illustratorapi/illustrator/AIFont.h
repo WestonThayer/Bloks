@@ -135,10 +135,17 @@ typedef enum AIFaceScript {
 	kTeluguAIScript = 15,
 	kKannadaAIScript = 16,
 	kMalayalamAIScript = 17,
+	
+	kSinhaleseAIScript = 18,
+	kBurmeseAIScript = 19,
+	kKhmerAIScript = 20,
+	kThaiAIScript = 21,
+	kLaotianAIScript = 22,
 
 	kSimplifiedChineseAIScript = 25,
 	kEastEuropeanRomanAIScript = 29,
 	kSymbolAIScript = 32,
+	kEmojiAIScript,
 	kTurkishAIScript = 81,
 	kBalticAIScript = 85
 } AIFaceScript;
@@ -509,7 +516,7 @@ struct AIFontSuite {
 			@param result [out] A buffer in which to return the glyph set. You must release
 				this object using \c #ReleaseGlyphSet() when it is no longer needed.
 			@see For the set of registered features tags,
-				\c  http://partners.adobe.com/public/developer/opentype/index_tag3.html
+				\c  https://docs.microsoft.com/en-us/typography/opentype/spec/featuretags 
 		 */
 	AIAPI AIErr (*GetGlyphSet)(AIFontKey theFont, ai::int32 otFeature, AIGlyphSet *result);
 
@@ -549,7 +556,7 @@ struct AIFontSuite {
 			@param featureCount [out] A buffer in which to return the size of array required for
 				\c featureList.
 			@see For the set of registered features tags,
-				\c  http://partners.adobe.com/public/developer/opentype/index_tag3.html
+				\c  https://docs.microsoft.com/en-us/typography/opentype/spec/featuretags 
 		*/
 	AIAPI AIErr (*GetOTFeatures)(AIFontKey theFont, ai::int32 *featureList, ai::int32 *featureCount);
 
@@ -569,7 +576,7 @@ struct AIFontSuite {
 			@return Non-zero (true) if the font contains at least one glyph for the given feature,
 				zero (false) otherwise.
 			@see For the set of registered features tags,
-				\c  http://partners.adobe.com/public/developer/opentype/index_tag3.html
+				\c  https://docs.microsoft.com/en-us/typography/opentype/spec/featuretags 
 		*/
 	AIAPI ai::int32  (*GetGlyphsForFeatureAccessInfo)(ai::int32 theFeature, AIFontKey fontKey, AIBoolean existFlag,
 			AIGlyphSet *glyphSet);
@@ -899,7 +906,7 @@ typedef struct {
 					@param result [out] A buffer in which to return the glyph set. You must release
 						this object using \c #ReleaseGlyphSet() when it is no longer needed.
 					@see For the set of registered features tags,
-						\c  http://partners.adobe.com/public/developer/opentype/index_tag3.html
+						\c  https://docs.microsoft.com/en-us/typography/opentype/spec/featuretags 
 			 */
 			AIAPI AIErr (*GetGlyphSet)(AIFontKey theFont, int AILanguage, ai::int32 otFeature, AIGlyphSet *result);
 			/** Retrieves all OpenType features supported by a particular font.
@@ -912,7 +919,7 @@ typedef struct {
 				@param featureCount [out] A buffer in which to return the size of array required for
 					\c featureList.
 				@see For the set of registered features tags,
-					\c  http://partners.adobe.com/public/developer/opentype/index_tag3.html
+					\c  https://docs.microsoft.com/en-us/typography/opentype/spec/featuretags 
 			*/
 			AIAPI AIErr (*GetOTFeatures)(AIFontKey theFont, int AILanguage, ai::int32 *featureList, ai::int32 *featureCount);
 
@@ -933,7 +940,7 @@ typedef struct {
 				@return Non-zero (true) if the font contains at least one glyph for the given feature,
 					zero (false) otherwise.
 				@see For the set of registered features tags,
-					\c  http://partners.adobe.com/public/developer/opentype/index_tag3.html
+					\c  https://docs.microsoft.com/en-us/typography/opentype/spec/featuretags 
 			*/
 			AIAPI ai::int32  (*GetGlyphsForFeatureAccessInfo)(ai::int32 theFeature, AIFontKey fontKey, int AILanguage, AIBoolean existFlag,
 					AIGlyphSet *glyphSet);

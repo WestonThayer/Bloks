@@ -19,7 +19,10 @@
 using ai::FilePath;
 using ai::UnicodeString;
 
-#ifdef _IAIFilePathSuite_INCLUDE_H_
+#if AI_AUTO_SUITE_AVAILABLE
+	#include "AutoSuite.h"
+	use_suite_required(AIFilePath)
+#elif defined(_IAIFilePathSuite_INCLUDE_H_)
     #include _IAIFilePathSuite_INCLUDE_H_
 #else
 	extern "C" AIFilePathSuite *sAIFilePath;
@@ -59,10 +62,10 @@ FilePath::FilePath(const FilePath &src):
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FilePath::FilePath(const ai::UnicodeString &in, bool expandName):
+FilePath::FilePath(const ai::UnicodeString &in, bool expandName, bool dontStripTrailingSpace):
 	impl(0)
 {
-	AIErr result = sAIFilePath->Set(in, expandName, *this);
+	AIErr result = sAIFilePath->Set(in, expandName, dontStripTrailingSpace, *this);
 	check_result(result);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,15 +82,6 @@ FilePath::FilePath(const CFStringRef string):
 	sAIFilePath->SetFromCFString(string, *this);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-#if DEPRICATED_IN_10_8
-FilePath::FilePath(const FSRef &ref):
-	impl(0)
-{
-	OSStatus result = sAIFilePath->SetFromFSRef(ref, *this);
-	check_result(result);
-}
-#endif // DEPRICATED_IN_10_8
 
 ////////////////////////////////////////////////////////////////////////////////
 FilePath::FilePath(const CFURLRef url):
@@ -101,13 +95,25 @@ FilePath::FilePath(const CFURLRef url):
 ////////////////////////////////////////////////////////////////////////////////
 FilePath::~FilePath()
 {
-	if(impl)
-		(void)sAIFilePath->DeleteFilePath(*this);
+	try
+	{
+		if (impl)
+		{
+			(void)sAIFilePath->DeleteFilePath(*this);
+		}
+	}
+	catch (...)
+	{
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 FilePath &FilePath::operator=(const FilePath &in)
 {
+    //if null is being assigned to null
+    if(in.impl == nullptr && impl == nullptr)
+        return *this;
+    
 	AIErr result = sAIFilePath->Copy(in, *this);
 	check_result(result);
 	return *this;
@@ -218,9 +224,9 @@ void FilePath::Resolve()
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilePath::Set(const ai::UnicodeString &string, bool expandName)
+void FilePath::Set(const ai::UnicodeString &string, bool expandName, bool dontStripTrailingSpace)
 {
-	AIErr result = sAIFilePath->Set(string, expandName, *this);
+	AIErr result = sAIFilePath->Set(string, expandName, dontStripTrailingSpace, *this);
 	check_result(result);
 }
 
@@ -239,14 +245,6 @@ void FilePath::SetFromCFString(const CFStringRef string)
 	sAIFilePath->SetFromCFString(string, *this);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-#if DEPRICATED_IN_10_8
-OSStatus FilePath::SetFromFSRef(const FSRef &ref)
-{
-	OSStatus result = sAIFilePath->SetFromFSRef(ref, *this);
-	return result;
-}
-#endif //DEPRICATED_IN_10_8
 
 ////////////////////////////////////////////////////////////////////////////////
 void FilePath::SetFromCFURL(const CFURLRef url)
@@ -309,18 +307,9 @@ ai::UnicodeString FilePath::GetDirectory(const bool displayName) const
 	return dir;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-#ifdef MAC_ENV
-#if DEPRICATED_IN_10_8
-void FilePath::GetVolumeAndParent(FSVolumeRefNum *vol, UInt32 *parent) const
-{
-	sAIFilePath->GetVolumeAndParent(*this, vol, (ai::uint32*)parent);
-}
-#endif // DEPRICATED_IN_10_8
-#endif //MAC_ENV
 
 ////////////////////////////////////////////////////////////////////////////////
-const char FilePath::GetDelimiter()
+char FilePath::GetDelimiter()
 {
 	return sAIFilePath->GetDelimiter();
 }
@@ -378,14 +367,6 @@ CFStringRef FilePath::GetAsCFString() const
 	return string;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-#if DEPRICATED_IN_10_8
-OSStatus FilePath::GetAsFSRef(FSRef &ref) const
-{
-	OSStatus result = sAIFilePath->GetAsFSRef(*this, ref);
-	return result;
-}
-#endif //DEPRICATED_IN_10_8
 
 ////////////////////////////////////////////////////////////////////////////////
 CFURLRef FilePath::GetAsCFURL() const
@@ -429,9 +410,9 @@ BOOL FilePath::IsAlias ()const
     return sAIFilePath->IsAlias(*this);
 }
 
-BOOL FilePath::IsOnNetwork ()const
+AIBoolean FilePath::IsOnNetwork ()const
 {
-    return sAIFilePath->IsOnNetwork(*this);
+    return static_cast<AIBoolean>(sAIFilePath->IsOnNetwork(*this));
 }
 BOOL FilePath::IsEjectable ()const
 {

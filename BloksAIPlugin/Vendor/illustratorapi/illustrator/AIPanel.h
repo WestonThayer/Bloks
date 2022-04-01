@@ -1,7 +1,7 @@
 /*************************************************************************
 *
 *ADOBE SYSTEMS INCORPORATED
-* Copyright 2010 Adobe Systems Incorporated
+* Copyright 2016 Adobe Systems Incorporated
 * All Rights Reserved.
 *
 *NOTICE:  Adobe permits you to use, modify, and distribute this file in accordance with the 
@@ -26,8 +26,8 @@
 **/
 
 #define kAIPanelSuite					"AI Panel Suite"
-#define kAIPanelSuiteVersion2			AIAPI_VERSION(2)
-#define kAIPanelSuiteVersion			kAIPanelSuiteVersion2
+#define kAIPanelSuiteVersion4			AIAPI_VERSION(4)
+#define kAIPanelSuiteVersion			kAIPanelSuiteVersion4
 #define kAIPanelVersion					kAIPanelSuiteVersion
 
 
@@ -43,7 +43,7 @@
 **/
 #ifdef WIN_ENV
 	typedef HWND AIPanelPlatformWindow;
-#elif MAC_ENV
+#elif defined(MAC_ENV)
     #ifdef __OBJC__
 	@class NSView;
 	typedef NSView*	AIPanelPlatformWindow;
@@ -143,7 +143,7 @@ Provides functions for creating and managing panels.
 struct AIPanelSuite{
 
 	/** Creates a new panel.
-	@param inPluginRef		The plug-in that is creating the panel.
+	@param inPluginRef		The plug-in that creates the panel.
 	@param inID				A unique identifier for the new panel.
 	@param inTitle			The title of the panel.
 	@param inStateCount 	The number of host layouts for the panel; must be at least 1.
@@ -185,8 +185,8 @@ struct AIPanelSuite{
 	If the panel is part of a tabbed group but is not the frontmost tab,
 	it is not considered visible.
 	@param inPanel			The panel object.
-	@param outIsShown		[out] A buffer in which to return true of the panel
-							is effectively visible, false otherwise.
+	@param outIsShown		[out] A buffer in which to return the Boolean output; True if the panel
+							is effectively visible, False otherwise.
 	  **/
 	AIAPI AIErr (*IsShown)(AIPanelRef inPanel, AIBoolean& outIsShown);
 
@@ -232,7 +232,8 @@ struct AIPanelSuite{
 							const ai::AutoBuffer<const ai::uint8*>& inPNGDarkData, const ai::AutoBuffer<ai::uint32>& inDarkDataSize);
 
 
-    /** Sets the icon to be used when a panel is collapsed, using an existing resource.
+    /** @deprecated. Use \c #AIPanelSuite::SetSVGIconResourceID()
+    Sets the icon to be used when a panel is collapsed, using an existing resource.
     Only PNG icons can be used.
     @param inPanel			The panel object.
     @param iconResId		The resource identifier of a PNG icon.
@@ -240,7 +241,15 @@ struct AIPanelSuite{
     **/
 	AIAPI AIErr	(*SetIconResourceID)(AIPanelRef inPanel, const ai::AutoBuffer<ai::uint32>& iconResId, const ai::AutoBuffer<ai::uint32>& darkIconResId);
 
-	/** Retrieves the inner dimensions of the current panel, which excludes the frame, title, and any
+    /** Sets the SVG icon to be used when a panel is collapsed, using an existing resource.
+     @param inPanel         The panel object.
+     @param iconResId		The resource identifier of a SVG icon in 2x scale factor.
+     @param darkIconResId	The resource identifier of a SVG icon for "dark" mode in 2x scale factor.
+     **/
+    AIAPI AIErr (*SetSVGIconResourceID)(AIPanelRef inPanel, ai::uint32 iconResId, ai::uint32 darkIconResId);
+    
+
+    /** Retrieves the inner dimensions of the current panel, which excludes the frame, title, and any
 		platform-specific decorations.
 	@param inPanel			The panel object.
 	@param outSize			[out] A buffer in which to return the size value.
@@ -299,7 +308,7 @@ struct AIPanelSuite{
 
 
 	/** For non-resizable panels, sets the minimum, maximum,
-	preferred unconstrained and preferred constrained sizes
+	preferred unconstrained, and preferred constrained sizes
 	for a panel's inner dimensions to a single size value.
 	For resizable panels, sets only the preferred unconstrained and
 	constrained sizes to the given size.
@@ -341,7 +350,7 @@ struct AIPanelSuite{
 
 	/** Modifies the state count of a panel.
 	@param inPanel			The panel object.
-	@param inStateCount		The new state count. Must be at least 1.
+	@param inStateCount		The new state count; must be at least 1
 	**/
 	AIAPI AIErr	(*SetStateCount)(AIPanelRef inPanel, ai::int16 inStateCount);
 
@@ -453,6 +462,12 @@ struct AIPanelSuite{
 	@param inPanelClosedNotifyProc		The new callback procedure.
 	 **/
 	AIAPI AIErr (*SetClosedNotifyProc)(AIPanelRef inPanel, AIPanelClosedNotifyProc inPanelClosedNotifyProc);
+
+	/** Get Panel Global Rect.
+	@param inPanel                      The panel object.
+	@param outRect                      OutRect.
+	**/
+	AIAPI AIErr(*GetPosition)(AIPanelRef inPanelRef, AIRealRect &outRect);
 };
 
 

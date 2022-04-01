@@ -8,7 +8,7 @@
  *     Purpose:	Adobe Illustrator Path Object Suite.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2009 Adobe Systems Incorporated.
+ * Copyright 1986-2016 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file
@@ -39,7 +39,6 @@
 #endif
 
 #include "AIHeaderBegin.h"
-
 /** @file AIPath.h */
 
 
@@ -50,8 +49,8 @@
  **/
 
 #define kAIPathSuite			"AI Path Suite"
-#define kAIPathSuiteVersion11	AIAPI_VERSION(11)
-#define kAIPathSuiteVersion		kAIPathSuiteVersion11
+#define kAIPathSuiteVersion12	AIAPI_VERSION(12)
+#define kAIPathSuiteVersion		kAIPathSuiteVersion12
 #define kAIPathVersion			kAIPathSuiteVersion
 
 
@@ -237,12 +236,24 @@ struct AIPathSuite {
 		*/
 	AIAPI AIErr (*SetPathSegmentSelected)( AIArtHandle path, ai::int16 segNumber, ai::int16 selected );
 
-	/** Reverses the order of segments in a path. The winding order is only
-		significant if the path is a subpath of a compound path. It controls
-		the insideness of the compound path.
+	/** Reverses the order of segments in a path.
+		The winding order is significant if the path is a subpath of a
+		compound path. It controls the insideness of the compound path.
+		This changes the appearance of the path if variable width, arrowheads, 
+		certain kind of brushes etc. are applied.
 			@param path The path object.
 		*/
 	AIAPI AIErr (*ReversePathSegments) ( AIArtHandle path );
+
+	/** Reverses the direction of a path.
+		For open paths this works the same as \c #ReversePathSegments().
+		For closed paths the transformation on segments is as follows:
+		[0,1,2,...,n-2,n-1] => [0,n-1,n-2,...,2,1].
+		This changes the appearance of the path if variable width, arrowheads,
+		certain kind of brushes etc. are applied.
+			@param path The path object.
+		*/
+	AIAPI AIErr (*ReversePathDirection) ( AIArtHandle path );
 
 	/** Calculates the area of a path. A pathﾒs winding order is
 		determined by the sign of area. If the area is negative,
@@ -255,8 +266,6 @@ struct AIPathSuite {
 				square points.
 		*/
 	AIAPI AIErr (*GetPathArea) ( AIArtHandle path, AIReal *area );
-
-	// New for AI8.0:
 
 	/** Calculates the length of the perimeter of a path measured in points.
 			@param path The path object.
@@ -293,15 +302,11 @@ struct AIPathSuite {
 	 	*/
 	AIAPI AIErr (*GetPathIsClip) ( AIArtHandle path, AIBoolean *isClip );
 
-	// New for AI 11
-
 	/** Reports whether all segments of a path are selected.
 			@param path The path object.
 			@param selected [out] A buffer in which to return true if the path is fully selected.
 		*/
 	AIAPI AIErr (*GetPathAllSegmentsSelected) ( AIArtHandle path, AIBoolean *selected );
-
-	// New for AI 13
 
 	/** Retrieves path object and segment number of the key anchor point (that is,
 		the one to which other anchor points are aligned). The key anchor point
@@ -326,8 +331,6 @@ struct AIPathSuite {
 		*/
 	AIAPI AIBoolean (*IsPath9SliceSplitter)(AIArtHandle path);
 
-	// New for AI14
-
 	/** Sets the key anchor point of an art object.
 		The key is the one to which other anchor points are aligned.
 		Setting a new anchor point as key replaces the previous one.
@@ -341,8 +344,6 @@ struct AIPathSuite {
 				no art object is specified.
 	 */
 	AIAPI AIErr (*SetKeySegment)(AIArtHandle path, ai::int16 segmentNumber);
-
-	// New for AI15
 
 	// Functions to measure path segments or access path positions specified by length fractions.
 	// The flatness used is adaptive per segment (based on the bounding box of its control points) and is not a parameter.

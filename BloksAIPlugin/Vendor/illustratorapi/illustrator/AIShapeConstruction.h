@@ -364,7 +364,18 @@ typedef struct {
 	*/
 	AIAPI AIErr(*NewLine)(const AIRealPoint& center, const AIReal length, const AIReal
 						  rotationAngle, AIArtHandle *newArt);
-	
+    
+#if defined(ILLUSTRATOR_MINIMAL)
+    /** Creates a path for circular arc.
+        @param center center point for the circle of which the arc is a part of.
+        @param startAngle absolute start angle of the arc in radians.
+        @param endAngle absolute end angle of the arc in radians.
+        @param outerRadius radius of outer arc..
+        @param innerRadius radius of inner arc.
+        @param newArt [out] A buffer in which to return the new path object.
+     */
+    AIAPI AIErr(*NewCircularArc)(const AIRealPoint& center, const AIReal startAngle, const AIReal endAngle, const AIReal outerRadius, const AIReal innerRadius, AIArtHandle* newArt);
+#endif	
 
 } AIShapeConstructionSuite;
 

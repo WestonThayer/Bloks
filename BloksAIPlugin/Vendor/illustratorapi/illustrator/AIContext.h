@@ -52,7 +52,7 @@
  **/
 
 #define kAIAppContextSuite			"AI Context Suite"
-#define kAIAppContextSuiteVersion	AIAPI_VERSION(7)
+#define kAIAppContextSuiteVersion	AIAPI_VERSION(10)
 #define kAIAppContextVersion		kAIAppContextSuiteVersion
 
 enum AIAppContextKind
@@ -95,12 +95,12 @@ typedef struct _t_AIAppMenuContextOpaque *AIAppMenuContext;
 	changes that occur during a single application context are grouped
 	together into a single operation, which can then be undone and redone.
 
-	Most plug-ins will not need to use these functions because Illustrator
+	Most plug-ins don't need to use these functions, because Illustrator
 	manages the context. In rare situations, however, a plug-in may need
-	to make changes to the context. For example, if a plug-in can
-	be called directly by the operating system, Illustrator will not have
-	established the context. If the plug-in wants to make SDK calls
-	in response, it should use \c #PushAppContext() and \c #PopAppContext().
+	to make changes to the context. For example, if a plug-in is called directly
+	by the operating system, Illustrator has not established the context. 
+	If the plug-in wants to make SDK calls in response, it should use 
+	\c #PushAppContext() and \c #PopAppContext().
 
 	\li Acquire this suite using \c #SPBasicSuite::AcquireSuite() with the constants
 		\c #kAIAppContextSuite and \c #kAIAppContextVersion.
@@ -189,6 +189,23 @@ typedef struct {
 	*/
 	AIAPI AIErr (*GetRulerWidthOffsetOnActiveDocument) (AIRect *horzRulerBounds, AIRect *vertRulerBounds, AIRect *cntrRulerBounds);
 
+	/** Tells if Application context is present or not.
+	**
+	** @return A buffer returning whether application context is present or not.
+	*/
+	AIAPI AIBoolean	(*DoesAppContextExist)();
+
+	/** Gets the current AppContextKind.
+		@param kind [out] A buffer in which to return the kind
+			\c kAIAppContextStandardKind, \c kAIAppContextUndoRedoKind, \c kAIAppContextBetaUpdateKind
+			which are mutually exclusive. See \c enum AIAppContextKind
+	*/
+	AIAPI AIErr (*GetAppContextKind) (AIAppContextKind &kind);
+    
+    /** Tells if kAPIContextShowProgressOption flag is set or not in APIContext options.
+        returns true/false whether progress bar is allowed or not.
+     */
+    AIAPI AIErr (*IsProgressBarAllowed) (AIBoolean &result);
 
 } AIAppContextSuite;
 

@@ -1,24 +1,20 @@
-#ifndef __AIPlaced__
-#define __AIPlaced__
-
-/*
- *        Name:	AIPlaced.h
- *   $Revision: 25 $
- *      Author:
- *        Date:
- *     Purpose:	Adobe Illustrator Placed Object Suite.
+/*************************************************************************
+ * ADOBE CONFIDENTIAL
+ * ___________________
  *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2007 Adobe Systems Incorporated.
- * All rights reserved.
+ *  Copyright 1986 Adobe
+ *  All Rights Reserved.
  *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file 
- * in accordance with the terms of the Adobe license agreement 
- * accompanying it. If you have received this file from a source other 
- * than Adobe, then your use, modification, or distribution of it 
- * requires the prior written permission of Adobe.
- *
- */
+ * NOTICE:  All information contained herein is, and remains
+ * the property of Adobe and its suppliers, if any. The intellectual
+ * and technical concepts contained herein are proprietary to Adobe
+ * and its suppliers and are protected by all applicable intellectual
+ * property laws, including trade secret and copyright laws.
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained
+ * from Adobe.
+ **************************************************************************/
+#pragma once
 
 
 /*******************************************************************************
@@ -40,7 +36,7 @@
 #endif
 
 #include "IAIFilePath.hpp"
-
+#include "AIPlacedTypes.h"
 #include "AIHeaderBegin.h"
 
 /** @file AIPlaced.h */
@@ -52,11 +48,30 @@
  **
  **/
 
-#define kAIPlacedSuite			"AI Placed Suite"
-#define kAIPlacedSuiteVersion9	AIAPI_VERSION(9)
-#define kAIPlacedSuiteVersion	kAIPlacedSuiteVersion9
-#define kAIPlacedVersion		kAIPlacedSuiteVersion
+#define kAIPlacedSuite				"AI Placed Suite"
+#define kAIPlacedSuiteVersion10		AIAPI_VERSION(10)
+#define kAIPlacedSuiteVersion		kAIPlacedSuiteVersion10
+#define kAIPlacedVersion			kAIPlacedSuiteVersion
 
+
+/*******************************************************************************/
+using ai::PlaceMethod;
+using ai::PlaceAlignment;
+using ai::kAsIs;
+using ai::kFill;
+using ai::kFit;
+using ai::kConform;
+using ai::kReconform;
+using ai::kTopLeft;
+using ai::kMidLeft;
+using ai::kBotLeft;
+using ai::kTopMid;
+using ai::kMidMid;
+using ai::kBotMid;
+using ai::kTopRight;
+using ai::kMidRight;
+using ai::kBotRight;
+/***/
 
 /** Types of placed object. */
 enum AIPlacedObjectType {
@@ -64,38 +79,6 @@ enum AIPlacedObjectType {
 	kEPSType = 0,
 	/** Not EPS */
 	kOtherType
-};
-
-/** Methods for positioning and sizing a linked object.
-	@see \c #AIPlacedSuite::SetPlaceOptions(), \c #AIPlacedSuite::GetPlaceOptions() */
-enum PlaceMethod {
-	/** Preserve original dimensions regardless of bounding box size and transformations. */
-	kAsIs,
-	/** Fill bounding box while preserving proportions. Can overlap edges in one dimension. */
-	kFill,
-	/** Fit fully inside bounding box while preserving proportions. */
-	kFit,
-	/** Fit to bounding box; replaced file preserves bounds but not proportions. */
-	kConform,
-	/** Fit to bounding box; replaced file preserves transformations and tries to preserve size.
-		Default. */
-	kReconform
-};
-
-/** Alignment options for positioning a linked object.
-	@see \c #AIPlacedSuite::SetPlaceOptions(), \c #AIPlacedSuite::GetPlaceOptions() */
-enum PlaceAlignment {
-	kTopLeft,
-	kMidLeft,
-	kBotLeft,
-
-	kTopMid,
-	kMidMid,
-	kBotMid,
-
-	kTopRight,
-	kMidRight,
-	kBotRight
 };
 
 /** Request types for \c #AIPlacedSuite::ExecPlaceRequest(). */
@@ -442,9 +425,12 @@ typedef struct AIPlacedSuite {
 			@param plateInfo [out]  A buffer in which to return which plates are used by the placed object
 		*/
 	AIAPI AIErr (*GetProcessPlatesInfo) (AIArtHandle art, AIPlacedPlateInfo * plateInfo);
+
+	/* Check if Placed Linked Object File is damaged(corrupt) or not.
+		@param art The placed object.
+	*/
+	AIAPI AIBoolean(*IsPlacedFileDamaged) (AIArtHandle art);
 	
 } AIPlacedSuite;
 
 #include "AIHeaderEnd.h"
-
-#endif

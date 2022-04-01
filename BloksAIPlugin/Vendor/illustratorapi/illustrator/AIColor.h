@@ -1,23 +1,21 @@
 #ifndef __AIColor__
 #define __AIColor__
 
-/*
- *        Name:	AIColor.h
- *      Author:
- *        Date:
- *     Purpose:	Adobe Illustrator Color type definitions (not a suite)
+/*************************************************************************
  *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2007 Adobe Systems Incorporated.
- * All rights reserved.
+ * ADOBE CONFIDENTIAL
  *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file 
- * in accordance with the terms of the Adobe license agreement 
- * accompanying it. If you have received this file from a source other 
- * than Adobe, then your use, modification, or distribution of it 
- * requires the prior written permission of Adobe.
+ * Copyright 2018 Adobe
  *
- */
+ * All Rights Reserved.
+ *
+ * NOTICE: Adobe permits you to use, modify, and distribute this file in
+ * accordance with the terms of the Adobe license agreement accompanying
+ * it. If you have received this file from a source other than Adobe,
+ * then your use, modification, or distribution of it requires the prior
+ * written permission of Adobe.
+ *
+ **************************************************************************/
 
 
 /*******************************************************************************
@@ -48,7 +46,7 @@
 /** Types of colors, patterns, and gradients,
 	that can be used to fill or stroke Illustrator art objects.
 	 */
-typedef enum {
+enum AIColorTag {
 	/** Grayscale color. */
 	kGrayColor = 0,
 	/** Solid ink, expressed in four CMYK process colors. */
@@ -63,19 +61,23 @@ typedef enum {
 	kThreeColor,
 	/** Null color, If art is painted with \c kNoneColor, the
 	 \c fillPaint or \c strokePaint of the \c #AIPathStyle must be false */
-	kNoneColor
-} AIColorTag;
+	kNoneColor,
+    /**
+     Advance color can not be represented in AIColor and need to used with parser.
+     **/
+    kAdvanceColor
+};
 
 /** Defines a named custom color, whose appearance is
 	defined by a color of one of these types. See \c #AICustomColorSuite. */
-typedef enum {
+enum AICustomColorTag {
 	/** Solid ink, expressed in four process colors */
 	kCustomFourColor = 0,
 	/** Solid color, expressed as three RGB values. */
 	kCustomThreeColor,
  	/** Lab color. Only valid for spot colors. */
 	kCustomLabColor
-} AICustomColorTag;
+};
 
 /** Types of gradients, or color blends. See \c #AIGradientStyle. */
 enum {
@@ -111,52 +113,98 @@ typedef short AICustomColorFlags;
  **/
 
 /** A grayscale color. */
-typedef struct {
+struct AIGrayColorStyle {
 	AIReal gray;
-} AIGrayColorStyle;
+    void Init()
+    {
+        gray = 0;
+    }
+};
 
 /** The valid fields of a partial gray color. */
-typedef struct {
+struct AIGrayColorStyleMap {
 	AIBoolean gray;
-} AIGrayColorStyleMap;
+    void Init()
+    {
+        gray = false;
+    }
+};
 
 
 /** A CMYK color. */
-typedef struct {
+struct AIFourColorStyle {
 	AIReal cyan, magenta, yellow, black;
-} AIFourColorStyle;
+    void Init()
+    {
+        cyan = 0;
+        magenta = 0;
+        yellow = 0;
+        black = 0;
+    }
+};
 
 /** The valid fields of a partial CMYK color. */
-typedef struct {
+struct AIFourColorStyleMap {
 	AIBoolean cyan, magenta, yellow, black;
-} AIFourColorStyleMap;
+    void Init()
+    {
+        cyan = false;
+        magenta = false;
+        yellow = false;
+        black = false;
+    }
+};
 
 
 /** An RGB color. */
-typedef struct {
+struct AIThreeColorStyle {
 	AIReal red, green, blue;
-} AIThreeColorStyle;
+    void Init()
+    {
+        red = 0;
+        green = 0;
+        blue = 0;
+    }
+};
 
 /** The valid fields of a partial RGB color. */
-typedef struct {
+struct AIThreeColorStyleMap {
 	AIBoolean red, green, blue;
-} AIThreeColorStyleMap;
+    void Init()
+    {
+        red = false;
+        green = false;
+        blue = false;
+    }
+};
 
 
 /** A Lab color. */
-typedef struct {
+struct AILabColorStyle {
 	AIReal l, a, b;
-} AILabColorStyle;
+    void Init()
+    {
+        l = 0;
+        a = 0;
+        b = 0;
+    }
+};
 
 /** The valid fields of a partial Lab color. */
-typedef struct {
+struct AILabColorStyleMap {
 	AIBoolean l, a, b;
-} AILabColorStyleMap;
+    void Init()
+    {
+        l = false;
+        a = false;
+        b = false;
+    }
+};
 
 
 /** The union of all possible process colors that can be associated with
 	a custom color. See \c #AICustomColorSuite. */
-typedef union {
+union AICustomColorUnion {
 	/** A CMYK color */
 	AIFourColorStyle	f;
 	/** An RGB color */
@@ -165,12 +213,12 @@ typedef union {
 	AIGrayColorStyle	gray;
 	/** A Lab color */
 	AILabColorStyle		lab;
-} AICustomColorUnion;
+};
 
 /** A named custom color. A custom color can be a spot (actual ink)
 	or a global process color. In either case, it has an associated
 	process color. See \c #AICustomColorSuite. */
-typedef struct {
+struct AICustomColor {
 	/** The type of the associated process color (CMYK or RGB) */
 	AICustomColorTag	kind;
 	/** The color values, in an appropriate structure. */
@@ -178,30 +226,48 @@ typedef struct {
 	/** Option flags for properties of the custom color.
 		A logical OR of \c #kCustomSpotColor and \c #kCustomRegistrationColor.  */
 	AICustomColorFlags	flag;
-} AICustomColor;
+
+	void Init()
+	{
+		flag = 0;
+		kind = kCustomFourColor;
+		c = {};
+	}
+};
 
 /** Opaque reference to a custom color. See \c #AICustomColorSuite. */
 typedef void *AICustomColorHandle;
 
 /** An instance of a custom color paint. */
-typedef struct {
+struct AICustomColorStyle {
 	/** Reference to the custom color. See \c #AICustomColorSuite. */
 	AICustomColorHandle color;
 	/** Amount of the custom color to be applied. Value is in the range
 		0 to 1 where ((1 - tint) * 100) is the percentage of ink to apply. */
 	AIReal tint;
-} AICustomColorStyle;
+    
+    void Init()
+    {
+        color = nullptr;
+        tint = 0;
+    }
+};
 
 /** The valid fields of a partial custom color paint. */
-typedef struct {
-	AIBoolean color;
+struct AICustomColorStyleMap {
+    AIBoolean color;
 	AIBoolean tint;
-} AICustomColorStyleMap;
+    void Init()
+    {
+        color = false;
+        tint = false;
+    }
+};
 
 /** Obsolete */
-typedef struct {
+struct AIPattern {
 	AIBoolean not_implemented;
-} AIPattern;
+};
 
 /** Opaque reference to a pattern.See \c #AIPatternSuite. */
 typedef void *AIPatternHandle;
@@ -217,9 +283,9 @@ typedef void *AIPatternHandle;
 	in the \c AIPatternStyle record are applied to the pattern art.
 
 */
-typedef struct {
+struct AIPatternStyle {
 	/** An opaque reference to the pattern object, accessed through the
-		\c #AIPatternSuite, whose functions get and set a pattern’s name
+		\c #AIPatternSuite, whose functions get and set a patterns name
 		and defining art object or objects.
 		 */
 	AIPatternHandle pattern;
@@ -230,7 +296,7 @@ typedef struct {
 		in degrees. */
 	AIReal shiftAngle;
 	/** Fraction to scale the prototype before filling. */
-	AIRealPoint scale;
+    AIRealPoint scale;
 	/** Angle to rotate the prototype before filling. */
 	AIReal rotate;
 	/** When true, the prototype is reflected before filling */
@@ -243,11 +309,26 @@ typedef struct {
 	AIReal shearAxis;
 	/** Additional transformation arising from manipulating the path. */
 	AIRealMatrix transform;
-} AIPatternStyle;
+    
+    void Init()
+    {
+        pattern = nullptr;
+        shiftDist = 0;
+        shiftAngle = 0;
+        scale = {0, 0};
+        rotate = 0;
+        reflect = false;
+        reflectAngle = 0;
+        shearAngle = 0;
+        shearAxis = 0;
+		transform.Init();
+    }
+    
+};
 
 /** The valid fields of a partial pattern style. */
-typedef struct {
-	AIBoolean pattern;
+struct AIPatternStyleMap {
+    AIBoolean pattern;
 	AIBoolean shiftDist;
 	AIBoolean shiftAngle;
 	AIBoolean scale;
@@ -257,7 +338,20 @@ typedef struct {
 	AIBoolean shearAngle;
 	AIBoolean shearAxis;
 	AIBoolean transform;
-} AIPatternStyleMap;
+    void Init()
+    {
+        pattern = false;
+        shiftDist = false;
+        shiftAngle = false;
+        scale = false;
+        rotate = false;
+        reflect = false;
+        reflectAngle = false;
+        shearAngle = false;
+        shearAxis = false;
+        transform = false;
+    }
+};
 
  /** Opaque reference to a gradient color. See \c #AIGradientSuite. */
 typedef void *AIGradientHandle;
@@ -272,7 +366,7 @@ typedef void *AIGradientHandle;
 	attribute called a blend \e hilight, which is the starting point
 	for the gradient ramp as it expands outward.
 	*/
-typedef struct {
+struct AIGradientStyle {
 	/** An opaque reference to the gradient. Access using functions in the
 		\c #AIGradientSuite. It contains a \c name, \c type (linear or radial),
 		and a ramp defined by a set of \e stops. */
@@ -294,7 +388,7 @@ typedef struct {
 		as the transformation matrix of the object containing the gradient.
 		When a gradient is first applied to an object, the value is set to the
 		identity matrix. When the user transforms the object, the user
-		transformation matrix is concatenated to the gradient instance’s matrix. */
+		transformation matrix is concatenated to the gradient instances matrix. */
 	AIRealMatrix matrix;
 	/** \li For a radial gradient, the angle to the blend highlight point.
 		\li Not used for linear gradients.  */
@@ -314,10 +408,10 @@ typedef struct {
 		hiliteAngle = kAIRealZero;
 		hiliteLength = kAIRealZero;
 	}
-} AIGradientStyle;
+};
 
 /** The valid fields of a partial gradient style. */
-typedef struct {
+struct AIGradientStyleMap {
 	AIBoolean gradient;
 	AIBoolean gradientOrigin;
 	AIBoolean gradientAngle;
@@ -335,11 +429,11 @@ typedef struct {
 		hiliteAngle = false;
 		hiliteLength = false;
 	}
-} AIGradientStyleMap;
+};
 
 
 /** The union of all possible types of color specification. */
-typedef union {
+union AIColorUnion {
 	/** A grayscale color */
 	AIGrayColorStyle g;
 	/** A CMYK color */
@@ -352,10 +446,11 @@ typedef union {
 	AIPatternStyle p;
 	/** A gradient (blend) */
 	AIGradientStyle b;
-} AIColorUnion;
+    
+};
 
 /** The valid fields of a partial color union. */
-typedef union {
+union AIColorUnionMap {
 	/** A grayscale color */
 	AIGrayColorStyleMap g;
 	/** A CMYK color */
@@ -368,35 +463,47 @@ typedef union {
 	AIPatternStyleMap p;
 	/** A gradient (blend) */
 	AIGradientStyleMap b;
-} AIColorUnionMap;
+    
+};
 
 /** A color specification, which describes a solid color, pattern, or gradient.
 	A color can be partially specified, as when retrieving the common color attributes
 	of a collection of objects or when modifying a specific subset of color attributes
 	for one or more objects. When a color is partially specified an associated
 	\c #AIColorMap contains boolean values indicating which fields are valid. */
-typedef struct {
+struct AIColor {
 	/** The type of color being described. */
 	AIColorTag kind;
 	/** Contains the detailed specification of the color as appropriate for
 		the \c kind. */
-	AIColorUnion c;
-} AIColor;
+    AIColorUnion c;
+    
+    void Init()
+    {
+        kind = kNoneColor;
+		c = {};
+    }
+};
 
 /** The valid fields of a partial color specification. For
 	example, if \c kind is true, the associated \c AIColor has
 	a valid value for \c kind. */
-typedef struct {
+struct AIColorMap {
 	AIBoolean kind;
 	AIColorUnionMap c;
-} AIColorMap;
+	void Init()
+	{
+		kind = false;
+		c = {};
+	}
+};
 
 
 /** Defines a gradient stop. Each stop is place where the color changes in a blend.
 	A set of stops defines the gradient \e ramp.
 	See \c #AIGradientStyle and \c #AIGradientSuite.
 	*/
-typedef struct {
+struct AIGradientStop {
 	/** The location between two ramp points where there is an equal mix of this
 		color and the color of the next stop. This value is a percentage of the
 		distance between the two ramp points, between 13 and 87. The midpoint
@@ -416,10 +523,10 @@ typedef struct {
 	{
 		midPoint = kAIRealZero;
 		rampPoint = kAIRealZero;
-		color.kind = kNoneColor;
+		color.Init();
 		opacity = kAIRealZero;
 	}
-} AIGradientStop;
+};
 
 
 /** Result return type for \c #AIPathStyleSuite::ObjectUsesAIColor(). */
@@ -581,6 +688,39 @@ enum VisitAIColorFlagValues {
 
 	/** When on, the Registration color is not filtered out. (By default this color is not visited.) */
 	kVisitColorsIncludeRegistration = 0x0800
+};
+
+
+/*******************************************************************************
+ **
+ ** Constants
+ **
+ *******************************************************************************/
+
+#define kAIColorSuite				"AI Color Suite"
+#define kAIColorSuiteVersion1       AIAPI_VERSION(1)
+#define kAIColorSuiteVersion        kAIColorSuiteVersion1
+
+/*******************************************************************************
+ **
+ **	Suite
+ **
+ ********************************************************************************/
+/** @ingroup Suites
+ Acquire this suite using \c #SPBasicSuite::AcquireSuite() with the constants
+ \c #kAIColorSuite and \c #kAIColorSuiteVersion.
+ */
+
+
+struct AIColorSuite {
+    
+    /** returns true if colors are equal otherwise false.
+     @param color1 : First AIColor
+     
+     @param color2 : Second AIColor.
+     */
+    AIAPI AIBoolean (*IsEqual) (const AIColor& color1, const AIColor &color2);
+    
 };
 
 #include "AIHeaderEnd.h"

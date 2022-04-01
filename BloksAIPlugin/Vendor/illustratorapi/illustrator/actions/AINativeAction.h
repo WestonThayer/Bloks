@@ -1,5 +1,4 @@
-#ifndef _AINATIVEACTION_H_
-#define _AINATIVEACTION_H_
+#pragma once
 
 /*
  *        Name:	AINativeAction.h
@@ -20,9 +19,7 @@
  *
  */
 
-#ifndef __AITypes__
-#include "AITypes.h"
-#endif
+#include "AIActionManager.h"
 
 // -----------------------------------------------------------------------------
 //	Types.
@@ -176,6 +173,3 @@ const ActionParamKeyID kAIEPSUseDefaultScreensKey		= 'dfsc';
 /** Additional parameter for \c #kAISaveDocumentAsAction when saving as an EPS file.
 	Integer: how to handle overprints in the EPS file. An \c #AIEPSOverprints value.  */
 const ActionParamKeyID kAIEPSOverprintsKey				= 'eopt';
-
-
-#endif

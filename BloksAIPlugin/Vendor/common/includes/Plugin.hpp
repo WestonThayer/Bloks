@@ -1,8 +1,8 @@
 //========================================================================================
 //  
-//  $File: //ai_stream/rel_20_0/devtech/sdk/public/samplecode/common/includes/Plugin.hpp $
+//  $File$
 //
-//  $Revision: #1 $
+//  $Revision$
 //
 //  Copyright 1987 Adobe Systems Incorporated. All rights reserved.
 //  
@@ -55,6 +55,7 @@ extern "C" ASAPI ASErr PluginMain(char* caller, char* selector, void* message);
 #if defined(__GNUC__)
 #pragma GCC visibility pop
 #endif	
+
 	
 class Plugin
 {
@@ -68,7 +69,8 @@ protected:
 	long fErrorTimeout;
 	ASBoolean fSupressDuplicateErrors;
 	time_t fLastErrorTime;
-		
+	AINotifierHandle fApplicationStartedNotifier{};
+	AINotifierHandle fApplicationShutdownNotifer{};
 public:
 	Plugin(SPPluginRef pluginRef);
 	Plugin() {}
@@ -76,7 +78,7 @@ public:
 	void *operator new(size_t size);
 	void operator delete(void *pMem);
 	
-	ASBoolean SuitesAcquired() { return fSuites != nil; }
+	ASBoolean SuitesAcquired() { return fSuites != nullptr; }
 	virtual void ReportError(ASErr error, char *caller, char *selector, void *message);
 	static void DefaultError(SPPluginRef ref, ASErr error);
 	static ASBoolean FilterError(ASErr error);
@@ -88,6 +90,7 @@ public:
 
 	virtual ASErr StartupPlugin(SPInterfaceMessage *message); 
 	virtual ASErr PostStartupPlugin(); 
+	virtual ASErr PreShutdownPlugin();
 	virtual ASErr ShutdownPlugin(SPInterfaceMessage *message); 
 	virtual ASErr UnloadPlugin(SPInterfaceMessage *message);
 	virtual ASErr ReloadPlugin(SPInterfaceMessage *message);
