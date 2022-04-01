@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>BuildMachineOSBuild</key>
-	<string>15G31</string>
+	<string>21E258</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
@@ -11,11 +11,11 @@
 	<key>CFBundleExecutable</key>
 	<string>BloksAIPlugin</string>
 	<key>CFBundleGetInfoHTML</key>
-	<string>BloksAIPlugin version 18 . 0 . 0 . 0, "Copyright 1987-2014 Adobe Systems Incorporated. All rights reserved."</string>
+	<string>BloksAIPlugin version 25 . 3 . 0 . 0, "Copyright © 1987-2021 by Adobe Inc.  All rights reserved."</string>
 	<key>CFBundleGetInfoString</key>
-	<string>BloksAIPlugin version 18 . 0 . 0 . 0, "Copyright 1987-2014 Adobe Systems Incorporated. All rights reserved."</string>
+	<string>BloksAIPlugin version 25 . 3 . 0 . 0, "Copyright © 1987-2021 by Adobe Inc.  All rights reserved."</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.adobe.illustrator.plugins.BloksAIPlugin</string>
+	<string>kSDKDefAIBundlePrefix.plugins.BloksAIPlugin</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -23,7 +23,7 @@
 	<key>CFBundlePackageType</key>
 	<string>ARPI</string>
 	<key>CFBundleShortVersionString</key>
-	<string>BloksAIPlugin version 18 . 0 . 0 . 0</string>
+	<string>BloksAIPlugin version 25 . 3 . 0 . 0</string>
 	<key>CFBundleSignature</key>
 	<string>ART5</string>
 	<key>CFBundleSupportedPlatforms</key>
@@ -31,23 +31,27 @@
 		<string>MacOSX</string>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>18 . 0 . 0 . 0</string>
+	<string>25 . 3 . 0 . 0</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>
 	<key>DTCompiler</key>
 	<string>com.apple.compilers.llvm.clang.1_0</string>
 	<key>DTPlatformBuild</key>
-	<string>7D1014</string>
+	<string>13C100</string>
+	<key>DTPlatformName</key>
+	<string>macosx</string>
 	<key>DTPlatformVersion</key>
-	<string>GM</string>
+	<string>12.1</string>
 	<key>DTSDKBuild</key>
-	<string>15E60</string>
+	<string>21C46</string>
 	<key>DTSDKName</key>
-	<string>macosx10.11</string>
+	<string>macosx12.1</string>
 	<key>DTXcode</key>
-	<string>0731</string>
+	<string>1321</string>
 	<key>DTXcodeBuild</key>
-	<string>7D1014</string>
+	<string>13C100</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.9</string>
 	<key>LSRequiresCarbon</key>
 	<true/>
 </dict>

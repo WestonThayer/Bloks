@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		27E74DA827F7930C0083D233 /* AIPluginDebug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 27E74DA527F7930C0083D233 /* AIPluginDebug.xcconfig */; };
+		27E74DA927F7930C0083D233 /* AIPluginRelease.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 27E74DA627F7930C0083D233 /* AIPluginRelease.xcconfig */; };
+		27E74DAA27F7930C0083D233 /* AIPluginCommon.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 27E74DA727F7930C0083D233 /* AIPluginCommon.xcconfig */; };
 		2AF5F7490CF5EF100091D961 /* AppContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AF5F7430CF5EF100091D961 /* AppContext.cpp */; };
 		2AF5F74A0CF5EF100091D961 /* IllustratorSDK.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AF5F7440CF5EF100091D961 /* IllustratorSDK.cpp */; };
 		2AF5F74B0CF5EF100091D961 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AF5F7450CF5EF100091D961 /* Main.cpp */; };
@@ -26,6 +29,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		27E74DA527F7930C0083D233 /* AIPluginDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = AIPluginDebug.xcconfig; path = Vendor/common/mac/AIPluginDebug.xcconfig; sourceTree = SOURCE_ROOT; };
+		27E74DA627F7930C0083D233 /* AIPluginRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = AIPluginRelease.xcconfig; path = Vendor/common/mac/AIPluginRelease.xcconfig; sourceTree = SOURCE_ROOT; };
+		27E74DA727F7930C0083D233 /* AIPluginCommon.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = AIPluginCommon.xcconfig; path = Vendor/common/mac/AIPluginCommon.xcconfig; sourceTree = SOURCE_ROOT; };
 		2AF5F7430CF5EF100091D961 /* AppContext.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = AppContext.cpp; path = Vendor/common/source/AppContext.cpp; sourceTree = SOURCE_ROOT; };
 		2AF5F7440CF5EF100091D961 /* IllustratorSDK.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = IllustratorSDK.cpp; path = Vendor/common/source/IllustratorSDK.cpp; sourceTree = SOURCE_ROOT; };
 		2AF5F7450CF5EF100091D961 /* Main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Main.cpp; path = Vendor/common/source/Main.cpp; sourceTree = SOURCE_ROOT; };
@@ -58,9 +64,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		27E74DA427F792DA0083D233 /* xcconfigs */ = {
+			isa = PBXGroup;
+			children = (
+				27E74DA727F7930C0083D233 /* AIPluginCommon.xcconfig */,
+				27E74DA527F7930C0083D233 /* AIPluginDebug.xcconfig */,
+				27E74DA627F7930C0083D233 /* AIPluginRelease.xcconfig */,
+			);
+			path = xcconfigs;
+			sourceTree = "<group>";
+		};
 		508817C209F0C9740071BF1A = {
 			isa = PBXGroup;
 			children = (
+				27E74DA427F792DA0083D233 /* xcconfigs */,
 				508817F509F0CAB50071BF1A /* Sources */,
 				5088180609F0CDD00071BF1A /* Libraries */,
 				6EE2BA590A40BDD300CC7CE2 /* Resources */,
@@ -163,17 +180,18 @@
 		508817C409F0C9740071BF1A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 1320;
 			};
 			buildConfigurationList = 508817C509F0C9740071BF1A /* Build configuration list for PBXProject "BloksAIPlugin" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
-				Japanese,
-				French,
-				German,
+				Base,
+				fr,
+				de,
+				ja,
+				en,
 			);
 			mainGroup = 508817C209F0C9740071BF1A;
 			productRefGroup = 508817D509F0C9AD0071BF1A /* Products */;
@@ -190,6 +208,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27E74DA827F7930C0083D233 /* AIPluginDebug.xcconfig in Resources */,
+				27E74DAA27F7930C0083D233 /* AIPluginCommon.xcconfig in Resources */,
+				27E74DA927F7930C0083D233 /* AIPluginRelease.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,29 +251,55 @@
 /* Begin XCBuildConfiguration section */
 		508817C609F0C9740071BF1A /* debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27E74DA727F7930C0083D233 /* AIPluginCommon.xcconfig */;
 			buildSettings = {
 				AI_CONFIGURATION = debug;
 				AI_LOCALE = en_US;
 				AI_PLATFORM = xcode;
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CONFIGURATION_BUILD_DIR = "output/mac/$(AI_CONFIGURATION)";
 				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/Default";
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DSTROOT = "/tmp/$(PROJECT_NAME).dst";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				EXPORTED_SYMBOLS_FILE = "";
 				FRAMEWORK_SEARCH_PATHS = "$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)";
 				GCC_DEBUGGING_SYMBOLS = used;
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = YES;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Vendor/common/includes/IllustratorSDK$(AI_CONFIGURATION).pch";
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_PKGINFO_FILE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -269,7 +316,6 @@
 				OBJROOT = .;
 				ONLY_LINK_ESSENTIAL_SYMBOLS = YES;
 				OTHER_LDFLAGS = "";
-				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
 				PRODUCT_NAME = BloksAIPlugin;
@@ -291,29 +337,55 @@
 		};
 		508817C709F0C9740071BF1A /* release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27E74DA727F7930C0083D233 /* AIPluginCommon.xcconfig */;
 			buildSettings = {
 				AI_CONFIGURATION = release;
 				AI_LOCALE = en_US;
 				AI_PLATFORM = xcode;
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CONFIGURATION_BUILD_DIR = "output/mac/$(AI_CONFIGURATION)";
 				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/Default";
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DSTROOT = "/tmp/$(PROJECT_NAME).dst";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				EXPORTED_SYMBOLS_FILE = "";
 				FRAMEWORK_SEARCH_PATHS = "$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)";
 				GCC_DEBUGGING_SYMBOLS = used;
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = YES;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Vendor/common/includes/IllustratorSDK$(AI_CONFIGURATION).pch";
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_PKGINFO_FILE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -330,7 +402,6 @@
 				OBJROOT = .;
 				ONLY_LINK_ESSENTIAL_SYMBOLS = YES;
 				OTHER_LDFLAGS = "";
-				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
 				PRODUCT_NAME = BloksAIPlugin;
@@ -352,10 +423,12 @@
 		};
 		508817D809F0C9AE0071BF1A /* debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27E74DA527F7930C0083D233 /* AIPluginDebug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "kSDKDefAIBundlePrefix.plugins.$(PRODUCT_NAME)";
 				SDKROOT = macosx;
 				STRIP_STYLE = "non-global";
 			};
@@ -363,10 +436,12 @@
 		};
 		508817D909F0C9AE0071BF1A /* release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27E74DA627F7930C0083D233 /* AIPluginRelease.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "kSDKDefAIBundlePrefix.plugins.$(PRODUCT_NAME)";
 				SDKROOT = macosx;
 				STRIP_STYLE = "non-global";
 			};
