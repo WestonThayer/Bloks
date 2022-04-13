@@ -1,8 +1,8 @@
 //========================================================================================
 //  
-//  $File: //ai_stream/rel_20_0/devtech/sdk/public/samplecode/common/includes/SDKDef.h $
+//  $File$
 //
-//  $Revision: #1 $
+//  $Revision$
 //
 //  Copyright 1987 Adobe Systems Incorporated. All rights reserved.
 //  
@@ -28,9 +28,9 @@
 #endif
 #define kSDKDefBuildNumber	0
 
-#define kSDKDefAIMajorVersionNum   18
-#define kSDKDefAIMinorVersionNum   0
-#define kSDKDefAIRevisionVersionNum    0
+#define kSDKDefAIMajorVersionNum	25
+#define kSDKDefAIMinorVersionNum	3
+#define kSDKDefAIRevisionVersionNum	0
 //eg "15.0.0.0"
 #define kSDKDefAIShortVersionString __STRING__(kSDKDefAIMajorVersionNum) "." __STRING__(kSDKDefAIMinorVersionNum) "." __STRING__(kSDKDefAIRevisionVersionNum) "." __STRING__(kSDKDefBuildNumber)
 #define kSDKDefAIFullCompanyName      "Adobe Systems Incorporated"
@@ -38,7 +38,7 @@
 //Mac specific for Plists
 #define kSDKDefAIBundlePrefix    com.adobe.illustrator
 
-#define kSDKDefCopyrightString "Copyright 1987-2014 Adobe Systems Incorporated. All rights reserved."
+#define kSDKDefCopyrightString "Copyright © 1987-2021 by Adobe Inc.  All rights reserved."
 #define kSDKDefFileDescriptionString "Adobe Illustrator SDK Plug-in"
 //eg "15.0"
 #define kSDKDefProductVersionString __STRING__(kSDKDefAIMajorVersionNum) "." __STRING__(kSDKDefAIMinorVersionNum)
@@ -52,5 +52,5 @@
 #define kSDKDefAboutSDKCompanyPluginsGroupNameString		"About SDK Plug-ins"
 
 // About box description for SDK plug-ins
-#define kSDKDefAboutSDKCompanyPluginsAlertString "An Adobe Illustrator SDK sample\nhttp://www.adobe.com/devnet/\nCopyright 1987-2014 Adobe Systems Incorporated. All rights reserved."
+#define kSDKDefAboutSDKCompanyPluginsAlertString "An Adobe Illustrator SDK sample\nhttp://www.adobe.com/devnet/\nCopyright © 1987-2021 by Adobe Inc.  All rights reserved."
 #endif //__SDKDef_h__

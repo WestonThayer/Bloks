@@ -28,7 +28,7 @@
  **/
 
 #include "SPTypes.h"
-#include "AiBasicTypes.h"
+#include "AIBasicTypes.h"
 
 #if PRAGMA_STRUCT_ALIGN
 #pragma options align=mac68k

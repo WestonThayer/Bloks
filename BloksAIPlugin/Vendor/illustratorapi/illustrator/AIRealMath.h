@@ -46,7 +46,7 @@
  **/
 
 #define kAIRealMathSuite			"AI Real Math Suite"
-#define kAIRealMathSuiteVersion		AIAPI_VERSION(4)
+#define kAIRealMathSuiteVersion		AIAPI_VERSION(5)
 #define kAIRealMathVersion			kAIRealMathSuiteVersion
 
 // Most of this stuff is completely unnecessary, and is just here to ease the
@@ -109,6 +109,9 @@
 
 #define kSmallestFixedNumberEquivalent_Tolerance		((AIReal) (1.0 / (1 << 16)) )	// 1 / 2^16
 #define kAIRealTolerance								kSmallestFixedNumberEquivalent_Tolerance
+
+#define kAIMinTransformDimensionValue                   ((AIReal) 0.00001)
+#define kAIToleranceForZero                             ((AIReal) (1.0 / (1 << 19)) )    // 1 / 2^19
 
 
 /*******************************************************************************
@@ -573,6 +576,13 @@ typedef struct {
 		    @param result [out] A buffer in which to return the result.
 		*/
 	AIAPI void (*AIRealMatrixXformPoint) ( const AIRealMatrix *m, const AIRealPoint *a, AIRealPoint *result );
+    
+    /** Transforms a rect using a transformation matrix.
+            @param m The matrix.
+            @param a The rect.
+            @param result [out] A buffer in which to return the result.
+     */
+    AIAPI void (*AIRealMatrixXformRect) ( const AIRealMatrix *m, const AIRealRect *a, AIRealRect *result );
 
     /**	Converts an \c #AIReal value to an \c #AIFixed value.
 			@param r The real value.

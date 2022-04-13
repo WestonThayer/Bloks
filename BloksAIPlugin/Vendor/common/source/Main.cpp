@@ -1,8 +1,8 @@
 //========================================================================================
 //  
-//  $File: //ai_stream/rel_20_0/devtech/sdk/public/samplecode/common/source/Main.cpp $
+//  $File$
 //
-//  $Revision: #1 $
+//  $Revision$
 //
 //  Copyright 1987 Adobe Systems Incorporated. All rights reserved.
 //  
@@ -58,8 +58,8 @@ extern "C" ASAPI ASErr PluginMain(char* caller, char* selector, void* message)
 				{
 					// Make sure to delete in case startup failed
 					delete plugin;
-					plugin = nil;
-					msgData->globals = nil;
+					plugin = nullptr;
+					msgData->globals = nullptr;
 				}
 			}
 			else
@@ -73,8 +73,8 @@ extern "C" ASAPI ASErr PluginMain(char* caller, char* selector, void* message)
 			{
 				error = plugin->ShutdownPlugin((SPInterfaceMessage *)message);				
 				delete plugin;
-				plugin = nil;
-				msgData->globals = nil;
+				plugin = nullptr;
+				msgData->globals = nullptr;
 			}
 		}
 	}

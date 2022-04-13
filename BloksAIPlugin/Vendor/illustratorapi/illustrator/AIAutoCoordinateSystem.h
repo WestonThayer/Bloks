@@ -24,6 +24,9 @@
 
 #ifdef _AI_AUTO_COORDINATE_SYSTEM_INCLUDE_H_
 #include _AI_AUTO_COORDINATE_SYSTEM_INCLUDE_H_
+#elif  AI_AUTO_SUITE_AVAILABLE
+#include "AutoSuite.h"
+extern_declare_suite(AIHardSoft);
 #else
 #ifndef _AI_AUTO_COORDINATE_SYSTEM_USE_C_LINKAGE_
 #define _AI_AUTO_COORDINATE_SYSTEM_USE_C_LINKAGE_ 1
@@ -75,7 +78,13 @@ namespace ai
 		*/
 		~AutoCoordinateSystem()
 		{
-			sAIHardSoft->SetCoordinateSystem(fCoordinateSystem);
+			try
+			{
+				sAIHardSoft->SetCoordinateSystem(fCoordinateSystem);
+			}
+			catch (...)
+			{
+			}
 		}
 	private:
 		ai::int32 fCoordinateSystem;

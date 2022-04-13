@@ -173,7 +173,13 @@ enum
 	/** A pointer which is 8-bytes in 64-bit and 4-bytes in 32 bit.**/
 	PointerType,
 	/** PointType which is written as relative to ruler origin in document*/
-	ArtworkPointType
+	ArtworkPointType,
+	/** A Smooth Shading Style. See ToDo \c #AIArtStyleSuite. */
+	SmoothShadingType
+#if defined(ILLUSTRATOR_MINIMAL)
+    /** A Boost uuid Type*/
+    ,BoostUUIDType
+#endif
 };
 
 

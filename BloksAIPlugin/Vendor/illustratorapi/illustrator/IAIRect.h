@@ -22,9 +22,10 @@
 * Includes
 */
 
-#include "AITypes.h"
+#include "AIBasicTypes.h"
 #include <cmath>
 #include <cfloat>
+#include <cstdlib>
 #include "AIBasicUtilities.h"
 
 namespace ai
@@ -62,6 +63,9 @@ namespace ai
 			typedef ai::int32 Coordinates_t;
 	#endif
 	#ifdef MAC_ENV
+			typedef short Coordinates_t;
+    #endif
+	#ifdef LINUX_ENV
 			typedef short Coordinates_t;
 	#endif
 			typedef Absolute<Coordinates_t> ABS_t;

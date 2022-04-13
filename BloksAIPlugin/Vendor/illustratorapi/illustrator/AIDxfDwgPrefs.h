@@ -48,8 +48,12 @@ enum DxfDwgAutoCADVersion
 	eR18,
 	/** AutoCAD version 2007/2008/2009 */
 	eR21,
-	/** AutoCad version 2010/2011/2012(Not all the features of 2012 though) */
-	eR24
+	/** AutoCad version 2010/2011/2012 */
+	eR24,
+	/** Autocad version 2013*/
+	eR27,
+	/* Autocad version 2018*/
+	eR32
 };
 
 /** AutoCAD file filter preference constants: measurement units. */
@@ -61,6 +65,7 @@ enum DxfDwgUnit
 	eMillimeters,
 	eCentimeters,
 	ePixels,
+	eFeets,
 	eNumberOfUnits
 };
 
@@ -134,7 +139,7 @@ enum DxfDwgExportOption
 /** AutoCAD file filter preference constants: AutoCAD version for export */
 #define kDxfDwgExportAutoCADVersion					"ExportAutoCADVersion"
 /** AutoCAD file filter preference constants: default AutoCAD version for export	 */
-#define kDxfDwgDefaultExportAutoCADVersion			eR24
+#define kDxfDwgDefaultExportAutoCADVersion			eR32
 
 /** AutoCAD file filter preference constants: scale ratio for export  */
 #define kDxfDwgExportUnitScaleRatio					"ExportUnitScaleRatio"
@@ -225,6 +230,10 @@ enum DxfDwgExportOption
 /** AutoCAD file filter preference constants: default for whether to scale line weights on import.   */
 #define kDxfDwgDefaultImportScaleLineweights		false
 
+/** AutoCAD file filter preference constants: whether to always convert AI group to Autocad Block Reference    */
+#define kDxfDwgExportGroupAsBlockRef		"ExportGroupAsBlockRef"
+/** AutoCAD file filter preference constants: default for whether to always convert AI group to Autocad Block Reference   */
+#define kDxfDwgDefaultExportGroupAsBlockRef	false
 // ------------------------------------------------------------------
 // structures
 
@@ -254,7 +263,8 @@ struct DxfDwgExportPrefs
 	AIBoolean					m_isOutlineText;
 	/** Whether to scale line weights on export. */
 	AIBoolean					m_isScaleLineweights;
-
+	/* whether to always convert AI group to Autocad Block Reference    */
+	AIBoolean                   m_isExportGroupAsBlockRef;
 };
 
 

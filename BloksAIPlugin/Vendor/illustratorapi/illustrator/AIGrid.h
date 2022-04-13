@@ -50,9 +50,9 @@
 /** Grid suite name */
 #define kAIGridSuite			"AI Grid Suite"
 /** Grid suite version */
-#define kAIGridSuiteVersion5	AIAPI_VERSION(5)
+#define kAIGridSuiteVersion6	AIAPI_VERSION(6)
 /** Grid suite version */
-#define kAIGridSuiteVersion		kAIGridSuiteVersion5
+#define kAIGridSuiteVersion		kAIGridSuiteVersion6
 /** Grid suite version */
 #define kAIGridVersion			kAIGridSuiteVersion
 
@@ -75,7 +75,7 @@ enum {
 /** Grid spacing information. */
 typedef struct {
 	/** Major grid increments, in points. */
-	AIFloat				spacing;
+	AIReal				spacing;
 	/** Minor grid increments. The number of steps (subdivisions)
 		per major increment. */
 	ai::int32				ticks;

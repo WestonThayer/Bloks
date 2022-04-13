@@ -6,7 +6,7 @@
  *     Purpose:	Adobe Illustrator Art Style Suite.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2015 Adobe Systems Incorporated.
+ * Copyright 1986-2016 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file 
@@ -51,11 +51,11 @@
  **
  **/
 
-#define kAIArtStyleSuite		"AI Art Style Suite"
-#define kAIArtStyleSuiteVersion7 AIAPI_VERSION(7)
+#define kAIArtStyleSuite			"AI Art Style Suite"
+#define kAIArtStyleSuiteVersion8	AIAPI_VERSION(8)
 
 /* Latest version */
-#define kAIArtStyleSuiteVersion		kAIArtStyleSuiteVersion7
+#define kAIArtStyleSuiteVersion		kAIArtStyleSuiteVersion8
 #define kAIArtStyleVersion			kAIArtStyleSuiteVersion
 
 /** Focus types, sent in notify data for \c #kAIArtStyleFocusChangedNotifier.*/
@@ -91,7 +91,7 @@ enum AIArtStyleFocusValue {
 /** An art style Preference key, a value for a \c suffix parameter in the
 	\c #AIPreferenceSuite functions, with a \c prefix value of \c NULL.
 	This preference controls whether new objects created
-	by the user with the shape, brush, pen, or pencil tools inherits the full
+	by the user with the shape, brush, pen, or pencil tools inherit the full
 	appearance currently displayed in the Appearance palette, or inherit only
 	the current fill and stroke (with no transparency). This is tied to the
 	"New Art Has Basic Appearance" option in the Appearance palette flyout menu. */
@@ -100,7 +100,7 @@ enum AIArtStyleFocusValue {
 /** An art style Preference key, a value for a \c suffix parameter in the
 	\c #AIPreferenceSuite functions, with a \c prefix value of \c NULL.
 	This preference controls whether Illustrator strips
-	the fill and stroke colors off all the text runs (that is. all the characters)
+	the fill and stroke colors off for all the text runs (that is, all the characters)
 	when a user applies a graphic style to a text object. Controls the
 	"Override Character Color" option in the Graphic Styles palette. */
 #define kAIContainerOverridesObjectAppearancePref		"AI Container Overrides Object"
@@ -350,10 +350,19 @@ struct AIArtStyleSuite {
 		*/
 	AIAPI AIErr (*SetCurrentArtStyle) ( AIArtStyleHandle artStyle );
 
+	/**	Reports whether an art style is anonymous. Named art styles appear in the
+		Graphic Styles palette.
+		(Note that the function returns a boolean value, not an error code.)
+
+			@param artStyle The art style object.
+			@return True if the style is anonymous; false if it is named.
+		*/
+	AIAPI AIBoolean (*IsArtStyleAnonymous) ( AIArtStyleHandle artStyle );
+
 	/** Retrieves the unique name of an art style.
 			@param artStyle The art style.
 			@param name [out] A buffer in which to return the name.
-			@param isAnonymous [out] A buffer in  which to return true if the style is anonymous,
+			@param isAnonymous [out] A buffer in  which to return the output as true if the style is anonymous,
 				or false if it is named (shown in the Graphic Styles palette).
 			*/
 	AIAPI AIErr (*GetArtStyleName) ( AIArtStyleHandle artStyle, ai::UnicodeString& name,
@@ -465,13 +474,13 @@ struct AIArtStyleSuite {
 	/** Tests equivalence between two art styles.
 			@param artStyle1 The first art style.
 			@param artStyle2 The second art style.
-			@param result [out] A buffer in which to return true if the styles are equivalent.
+			@param result [out] A buffer in which to return the output as true if the styles are equivalent.
 			@note A false result does not guarantee that the two styles are not equivalent.
 	*/
 	AIAPI AIErr (*Equiv) ( AIArtStyleHandle artStyle1, AIArtStyleHandle artStyle2,
 							  AIBoolean* result );
 
-	/** Sorts the named art styles in the current document alphabetically by name. The order
+	/** Sorts the named art styles in the current document alphabetically. The order
 		is reflected in the Graphic Styles palette.
 		*/
 	AIAPI AIErr (*SortNamedStyles) ( void );
@@ -560,8 +569,8 @@ struct AIArtStyleSuite {
 				A logical OR of \c #AITransformArtOptions values.
 				If the \c kTransformObjects flag is on, it is assumed that the art object itself
 				has also been transformed by the same matrix, and that any transformation of the points,
-				descendant art, and so on, has already been performed. This allows gradient vectors and
-				other style attributes that are dependent upon object bounds to be adjusted immediately
+				descendant art, and so on, have already been performed. This allows gradient vectors and
+				other style attributes that are dependent upon object bounds to be adjusted immediately,
 				rather than deferred until artwork synchronization.
 			*/
 	AIAPI AIErr (*TransformObjectArtStyle) ( AIArtHandle art, AIRealMatrix *matrix, AIReal lineScale, ai::int32 flags );
@@ -582,7 +591,7 @@ struct AIArtStyleSuite {
 		*/
 	AIAPI AIErr (*GetToolArtStyle) ( AIArtStyleHandle* artStyle );
 
-	// ===================== NEW FOR Illustrator 10.0 =========================
+	// ===================== Introduced in Illustrator 10.0 =========================
 
 	/** Expands the style of an art object, replacing the art object with the art
 		that would be returned by \c #GetStyledArt(). Transfers opacity masks,

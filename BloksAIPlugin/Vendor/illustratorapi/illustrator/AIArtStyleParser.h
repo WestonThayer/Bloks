@@ -36,6 +36,8 @@
 #include "AIPathStyle.h"
 #endif
 
+#include "AISmoothShadingStyle.h"
+
 #include "AIHeaderBegin.h"
 
 /** @file AIArtStyleParser.h */
@@ -47,8 +49,8 @@
  **/
 
 #define kAIArtStyleParserSuite				"AI Art Style Parser Suite"
-#define kAIArtStyleParserSuiteVersion8		AIAPI_VERSION(8)
-#define kAIArtStyleParserSuiteVersion		kAIArtStyleParserSuiteVersion8
+#define kAIArtStyleParserSuiteVersion9		AIAPI_VERSION(9)
+#define kAIArtStyleParserSuiteVersion		kAIArtStyleParserSuiteVersion9
 #define kAIArtStyleParserVersion			kAIArtStyleParserSuiteVersion
 
 
@@ -902,6 +904,42 @@ struct AIArtStyleParserSuite {
 		*/
 	AIAPI AIErr (*SetParserPaintBlendVisible) ( AIParserPaintField paintField, AIBoolean visible);
 
+    
+    /** Constructs a new paint field with a given smooth shading.
+     The new paint field is not associated with any parser.
+     @param smoothStyle The smoothStyle style.
+     @param paintField [out] A buffer in which to return the new paint field.
+     */
+    AIAPI AIErr(*NewPaintFieldSmoothShading) ( AISmoothShadingStyle smoothStyle/*move aware*/, AIParserPaintField& paintField);
+    
+    /** Reports whether a paint field corresponds to a smooth shading style. (Note that this function
+     returns a boolean value, not an error code.)
+     @param paintField The paint field.
+     @return True if the paint field is for a smooth shading style.
+     */
+    AIAPI AIBoolean (*IsSmoothShadingStyle) ( AIParserPaintField paintField );
+    
+    /** Retrieves SmoothShadingStyle information from a paint field.
+     @param paintField The paint field.
+     @param outSmoothStyle [out] A buffer in which to return the SmoothShadingStyle style.
+     */
+    
+    AIAPI AIErr (*GetSmoothShadingStyle)(AIParserPaintField paintField, AISmoothShadingStylePtr &outSmoothStyle);
+    
+    /**
+     Clone all the effect from fromPaintField field to toPaintField. All existing effects on toPaintField will be lost.
+     @param parser : The parser.
+     @param fromPaintField : Source paint field from which effects should be applied.
+     @param toPaintField : Destination paint field on which effects will be applied.
+     **/
+    AIAPI AIErr (*CloneEffectsList) (AIStyleParser parser, AIParserPaintField &fromPaintField, AIParserPaintField &toPaintField);
+    
+    /** Sets SmoothShadingStyle information for a paint field.
+     @param paintField The paint field.
+     @param inSmoothShadingStyle: The new smooths shading style.
+	 @returns error if paintField kind is not smooth shading.
+     */
+    AIAPI AIErr (*SetSmoothShadingStyle) (AIParserPaintField paintField, AISmoothShadingStylePtr inSmoothShadingStyle);
 };
 
 

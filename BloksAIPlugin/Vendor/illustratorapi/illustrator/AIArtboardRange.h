@@ -27,10 +27,10 @@
 /** @file AIArtboardRange.h */
 
 #define kAIArtboardRangeSuite			"AI Artboard Range Suite"
-#define kAIArtboardRangeSuiteVersion3		AIAPI_VERSION(3)
+#define kAIArtboardRangeSuiteVersion4		AIAPI_VERSION(4)
 
 /* Latest version */
-#define kAIArtboardRangeSuiteVersion		kAIArtboardRangeSuiteVersion3
+#define kAIArtboardRangeSuiteVersion		kAIArtboardRangeSuiteVersion4
 #define kAIArtboardRangeVersion			kAIArtboardRangeSuiteVersion
 
 
@@ -65,7 +65,7 @@ typedef struct
 	@param range [out] A buffer in which to return the new artboard range reference.
 	@see \c #ValidateString()
 	*/
-	AIAPI AIErr (*Create)(ASBoolean allArtboards, ai::UnicodeString *rangeStr, AIArtboardRangeHandle* range);
+	AIAPI AIErr (*Create)(ASBoolean allArtboards, const ai::UnicodeString *rangeStr, AIArtboardRangeHandle* range);
 
 	/**
 	Retrieves the number of artboards in an artboard range.
@@ -104,6 +104,13 @@ typedef struct
 	AIAPI AIErr (*Previous)(AIArtboardRangeIterator rangeItr, ASInt32 *artboardNumber);
 
 	/**
+	Sets the iterator to the last element in an artboard range.
+
+	@param rangeItr The artboard range iterator.
+	*/
+	AIAPI AIErr(*Back)(AIArtboardRangeIterator rangeItr);
+
+	/**
 	Disposes of an artboard range iterator created by \c #Begin().
 
 	@param rangeItr An artboard range iterator.
@@ -125,12 +132,12 @@ typedef struct
 	@param rangeStr The string containing the artboard range.
 	@return The error \c #kBadParameterErr if the range string is invalid.
 	*/
-	AIAPI AIErr (*ValidateString)(ai::UnicodeString *rangeStr);
+	AIAPI AIErr (*ValidateString)(const ai::UnicodeString *rangeStr);
 
 	/**
 	Reports whether an artboard range includes all defined artboards.
 	@param range An artboard range reference.
-	@param result [out] A buffer in which to return true if the range includes all artboards, false otherwise.
+	@param result [out] A buffer in which to return the output as true if the range includes all artboards, false otherwise.
 	@return The error \c #kBadParameterErr if any parameter is NULL.
 	*/
 	AIAPI AIErr (*IsAllSelected)(AIArtboardRangeHandle range,ASBoolean * result);

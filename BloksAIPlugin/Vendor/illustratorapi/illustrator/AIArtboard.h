@@ -25,7 +25,7 @@
 **/
 
 #include "IAIArtboards.hpp"
-
+#include "IAIAutoBuffer.h"
 
 #include "AIHeaderBegin.h"
 
@@ -38,7 +38,7 @@
 **/
 
 #define kAIArtboardSuite				"AI Artboard Suite"
-#define kAIArtboardSuiteVersion			AIAPI_VERSION(3)
+#define kAIArtboardSuiteVersion			AIAPI_VERSION(6)
 #define kAIArtboardVersion				kAIArtboardSuiteVersion
 
 /*******************************************************************************
@@ -65,8 +65,7 @@ rather than calling these functions directly.
 \c #kAIArtboardSuite and \c #kAIArtboardSuiteVersion.
 
 */
-typedef struct
-{
+struct AIArtboardSuite{
 	/** Initializes an artboard properties object with default values.
 	@param artboard The artboard properties object.
 	*/
@@ -215,6 +214,7 @@ typedef struct
 	@param artboard The new artboard's properties.
 	@param index 0-based index position of the new artboard.
 	@return The error \c #kAIExceededMaxArtboardLimitErr if maximum number of allowed artboards is exceeded.
+	Note : It will override the UUID in artboardProperties. In case you want to preserve the UUID in artboard properties use \c #InsertUsingArtboardPropertiesUUID()
 	*/
 	AIAPI AIErr (*Insert)(ai::ArtboardList& artboardList,ai::ArtboardProperties& artboard, ai::ArtboardID& index);
 
@@ -233,9 +233,80 @@ typedef struct
 	*/
 	AIAPI AIErr (*SetIsDefaultName)(ai::ArtboardProperties& properties,const AIBoolean& isDefault);
 
-} AIArtboardSuite;
+	/** Query artboard selection
+	@param properties		The artboard properties object.
+	@param isSelected [out]	A buffer in which to return the selection
+	*/
+	AIAPI AIErr (*IsSelected)(const ai::ArtboardProperties& properties, AIBoolean &isSelected);
+	
+	/** Select one artboard
+	@param artboardList		The ArtboardList object.
+	@param artboardID		The artboard to select.
+	@param exclusively		if true, clear existing selection first.
+	*/
+	AIAPI AIErr (*SelectArtboard)(ai::ArtboardList& artboardList, ai::ArtboardID artboardID, AIBoolean exclusively);
+
+	/** Select multiple artboards
+	@param artboardList		The ArtboardList object.
+	@param artboardIDs		The artboards to select.
+	@param exclusively		if true, clear existing selection first.
+	*/
+	AIAPI AIErr (*SelectArtboards)(ai::ArtboardList& artboardList, const ai::AutoBuffer<ai::ArtboardID>& artboardIDs, AIBoolean exclusively);
+
+	/** Select all artboards
+	@param artboardList		The ArtboardList object.
+	*/
+	AIAPI AIErr (*SelectAllArtboards)(ai::ArtboardList& artboardList);
+
+	/** Delete set of artboards
+	@param artboardList		The ArtboardList object.
+	@param artboardIDs		The artboards to delete.
+	*/
+	AIAPI AIErr (*DeleteArtboards)(ai::ArtboardList& artboardList, const ai::AutoBuffer<ai::ArtboardID>& artboardIDs);
+
+	/** Deselect an artboard
+	@param artboardList		The ArtboardList object.
+	@param artboardID		The artboard to de-select.
+	*/
+	AIAPI AIErr (*DeselectArtboard)(ai::ArtboardList& artboardList, ai::ArtboardID artboardID);
+
+	/** Deselect all artboards
+	@param artboardList		The ArtboardList object.
+	*/
+	AIAPI AIErr (*DeselectAllArtboards)(ai::ArtboardList& artboardList);
+
+	AIAPI AIErr(*AreAnyArtboardsOverlapping)(ai::ArtboardList &artboardList, AIBoolean &isOverlapping);
+    
+#if defined(ILLUSTRATOR_MINIMAL)
+    /** Retrieves Artboard UUID
+    @param properties       The artboard properties to retrieve from.
+    @param uuid             The uuid to fetch.
+    */
+    AIAPI AIErr (*GetUUID)(const ai::ArtboardProperties& properties, ai::ArtboardUUID& uuid);
+    
+    /** Clones artboard properties with unique UUID.
+    @param source           The artboard whose property is to be cloned
+    @param dest             Cloned properties
+    */
+    AIAPI AIErr (*CloneWithUniqueUUID)(ai::ArtboardProperties& dest, const ai::ArtboardProperties& source);
+#endif
+	
+	/** Retrieves Artboard UUID as Unicode String
+	@param properties       The artboard properties to retrieve from.
+	@param uuid             The uuid to fetch.
+	*/
+	AIAPI AIErr (*GetUUIDAsString)(const ai::ArtboardProperties& properties, ai::UnicodeString& uuid);
+
+
+	/** Inserts a new Artboard at the specified location using the UUID in artboard properties.
+	@param artboardList The ArtboardList object.
+	@param artboard The new artboard's properties.
+	@param index 0-based index position of the new artboard.
+	@return The error \c #kAIExceededMaxArtboardLimitErr if maximum number of allowed artboards is exceeded.
+	*/
+	AIAPI AIErr(*InsertUsingArtboardPropertiesUUID)(ai::ArtboardList& artboardList, ai::ArtboardProperties& artboard, ai::ArtboardID& index);
+};
+
 #include "AIHeaderEnd.h"
-
-
 
 #endif // __AIArtboards__

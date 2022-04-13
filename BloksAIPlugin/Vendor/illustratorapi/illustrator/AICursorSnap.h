@@ -100,12 +100,12 @@ typedef AICustomAnnotationLine* AICustomAnnotationLinePtr;
 
 /** Function pointer type to retrieve details of custom annotations
 * to be drawn (if kDrawCustomAnnotations flag is set).
-* The function pointer is set  in AICursorConstraint struct during constraint addition
+* The function pointer is set in AICursorConstraint struct during constraint addition.
 * When the custom constraint is hit and annotations are ready to be drawn, the callback is invoked.
 *		@param	inId				ConstraintId of the custom constraint hit
 *		@param	inSnappedPt			The point we snapped to
 *		@param  outNumberOfLines	Number Of Annotation Lines to be drawn (To be Filled by the callback)
-*		@param	outAnnotationLines	An array of custom annotations lines to be drawn (To be Filled by the callback)
+*		@param	outAnnotationLines	An array of custom annotation lines to be drawn (To be Filled by the callback)
 * The calling function is responsible to destroy the array of points.
 */
 typedef AIErr(*CustomAnnotationsCallback)(ai::uint32 inId, const AIRealPoint& inSnappedPt, size_t* outNumberOfLines, AICustomAnnotationLine** outAnnotationLines);
@@ -129,7 +129,7 @@ struct AICursorConstraint {
 	AIRealPoint					point;
 	/** When \c kind is \c kLinearConstraintRel, the angle of the line. */
 	AIReal						angle;
-	/** Label for the constraint presented to the user. Keep the max size to be 256 bytes */
+	/** Label for the constraint presented to the user. Keep the maximum size to be 256 bytes */
 	ai::UnicodeString			label;
 	/** Callback function registered by client to retrieve details for drawing custom annotations. */
 	CustomAnnotationsCallback	getCustomAnnotationDetails;
@@ -174,8 +174,8 @@ struct AICursorConstraint {
 	Tools that use the Smart Guides snapping facility use these
 	functions in the cursor-tracking code. The suite provides functions
 	for snapping the cursor to various things, called \e constraints.
-	Constraints include art objects, page boundaries
-	and the automatically generated guide lines. You can also define your own
+	Constraints include art objects, page boundaries,
+	and automatically generated guide lines. You can also define your own
 	constraints, using \c #SetCustom(), although most tools do not do so.
 
 	@note Turning on the grid turns smart guides off, so you never use
@@ -188,7 +188,7 @@ struct AICursorConstraint {
 	takes a current cursor location and returns the snapped location.
 	A control string contains a series of Smart Guide commands
 	that control how the snap is performed; that is, what kind of
-	object is snapped to, and what kind of location to look for in
+	object is snapped to and what kind of location to look for in
 	each kind of object.
 
 	You can find out what object is under the snapped location:
@@ -200,28 +200,28 @@ if (result)
 	throw ai::Error(result);
 @endcode
 
-	These are the control strings used by the various tools built
+	These are the control strings used by various tools built
 	into Illustrator, as saved in the preferences file.
 	The first entry in each line is the key used in preferences. The second
-	is the control string for when the mouse is up and the third is the control
-	string for when the mouse is down.
+	is the control string for the time when the mouse is up. The third is the control
+	string for the time when the mouse is down.
 
-	- "Blend", "A v", "A v"
-	- "Select", "A v o f", "ATFGP v i o f"
-	- "RangeSelect", "", ""
-	- "Zoom", "", ""
-	- "Page", "ATFGP v i o", "ATFGP v i o"
-	- "Ruler", "ATFGP v i o", "ATFGP v i o"
-	- "Guide", "ATFGP v i o", "ATFGP v i o"
-	- "Scissor", "ATFGP v i o", "ATFGP v i o"
-	- "SquareCircle", "ATFGP v i o", "ATFGP v i o"
-	- "Pen", "ATFGP v i o", "ATFGP v i o"
-	- "Translate", "ATFGP v i o", "ATFGPB v i o"
-	- "Scale", "ATFGP v i o", "ATFGPB v i o"
-	- "Rotate", "ATFGP v i o", "ATFGP v i o"
-	- "Reflect", "ATFGP v i o", "ATFGP v i o"
-	- "Shear", "ATFGP v i o", "ATFGP v i o"
-	- "Eyebucket", "A v o f", "A v o f"
+	- "Blend",			"A v",				"A v",
+	- "Select",			"A v o f",			"ATFGPLM v i o f", 
+	- "RangeSelect",	"",					"",
+	- "Zoom",			"",					"",
+	- "Page",			"ATFGP v i o",		"ATFGP v i o",
+	- "Ruler",			"ATFGPX v i o",		"ATFGPMX v i o",
+	- "Guide",			"ATFGPX v i o",		"ATFGPX v i o",
+	- "Scissor",		"ATFL v i o",		"ATFGPL v i o", 
+	- "SquareCircle",	"ATFGP v i o",		"ATFGP v i o",
+	- "Pen",			"ATFGPLMSU v i o",	"ATF v i o",
+	- "Translate",		"ATFGP v i o",		"ATFGPBLM v i o",
+	- "Scale",			"ATFGPXY v i o",	"ATFGPBLMXY v i o",
+	- "Rotate",			"ATFGPXY v i o",	"ATFGPLMXY v i o",
+	- "Reflect",		"ATFGPXY v i o",	"ATFGPLMXY v i o",
+	- "Shear",			"ATFGP v i o",		"ATFGPLM v i o",
+	- "Eyebucket",		"A v o f",			"A v o f",
 */
 
 struct AICursorSnapSuite {
@@ -254,7 +254,7 @@ struct AICursorSnapSuite {
 	/** Snaps the cursor to a specified constraint, using a specified technique, using
 		the "Snap To Point" application preference.
 			@param view The document view in which to snap the cursor.
-			@param srcpoint The actual cursor location in view coordinates.
+			@param srcpoint The actual cursor location in artwork coordinates.
 				Typically passed in the \c #AIToolMessage member \c cursor.
 			@param event The state of modifier keys.
 			@param control How snapping is performed, a string containing
@@ -268,17 +268,21 @@ struct AICursorSnapSuite {
 					- T: Enable snapping to custom constraints defined by the current tool.
 					- F: Enable snapping to automatically generated guidelines.
 					- P: Enable snapping to the page boundaries.
-					- L: Enable snapping to automatically generated guidelines along the center and edges
+					- L: Enable snapping to automatically generated guidelines along the center and the edges
 						 of geometric box of all visible art objects in view.
-					- M: Enable snapping to automatically generated guidelines along the center and edges
+					- M: Enable snapping to automatically generated guidelines along the center and the edges
+                    - N: Enable angular snapping to automatically generated guidelines along the angular regions on canvas (currently support only for text objects)
 						 of all artboards in the view.
 					- S: Enable snapping to automatically generated Perspective guidelines.
 					- U: Enable snapping to Perspective Grid visible in the current document.
+					- X: Enable snapping to pixel grid (if "snap to pixel" document preference is set)
+					- Y: Enable snapping to sub-pixel grid (if "snap to pixel" document preference is set)
+					- Z: Enable snapping to pixel/sub-pixel grid in a stroke-aware fashion (if "snap to pixel" document preference is set)
 
 				\li A lower case character is an instruction to look for the best snap location.
 					of a particular type among the currently enabled constraints.
 						- i: Look for intersections of two or more constraints.
-						- o: Try to snap onto a constraint line
+						- o: Try to snap onto a constraint line.
 						- v: Try to snap to a point (vertex).
 						- f: Look for filled objects.
 				\li A space character is an instruction to return the best snap location found
@@ -295,7 +299,7 @@ struct AICursorSnapSuite {
 		tolerance to identify hits on art objects. This function is used for direct
 		selection of anchor points.
 			@param view The document view in which to snap the cursor.
-			@param srcpoint The actual cursor location in view coordinates.
+			@param srcpoint The actual cursor location in artwork coordinates.
 				Typically passed in the \c #AIToolMessage member \c cursor.
 			@param event The state of modifier keys.
 			@param control How snapping is performed, a string containing
@@ -309,6 +313,10 @@ struct AICursorSnapSuite {
 					- T: Enable snapping to custom constraints defined by the current tool.
 					- F: Enable snapping to automatically generated guidelines.
 					- P: Enable snapping to the page boundaries.
+					- X: Enable snapping to pixel grid (if "snap to pixel" document preference is set)
+					- Y: Enable snapping to sub-pixel grid (if "snap to pixel" document preference is set)
+					- Z: Enable snapping to pixel/sub-pixel grid in a stroke-aware fashion (if "snap to pixel" document preference is set)
+
 				\li A lower case character is an instruction to look for the best snap location
 					of a particular type among the currently enabled constraints.
 						- i: Look for intersections of two or more constraints.
@@ -329,11 +337,11 @@ struct AICursorSnapSuite {
 
 	/** Snaps the rectangle supplied to a specified constraint, using a specified technique and
 	the "Snap To Point" application preference. This method returns the new snapped rectangle and
-	new mouse location. If no snapping is done then returned point and rectangle would be same as
+	new mouse location. If no snapping is done, then the returned point and the rectangle would be same as
 	the passed values for source point and rectangle.
 
 		@param view The document view in which to snap the cursor.
-		@param srcpoint The actual cursor location in view coordinates.
+		@param srcpoint The actual cursor location in artwork coordinates.
 			Typically passed in the \c #AIToolMessage member \c cursor.
 		@param event The state of modifier keys.
 		@param control How snapping is performed, a string containing
@@ -347,12 +355,15 @@ struct AICursorSnapSuite {
 				- T: Enable snapping to custom constraints defined by the current tool.
 				- F: Enable snapping to automatically generated guidelines.
 				- P: Enable snapping to the page boundaries.
-				- L: Enable snapping to automatically generated guidelines along the center and edges
+				- L: Enable snapping to automatically generated guidelines along the center and the edges
 					 of geometric box of all visible art objects in view.
-				- M: Enable snapping to automatically generated guidelines along the center and edges
+				- M: Enable snapping to automatically generated guidelines along the center and the edges
 					 of all artboards in the view.
 				- S: Enable snapping to automatically generated Perspective guidelines.
 				- U: Enable snapping to Perspective Grid visible in the current document.
+				- X: Enable snapping to pixel grid (if "snap to pixel" document preference is set)
+				- Y: Enable snapping to sub-pixel grid (if "snap to pixel" document preference is set)
+				- Z: Enable snapping to pixel/sub-pixel grid in a stroke-aware fashion (if "snap to pixel" document preference is set)
 
 			\li A lower case character is an instruction to look for the best snap location.
 				of a particular type among the currently enabled constraints.

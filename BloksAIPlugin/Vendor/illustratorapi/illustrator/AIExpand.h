@@ -78,6 +78,8 @@ enum AIExpandFlagValue {
 	kExpandSymbolInstances	= 0x0040,
 	/** Expand charts */
 	kExpandChartArt			= 0x0080,
+    /** Expand repeats */
+    kExpandRepeatArt        = 0x0100,
 	 /** Stop the expansion operation after the first expansion occurs. */
 	kExpandOneAtATime		= 0x4000,
 	/** Show a progress bar during the operation. */

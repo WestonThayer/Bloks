@@ -163,6 +163,10 @@ typedef SPAPI SPErr (*SPEntry)( const char *caller, const char *selector, void *
 typedef struct SPAccess *SPAccessRef;
 
 
+#ifdef LINUX_ENV
+typedef void* SPMacResChain;
+#endif
+
 
 
 
@@ -192,11 +196,12 @@ typedef SPMacResChain *SPPlatformAccessRef;
 
 #endif
 
-#ifdef WIN_ENV
-
+#if defined(WIN_ENV)
 /** Plug-in library handle on Windows.  */
 typedef HINSTANCE SPPlatformAccessRef;
-
+#elif defined(LINUX_ENV)
+/** Plug-in library handle on Unix.  */
+typedef void* SPPlatformAccessRef;
 #endif
 
 #if	!defined(IOS_ENV)
@@ -338,7 +343,7 @@ typedef struct SPAccessSuite {
 			@param count [out] A buffer in which to return the count.
 		*/
 	SPAPI SPErr (*GetAccessCount)( SPAccessRef access, ai::int32 *count );
-#if	!defined(IOS_ENV)
+#if	!defined(ILLUSTRATOR_MINIMAL)
 	/** Retrieves the platform-specific resource access information of a plug-in accessor.
 		This is for the resource-chain in Mac OS, or the plug-in library in Windows.
 			@param access The access object.
@@ -359,7 +364,7 @@ typedef struct SPAccessSuite {
 		@param resourceAccess The new resource-access information.
 		*/
 	SPAPI SPErr (*SetPluginResourceAccess)( SPPluginRef plugin, SPPlatformAccessRef resourceAccess );
-#endif	// !defined(IOS_ENV)
+#endif	// !defined(ILLUSTRATOR_MINIMAL)
 
 	/** Sends a message to a plug-in, using an accessor object.
 			@param access The access object.
@@ -402,7 +407,7 @@ SPAPI SPErr SPGetAccessPlugin( SPAccessRef access, SPPluginRef *plugin );
 SPAPI SPErr SPGetAccessEntry( SPAccessRef access, SPEntry *entry );
 /** Internal */
 SPAPI SPErr SPGetAccessCount( SPAccessRef access, ai::int32 *count );
-#if	!defined(IOS_ENV)
+#if	!defined(ILLUSTRATOR_MINIMAL)
 /** Internal */
 SPAPI SPErr SPGetAccessInfo( SPAccessRef access, SPPlatformAccessInfo *info );
 
@@ -410,7 +415,7 @@ SPAPI SPErr SPGetAccessInfo( SPAccessRef access, SPPlatformAccessInfo *info );
 SPAPI SPErr SPGetPluginResourceAccess( SPPluginRef plugin, SPPlatformAccessRef *resourceAccess );
 /** Internal */
 SPAPI SPErr SPSetPluginResourceAccess( SPPluginRef plugin, SPPlatformAccessRef resourceAccess );
-#endif	// !defined(IOS_ENV)
+#endif	// !defined(ILLUSTRATOR_MINIMAL)
 
 /** Internal */
 SPAPI SPErr SPCallPlugin( SPAccessRef access, const char *caller, const char *selector,

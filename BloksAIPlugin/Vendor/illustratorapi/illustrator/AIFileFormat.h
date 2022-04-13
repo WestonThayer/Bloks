@@ -1,21 +1,21 @@
+/*************************************************************************
+*
+* ADOBE CONFIDENTIAL
+*
+* Copyright 1986 Adobe
+*
+* All Rights Reserved.
+*
+* NOTICE: Adobe permits you to use, modify, and distribute this file in
+* accordance with the terms of the Adobe license agreement accompanying
+* it. If you have received this file from a source other than Adobe,
+* then your use, modification, or distribution of it requires the prior
+* written permission of Adobe.
+*
+**************************************************************************/
+
 #ifndef __AIFileFormat__
 #define __AIFileFormat__
-
-/*
- *        Name:	AIFileFormat.h
- *     Purpose:	Adobe Illustrator File Format Suite.
- *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2014 Adobe Systems Incorporated.
- * All rights reserved.
- *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file 
- * in accordance with the terms of the Adobe license agreement 
- * accompanying it. If you have received this file from a source other 
- * than Adobe, then your use, modification, or distribution of it 
- * requires the prior written permission of Adobe.
- *
- */
 
 
 /*******************************************************************************
@@ -59,13 +59,13 @@
  **
  **/
 #define kAIFileFormatSuite				"AI File Format Suite"
-#define kAIFileFormatSuiteVersion14		AIAPI_VERSION(14)			// From AI 20.0
-#define kAIFileFormatSuiteVersion		kAIFileFormatSuiteVersion14
+#define kAIFileFormatSuiteVersion15		AIAPI_VERSION(15)			// From AI 23.1
+#define kAIFileFormatSuiteVersion		kAIFileFormatSuiteVersion15
 #define kAIFileFormatVersion			kAIFileFormatSuiteVersion
 
 
 #define kAIMacFileFormatSuite			"AI Mac File Format Suite"
-#define kAIMacFileFormatSuiteVersion	AIAPI_VERSION(4)
+#define kAIMacFileFormatSuiteVersion	AIAPI_VERSION(5)
 #define kAIMacFileFormatVersion			kAIMacFileFormatSuiteVersion
 
 
@@ -168,73 +168,84 @@ enum AIFileFormatOptions {
 	/** Read the file, creating artwork in a new document.
 		The format is included in the File > Open file types.
 		Use when adding a format. */
-	kFileFormatRead	=							(1<<0),
+	kFileFormatRead	=							(1 << 0),
+
 	/** Write the documents contents to a file
 		in a non-Illustrator format.
 		The format is included in the File > Export file types.
 		Use when adding a format. */
-	kFileFormatExport =							(1<<1),
+	kFileFormatExport =							(1 << 1),
+
+	/** Read the file and embed artwork to the current document.
+		The format is included in the File > Import file types.
+		Use when adding a format.*/
+	kFileFormatImportArt =						(1 << 2),
+
+	/** Read the file and embed artwork to the current document.
+		This is the same as \c #kFileFormatImportArt.
+		Use when adding a format.*/
+	kFileFormatPlaceArt =						(1 << 3),
+
+	/** Not used. */
+	kFileFormatImportStyles =					(1 << 4),
+
+	/** When reading, the plug-in sets the print record. See
+		\c #AIDocumentSuite::SetDocumentPrintRecord().
+		Use when adding a format.*/
+	kFileFormatSuppliesPrintRecordOption =		(1 << 5),
+
+	/** Makes this the default format for all documents. If specified
+		by more than one plug-in, the last one becomes the default.
+		Use when adding a format.*/
+	kFileFormatIsDefaultOption =				(1 << 6),
+
+	/** Allows "Template" to be checked in the Place dialog when
+		linking or embedding a file of this type, so the art is
+		placed in a template layer.
+		Use when adding a format.*/
+	kFileFormatConvertTemplate =				(1 << 7),
+
+	/** Make a link from the contents of a file to an Illustrator
+		document.
+		Use when adding a format.*/
+	kFileFormatLinkArt =						(1 << 8),
+
 	/** Write the documents contents to a file
 		in a format from which is can be read back into
 		Illustrator without loss of data.
 		The format is included in the File > Save As file types.
 		Use when adding a format.*/
-	kFileFormatWrite =							(1<<9),
-	/** Read the file and embed artwork to the current document.
-		The format is included in the File > Import file types.
-		Use when adding a format.*/
-	kFileFormatImportArt =						(1<<2),
-	/** Read the file and embed artwork to the current document.
-		This is the same as \c #kFileFormatImportArt.
-		Use when adding a format.*/
-	kFileFormatPlaceArt	=						(1<<3),
-	/** Allows "Template" to be checked in the Place dialog when
-		linking or embedding a file of this type, so the art is
-		placed in a template layer.
-		Use when adding a format.*/
-	kFileFormatConvertTemplate =				(1<<7),
-	/** Make a link from the contents of a file to an Illustrator
-		document.
-		Use when adding a format.*/
-	kFileFormatLinkArt =						(1<<8),
-	/** Not used. */
-	kFileFormatImportStyles =					(1<<4),
-	/** When reading, the plug-in sets the print record. See
-		\c #AIDocumentSuite::SetDocumentPrintRecord().
-		Use when adding a format.*/
-	kFileFormatSuppliesPrintRecordOption =		(1<<5),
-
-	/** Makes this the default format for all documents. If specified
-		by more than one plug-in, the last one becomes the default.
-		Use when adding a format.*/
-	kFileFormatIsDefaultOption =				(1<<6),
+	kFileFormatWrite =							(1 << 9),
 
 	/** The plug-in will not respond to the \c #kSelectorAICheckFileFormat
 		selector. (For example, the PhotoShop adapter plug-in always returns
 		\c #kNoErr.)
 		Use when adding a format.*/
-	kFileFormatNoAutoCheckFormat =				(1<<10),
+	kFileFormatNoAutoCheckFormat =				(1 << 10),
+
 	/** Read the file, creating artwork in a new template layer in
 		the current document.
 		Not used for adding a format. */
-	kFileFormatCreateTemplateLayer =			(1<<11),
+	kFileFormatCreateTemplateLayer =			(1 << 11),
+
 	/** Handle the extended data passed in a Go message for a placement request
 		or in the Set Parameters message for additional options.
 		Use when adding a format.*/
-	kFileFormatHasExtendedData =				(1<<12),
+	kFileFormatHasExtendedData =				(1 << 12),
 
 	/** This file format supplies its own startup objects (colors, patterns,
 		and so on), Illustrator does not copy the startup file
 		Use when adding a format.*/
-	kFileFormatSkipStartupObjectsOption =		(1<<13),
+	kFileFormatSkipStartupObjectsOption =		(1 << 13),
 
 	/** Disable warning dialogs upon read and write.
 		Not used for adding a format.*/
-	kFileFormatNoWarningOption =				(1<<14),
+	kFileFormatNoWarningOption =				(1 << 14),
+
 	/** Write the current document to a copy of the file it was
 		loaded from.
 		Not used for adding a format. */
-	kFileFormatSaveCopyOption =					(1<<15),
+	kFileFormatSaveCopyOption =					(1 << 15),
 
 	/** Write the contents of selected artwork in a document to a file
 		in a non-Illustrator format.
@@ -252,20 +263,34 @@ enum AIFileFormatOptions {
 	Not used when adding a format. */
 	kFileFormatSuppressPluginFileNameUniquify = (1 << 18),
 
+	/** Optimize Save on network locations by first saving the file to a local scratch disk 
+		and then copying this saved file to network. 
+		Note: During the file save and export, if the format saves some additional files along with the main file, 
+			  this flag should not be used. This is because the format plugins will have a path to the 
+			  local disk location, which will be different from the final network location.
+		Use when adding a format.
+	*/
+	kFileFormatOptimizeNetworkOperation =			(1 << 19),
+
+	/* Enables save of AI file in background if possible */
+
+	kFileFormatSaveInBackground =				(1 << 20),
+
 	/**  Prevents this file format from appearing in the file
 		selection menu of the Open, Place, Save and Export dialogs.
 		Use when adding a format. */
-	kFileFormatSuppressUI =						(1<<21),
+	kFileFormatSuppressUI =						(1 << 21),
+
 	/** Set in combination with \c #kFileFormatWrite for a
 		Save As operation, to distinguish it from Save.
 		Not used for adding a format. */
-	kFileFormatWriteAs =						(1<<22),
+	kFileFormatWriteAs =						(1 << 22),
 
 	/** Always receive the Check message, even for operations this plug-in
 		does not support. Allows an opportunity to explicitly reject operations
 		on files matching this plug-in's type.
 		Use when adding a format.*/
-	kFileFormatCheckAlways =					(1<<23),
+	kFileFormatCheckAlways =					(1 << 23),
 
 	/** Handle additional parameters passed in \c #AIFileFormatMessage::actionParm.
 		These supplement the usual parameters of the file format,
@@ -274,42 +299,46 @@ enum AIFileFormatOptions {
 		If set in the Go message for a plug-in that does not handle the option,
 		you can ignore it.
 		Not used for adding a format. */
-	kFileFormatContainsPartialParameters =		(1<<24),
+	kFileFormatContainsPartialParameters =		(1 << 24),
 
 	/** Import only the SLO composite fonts.
 		Do not import artwork or other global objects, and
 		do not perform font fauxing.
 		Not used for adding a format.*/
-	kFileFormatImportCompositeFonts	=			(1<<25),
+	kFileFormatImportCompositeFonts	=			(1 << 25),
 
 	/** Treat the file as stationary--that is, open a copy with an Untitled name.
 		Use only in conjunction with \c #kFileFormatRead
 		Not used for adding a format. */
-	kFileFormatOpenUntitledCopy =				(1<<26),
+	kFileFormatOpenUntitledCopy =				(1 << 26),
 
 	/** An option for the native (PGF) AI File Format Writer,
 		telling it to write out only the indicated palettes and the global objects,
 		directly or indirectly. Not used for adding a format. */
-	kFileFormatWriteSwatchLibrary =				(1<<27),
+	kFileFormatWriteSwatchLibrary =				(1 << 27),
+
 	/** An option for the native (PGF) AI File Format Writer,
 		telling it to write out only the indicated palettes and the global objects,
 		directly or indirectly. Not used for adding a format. */
-	kFileFormatWriteBrushLibrary =				(1<<28),
+	kFileFormatWriteBrushLibrary =				(1 << 28),
+
 	/** An option for the native (PGF) AI File Format Writer,
 		telling it to write out only the indicated palettes and the global objects,
 		directly or indirectly. Not used for adding a format. */
-	kFileFormatWriteStyleLibrary =				(1<<29),
+	kFileFormatWriteStyleLibrary =				(1 << 29),
+
 	/** An option for the native (PGF) AI File Format Writer,
 		telling it to write out only the indicated palettes and the global objects,
 		directly or indirectly. Not used for adding a format. */
-	kFileFormatWriteSymbolLibrary =				(1<<30),
+	kFileFormatWriteSymbolLibrary =				(1 << 30),
+
 	/** Write the documents contents to a file
 		in a format from which it can be read back into
 		Illustrator without loss of data.
 		The format should be added if this format can be saved 
 		in touch workspace.
 		Use when adding a format.*/
-	kFileFormatWriteInTouch		=				(1<<31)
+	kFileFormatWriteInTouch		=				(1 << 31)
 };
 
 /** Used internally to test for matches to any of the options
@@ -340,8 +369,13 @@ enum AIFileFormatOptions {
 	Plug-in file format could not complete the operation at current resolution, either
 	because the resolution is invalid or its too high. Trying at a lower resolution may
 	eliminate this error*/
-
 #define	kBadResolutionErr						'RES!' 
+
+/** @ingroup Errors
+	Optimized Save or export could not be completed because of an error in the file format plug-in. 
+	The save or export operation will be retried directly on the network.	
+*/
+#define	kOptimizedNetworkSaveFailedErr		'ONSF' 
 
 /** File format priorities, which determine the order in which Illustrator
 	searches through formats in deciding which one to use to open a file.
@@ -384,7 +418,7 @@ typedef struct PlatformAddFileFormatData {
 	ai::int32			type;
 	/** The Pascal-type string shown in the file type menu of
 		the Save As and Open dialog. */
-	unsigned char*	title;
+	ai::UnicodeString	title;
 	/** The order of menu items if a plug-in adds multiple file formats.
 		Use 0 if the plug-in adds only one filter. */
 	ai::int32			titleOrder;
@@ -394,7 +428,7 @@ typedef struct PlatformAddFileFormatData {
 
 		The list has a maximum of 31 characters, and each
 		extension has a maximum of 5 characters.  */
-	const char*			extension;
+    ai::UnicodeString		extension;
 } PlatformAddFileFormatData;
 
 
@@ -407,7 +441,7 @@ typedef struct PlatformAddFileFormatExData {
 	ai::int32*			typeList;
 	 /** The Pascal-type string shown in the file type menu of
 		the Save As and Open dialog. */
-	unsigned char*	title;
+	ai::UnicodeString	title;
 	/** The order of menu items if a plug-in adds multiple file formats.
 		Use 0 if the plug-in adds only one filter. */
 	ai::int32			titleOrder;
@@ -417,7 +451,7 @@ typedef struct PlatformAddFileFormatExData {
 
 		The list has a maximum of 31 characters, and each
 		extension has a maximum of 5 characters.  */
-	const char*			extension;
+	ai::UnicodeString			extension;
 } PlatformAddFileFormatExData;
 
 
@@ -460,7 +494,13 @@ enum AIFFExtendedOptions{
 	/** Read the file and embed artwork to the current document.
 		Use when adding a format, this option should be added 
 		if this format can be placed in touch workspace.*/
-	kFileFormatPlaceInTouch		=				(1<<2)
+	kFileFormatPlaceInTouch		=				(1<<2),
+	/** On placing the content on the scaled document, if this flag won't be set, content will be scaled by the scale factor of the document.*/
+	kDoNotHonourDocumentScaleOnPlace	=		(1<<3),
+	/*This is a export request, primarily for a format which can be
+		exported in a large Canvas document i.e, with document scale as 10x
+	    Large Canvas is supported*/
+	kFileFormatSupportsLargeCanvas = (1 << 4)
 };
 
 
@@ -474,7 +514,7 @@ enum eFFOperationOptions{
 union FileFormatExtUnion {
 	/** Additional options to be used during import/export.
 		Entries in the dictionary are file format specific.
-		Currently this is used only for SVG export. */
+		Currently this is used for AI save and SVG export. */
 	AIDictionaryRef m_AdditionalOptionsDict;
 	/** Additional data needed for a placement request */
 	AIPlaceRequestData *m_pPlaceRequestData;
@@ -485,6 +525,7 @@ typedef struct FileFormatExtData {
 	/** The type of union. See \c #eFFExtType for valid values. */
 	ai::int32 m_lExtType;
 	/** The placement data for a placement request */
+    
 	union FileFormatExtUnion m_unExt;
 	/** Constructor */
 	FileFormatExtData() : m_lExtType(kFFExtNone)
@@ -711,7 +752,7 @@ kFileFormatCheckAlways
 
 			@see \c #AddFileFormatEx()
 	*/
-	AIAPI AIErr (*AddFileFormat) ( SPPluginRef self, const char *name,
+    AIAPI AIErr (*AddFileFormat) ( SPPluginRef self, const char* name,
 				PlatformAddFileFormatData *data, ai::int32 options, AIFileFormatHandle *fileFormat ,  ai::int32 extendedOptions);
 
 	/** Retrieves the name of a file format.
@@ -719,7 +760,7 @@ kFileFormatCheckAlways
 			@param name [out] A buffer in which to return the name string, as
 				passed to \c #AddFileFormat(). Do not modify this string.
 		*/
-	AIAPI AIErr (*GetFileFormatName) ( AIFileFormatHandle fileFormat, char **name );
+	AIAPI AIErr (*GetFileFormatName) ( AIFileFormatHandle fileFormat, const char **name );
 
 	/** Retrieves the option flags of a file format.
 			@param fileFormat The file format.
@@ -760,7 +801,7 @@ kFileFormatCheckAlways
 			@param fileFormat The file format.
 			@param extension [out] A buffer in which to return the file extension string.
 		*/
-	AIAPI AIErr (*GetFileFormatExtension) ( AIFileFormatHandle fileFormat, char *extension );
+	AIAPI AIErr (*GetFileFormatExtension) ( AIFileFormatHandle fileFormat, ai::UnicodeString& extension );
 
 	/** Adds a plug-in file format. This extended version allows you to specify
 		a list of Mac OS file types. Call during startup to install a plug-in file format.
@@ -790,14 +831,14 @@ kFileFormatCheckAlways
 				
 			@see \c #AddFileFormat(), \c #SetFileFormatFilter()
 		*/
-	AIAPI AIErr (*AddFileFormatEx) ( SPPluginRef self, const char *name,
+	AIAPI AIErr (*AddFileFormatEx) ( SPPluginRef self, const char* name,
 				PlatformAddFileFormatExData *dataEx, ai::int32 options, AIFileFormatHandle *fileFormat, ai::int32 extendedOptions );
 
 	/** Retrieves the localizable display name of a plug-in file format.
 			@param fileFormat The file format.
 			@param szTitle [out] A buffer in which to return the display name.
 		*/
-	AIAPI AIErr (*GetFileFormatTitle) ( AIFileFormatHandle fileFormat, char *szTitle );
+	AIAPI AIErr (*GetFileFormatTitle) ( AIFileFormatHandle fileFormat, ai::UnicodeString& szTitle );
 
 	/** Retrieves the Mac OS file types for a plug-in file format.
 			@param fileFormat The file format.
@@ -821,7 +862,7 @@ kFileFormatCheckAlways
 				are filtered in the Open dialog, or appended to the file name in the
 				Saves As dialog. For example, \c "ai,eps".
 		*/
-	AIAPI AIErr (*SetFileFormatFilter) ( AIFileFormatHandle fileFormat, ai::int32 numPairs, AICreatorTypePair *pairList, const char* extensions );
+	AIAPI AIErr (*SetFileFormatFilter) ( AIFileFormatHandle fileFormat, ai::int32 numPairs, AICreatorTypePair *pairList, const ai::UnicodeString& extensions );
 
 	/** Retrieves the file type filter for a file format, as specified by (creator, type)
 		pairs for Mac OS.
@@ -945,8 +986,8 @@ kFileFormatCheckAlways
 /** @deprecated. Obsolete platform-specific functions.	Use functions in \c #AIFileFormatSuite. */
 typedef struct {
 
-	AIAPI AIErr (*MacXGetFileFormatTitle) ( AIFileFormatHandle fileFormat, unsigned char *title );
-	AIAPI AIErr (*MacXSetFileFormatTitle) ( AIFileFormatHandle fileFormat, const unsigned char *title );
+    AIAPI AIErr (*MacXGetFileFormatTitle) ( AIFileFormatHandle fileFormat, ai::UnicodeString& title );
+	AIAPI AIErr (*MacXSetFileFormatTitle) ( AIFileFormatHandle fileFormat, ai::UnicodeString title );
 	AIAPI AIErr (*MacXGetFileFormatType) ( AIFileFormatHandle fileFormat, ai::int32 *type );
 	AIAPI AIErr (*MacXSetFileFormatType) ( AIFileFormatHandle fileFormat, ai::int32 type );
 

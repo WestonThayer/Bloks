@@ -2,19 +2,19 @@
 
     Copyright 2000-2006 Adobe Systems Incorporated. All Rights Reserved.
 
-    NOTICE:  Adobe permits you to use, modify, and distribute this file 
-    in accordance with the terms of the Adobe license agreement accompanying 
-    it. If you have received this file from a source other than Adobe, then 
-    your use, modification, or distribution of it requires the prior written 
+    NOTICE:  Adobe permits you to use, modify, and distribute this file
+    in accordance with the terms of the Adobe license agreement accompanying
+    it. If you have received this file from a source other than Adobe, then
+    your use, modification, or distribution of it requires the prior written
     permission of Adobe.
 
  ----------------------------------------------------------------------------------
 
-	File:	ATETextSuitesExtern.h
-		
-	Notes:	Machine Generated file from script version 1.45
-	        Please don't modify manually!
-	
+    File:   ATETextSuitesExtern.h
+
+    Notes:  Machine Generated file from script version 1.45
+            Please don't modify manually!
+
  ---------------------------------------------------------------------------------- */
 #ifndef __ATETextSuitesExtern__
 #define __ATETextSuitesExtern__
@@ -29,6 +29,8 @@ extern "C" CompFontComponentSuite* sCompFontComponent;
 extern "C" CompFontSetSuite* sCompFontSet;
 extern "C" GlyphRunSuite* sGlyphRun;
 extern "C" GlyphRunsIteratorSuite* sGlyphRunsIterator;
+extern "C" ListStyleSuite* sListStyle;
+extern "C" ListStyleSetSuite* sListStyleSet;
 extern "C" MojiKumiSuite* sMojiKumi;
 extern "C" MojiKumiSetSuite* sMojiKumiSet;
 extern "C" TextFrameSuite* sTextFrame;
@@ -61,6 +63,8 @@ extern "C" ArrayArrayRealSuite* sArrayArrayReal;
 extern "C" ArrayBurasagariTypeSuite* sArrayBurasagariType;
 extern "C" ArrayPreferredKinsokuOrderSuite* sArrayPreferredKinsokuOrder;
 extern "C" ArrayKinsokuRefSuite* sArrayKinsokuRef;
+extern "C" ArrayListStyleRefSuite* sArrayListStyleRef;
+extern "C" ArrayListStyleSetRefSuite* sArrayListStyleSetRef;
 extern "C" ArrayMojiKumiRefSuite* sArrayMojiKumiRef;
 extern "C" ArrayMojiKumiSetRefSuite* sArrayMojiKumiSetRef;
 extern "C" ArrayTabStopsRefSuite* sArrayTabStopsRef;
@@ -113,5 +117,3 @@ extern "C" ArrayComposerEngineSuite* sArrayComposerEngine;
 
 }// namespace ATE
 #endif //__ATETextSuitesExtern__
-
-

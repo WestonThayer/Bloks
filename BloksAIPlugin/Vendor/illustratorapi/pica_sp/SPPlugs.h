@@ -57,7 +57,9 @@ extern "C" {
 	#define kSPPluginsSuiteVersion6		6
 	/** PICA plug-ins suite version */
 	#define kSPPluginsSuiteVersion		kSPPluginsSuiteVersion6
-#elif MAC_ENV
+#elif defined(MAC_ENV)
+	#define kSPPluginsSuiteVersion		kSPPluginsSuiteVersion4
+#elif defined(LINUX_ENV)
 	#define kSPPluginsSuiteVersion		kSPPluginsSuiteVersion4
 #endif
 
@@ -88,7 +90,8 @@ typedef struct _SPErrorData
 	/** The file for which the error occurred. */
 	SPPlatformFileReference	mErrorFile;
 	/** Error code, see @ref Errors. */
-	SPErr						mErrorCode;
+	SPErr					mErrorCode;
+	SPPluginRef				mPluginRef;
 } SPErrorData, *SPErrorDataPtr;
 
 /**  */
@@ -380,7 +383,10 @@ SPAPI SPErr SPSetPluginPropertyList( SPPluginRef plugin, SPFileRef file );
 SPErr SPAddHostPlugin( SPPluginListRef pluginList, SPPluginEntryFunc entry, void *access, const char *adapterName,
 			void *adapterInfo, SPPluginRef *plugin, const char *name);
 																  /* access is SPPlatformAccessRef */
-
+#if defined(STATIC_LINKED_PLUGIN)
+SPErr SPAddHostPluginStatic( SPPluginListRef pluginList, SPPluginEntryFunc entry, void *access, const char *adapterName,
+			void *adapterInfo, SPPluginRef *plugin, const char *name);
+#endif
 
 // Plug-ins suite version 5
 /* This attribute frees the adapterInfo field for private data for adapters. */

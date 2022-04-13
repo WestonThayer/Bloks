@@ -21,6 +21,7 @@
 #ifndef _IAIAUTOBUFFER_H_
 #define _IAIAUTOBUFFER_H_
 
+#include "AITypes.h"
 
 #include <string>
 
@@ -61,6 +62,9 @@ public:
  */
 template<class elem, typename size_type=size_t, class A=SPAlloc> class AutoBuffer {
 public:
+	typedef elem* iterator;
+	typedef const elem* const_iterator;
+
 	/** Constructor.
 			@param count Initial number of elements that the buffer should be able to hold
 		*/
@@ -87,15 +91,31 @@ public:
 			Copy(b.fBuffer);
 		}
 	}
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+	/** Move constructor.
+		@param b buffer to be moved from.
+	*/
+	AutoBuffer (AutoBuffer&& b) AINOEXCEPT : fCapacity{b.fCapacity}, fBuffer{b.fBuffer}
+	{
+		b.fBuffer = nullptr;
+	}
+#endif
+
 	/** Destructor.
 		*/
 	~AutoBuffer ()
 	{
-		if ( fBuffer )
-		{
-			Destroy(fBuffer);
-			A::DeleteBlock(fBuffer);
-		}
+		try
+        {
+            if ( fBuffer )
+            {
+                Destroy(fBuffer);
+                A::DeleteBlock(fBuffer);
+            }
+        }
+        catch(...)
+        {}
 	}
 
 	/** Reports whether the buffer object has a handle to a valid buffer.
@@ -114,7 +134,8 @@ public:
 	{
 		return fBuffer;
 	}
-	operator elem* () const
+	
+	explicit operator elem* () const
 	{
 		return GetBuffer();
 	}
@@ -129,13 +150,57 @@ public:
 	{
 		return fBuffer[n];
 	}
+
+	const elem& operator[] (size_type n) const
+	{
+		return fBuffer[n];
+	}
+
+	/** Retrieves the first element in the buffer.
+			@note There is no protection for indexing off the begin or end of the array.
+		*/
+	elem& front()
+	{
+		return fBuffer[0];
+	}
+
+	const elem& front() const
+	{
+		return fBuffer[0];
+	}
+
+	/** Retrieves the last element in the buffer.
+			@note There is no protection for indexing off the begin or end of the array.
+		*/
+	elem& back()
+	{
+		return fBuffer[fCapacity - 1];
+	}
+
+	const elem& back() const
+	{
+		return fBuffer[fCapacity - 1];
+	}
+
 	/** Retrieves the current capacity of the buffer.
 			@return The number of elements that can be contained.
 		*/
-	size_type GetCount () const
+	size_type GetCount () const AINOEXCEPT
+	{
+		return size();
+	}
+
+	size_type size() const AINOEXCEPT
 	{
 		return fCapacity;
 	}
+
+	bool empty() const AINOEXCEPT
+	{
+		return fCapacity == 0;
+	}
+
+
 	/** Resizes the buffer. If the given size is less than the current
 		capacity, the buffer is shortened and truncated elements are destroyed.
 		If it is greater, the buffer is grown and the new elements
@@ -183,6 +248,20 @@ public:
 		}
 		return *this;
 	}
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+	AutoBuffer& operator= (AutoBuffer&& rhs) AINOEXCEPT
+	{
+		fCapacity = rhs.fCapacity;
+		std::swap(fBuffer, rhs.fBuffer);
+		return *this;
+	}
+#endif
+
+	iterator begin() AINOEXCEPT { return fBuffer; }
+	iterator end() AINOEXCEPT { return fBuffer + fCapacity; }
+	const_iterator begin() const AINOEXCEPT { return fBuffer; }
+	const_iterator end() const AINOEXCEPT { return fBuffer + fCapacity; }
 
 	static size_type lastIndex ()
 	{ return size_type(-1); }

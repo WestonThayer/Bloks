@@ -1,29 +1,29 @@
-#ifndef __AIPluginNames__
-#define __AIPluginNames__
+#pragma once
 
 /*
- *        Name:	AIPluginNames.h
- *        Date:	Feb 14, 1997
- *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2014 Adobe Systems Incorporated.
- * All rights reserved.
- *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file 
- * in accordance with the terms of the Adobe license agreement 
- * accompanying it. If you have received this file from a source other 
- * than Adobe, then your use, modification, or distribution of it 
- * requires the prior written permission of Adobe.
- *
- * Includes names for all plugins
- *
- */
+*        Name:	AIPluginNames.h
+*        Date:	Feb 14, 1997
+*
+* ADOBE SYSTEMS INCORPORATED
+* Copyright 1986-2016 Adobe Systems Incorporated.
+* All rights reserved.
+*
+* NOTICE:  Adobe permits you to use, modify, and distribute this file
+* in accordance with the terms of the Adobe license agreement
+* accompanying it. If you have received this file from a source other
+* than Adobe, then your use, modification, or distribution of it
+* requires the prior written permission of Adobe.
+*
+* Includes names for all plugins
+*
+*/
 
 
 #define kAIAppPluginName						"Adobe AI Application Plugin"
 
 
 #define k3DPluginName							"3D v2"
+#define k3DLibPluginName                        "3D Lib"
 #define kAboutPluginsPluginName					"Adobe Illustrator About Plug-ins"
 #define kActionManagerPluginName				"AdobeActionManager"
 #define kActionPalettePluginName				"AdobeActionPalette"
@@ -47,13 +47,15 @@
 #define kBeautifulStrokesPluginName				"BeautifulStrokes Suite"
 #define kBoundingBoxPluginName					"BoundingBox"
 #define kBrushManagerPluginName					"AdobeBrushMgr"
-#define kCalligraphicBrushPluginName				"Adobe Calligraphic Brush Tool"
+#define kCalligraphicBrushPluginName			"Adobe Calligraphic Brush Tool"
+#define kCalligraphicBrushToolUIPluginName      "Adobe Calligraphic Brush Tool UI"
 #define kCharParaStylesPluginName				"Character and Paragraph Styles"
 #define kCharacterPalettePluginName				kAIAppPluginName
 #define kCleanupPluginName						"Cleanup"
 #define kColorsPluginName						"Colors"
 #define kColorHarmonyPluginName					"Adobe Color Harmony Plugin"
 #define kControlPalettePluginName				"Control Palette Plugin"
+#define kControlPanelPluginName					"Control Panel Plugin"
 #define kCropPluginName							"Adobe Crop Tool"
 #define kCSSExtractPluginName					"CSSExtract"
 #define kCSSExtractUIPluginName					"CSSExtractUI"
@@ -68,9 +70,10 @@
 #define kDocWindowPluginName					"Document Window Plugin"
 #define kExperimentationName					"Experimentation Plugin"
 #define kHelloPluginName						"Hello Experience Plugin"
+#define kAdobeSymbolModelPluginName				"Adobe Symbol Model Plugin"
+#define kAdobeRepeatModelPluginName				"Adobe Repeat Model Plugin"
 #define kToolPenPluginName						"Pen Tool Plugin"
 #define kDropShadowPluginName					"DropShadow"
-#define kDXFDWGFormatPluginName					"Adobe DXFDWG Format"
 #define kEraserPluginName						"Adobe Eraser Tool"
 #define kEurekaPluginName						"AdobeEurekaPlugin"
 #define kExpandPluginName						"Expand"
@@ -152,6 +155,8 @@
 #define kScriptingSupportPluginName				"ScriptingSupport"
 #define kScriptsMenuPluginName					"Scripts Menu"
 #define kSegmentToolsPluginName					"Segment Tools"
+#define kSelectiveUnlockPluginName              "Adobe Selective Unlock Plugin"
+#define kSenseiAgentsPluginName					"Adobe Sensei Agents Plugin"
 #define kSeparationPreviewPluginName				"SeparationPreviewPlugin"
 #define kShapeSuitePluginName					"Shape Suite"
 #define kShapeEffectPluginName					"ShapeEffects v2"
@@ -166,8 +171,6 @@
 #define kSvgFileFormatPluginName				"SvgFileFormat"
 #define kSvgFileFormatUIPluginName				"SvgFileFormatUI"
 #define kSvgFilterEffectPluginName				"SVG Filter Effect v2"
-#define kSWFExportPluginName					"SWFExport"
-#define kSWFExportUIPluginName					"SWFExport UI"
 #define kSwatchPalettePluginName				"AdobeSwatch_"
 #define kSymbolismPluginName					"Adobe Symbolism"	//	particle systems
 #define kSymbolPalettePluginName				"Adobe Symbol Palette Plugin"
@@ -178,6 +181,7 @@
 #define kTextSmartPunctuationPluginName			"Smart Punctuation"
 #define kTextSpellPluginName					"TextSpell"			//No longer used
 #define kTextWrapDlgPluginName					"TextWrap Dlg"
+#define kTextModelNamePluginName				"TextModel"
 #define kTIFFFileFormatPluginName				"TIFF File Format"
 #define kTIFFFileFormatUIPluginName				"TIFF File Format UI"
 #define kToolPalettePluginName					"AdobeBuiltInToolbox"
@@ -275,7 +279,6 @@
 #define kAIDesignLibraryPluginName				"Design Library"
 #define kSmartExportPluginName					"SmartExport"
 #define kSmartExportUIPluginName				"SmartExportUI"
-#define kIdeaFileFormatUIPluginName				"Idea File Format UI"
 #define kAIVulcanServicePluginName				"Vulcan Service"
 #define kAIShapeCorePluginName					"Shape Core"
 #define kAIShapeCoreUIPluginName				"Shape Core UI"
@@ -285,4 +288,40 @@
 #define kAIToolPluginName						"AI Tool Plugin"
 #define kAIPGFFileFormatPluginName              "Adobe PGF File Format" 
 #define kMultiEveDialogUIPluginName             "Adobe Multi Eve Dialog UI"
+#define kCropUIPluginName						"Adobe Crop UI"
+#define kVectorSculptingUIPluginName			"Adobe Vector Sculpting UI"
+#define kVectorSculptingPluginName				"Vector Sculpting"
+#define kPropertiesPanelPluginName				"Properties Panel"
+#define kTouchBarPluginName						"Adobe Touch Bar"
+#define kTorqExtensionPluginName				"Adobe Torq Extension"
+#define kRadialDevicePluginName					"Adobe Radial Device"
+#define kDiffusionColoringPluginName			"Adobe Diffusion Coloring"
+#define kSmartEditPluginName				    "Adobe Smart Edit"
+#define kSmartEditUIPluginName					"Adobe Smart Edit UI"
+#define kDeepLearningPluginName				"Adobe Deep Learning"
+#define kAdobeLicenseManagerPluginName                  "AdobeLicenseManager"
+#define kAdobeDebugPanel                        "Adobe Debug Panel"
+#define kCloudAIUIPluginName                    "Adobe Cloud AIUI"
+#define kCloudAIPluginName                      "Adobe Cloud AI"
+#define kAIRobinServicePluginName				"AI Robin Service"
+#define kAIRobinClientPluginName				"AI Robin Client"
+#define kUxpExtensionPluginName                    "Adobe Uxp Extension"
+#define kAIAeroPluginName						"AI Aero"
+#define kCCLibAccessorPluginName                "AI CCLibAccessor Plugin"
+#define kImageDecoderEncoderPluginName				"Adobe Image Decoder Encoder"
+#define kTaskManagerUIPluginName                "Adobe Task Manager UI"
+#define kSwatchLibsCorePluginName				"Adobe Swatch Libs Core"
+#define kMultiThreadedRasterizationPluginName				"Adobe Multi Threaded Rasterization"
+#define kDxfDwgFileFormatPluginName				"Adobe DxfDwg File Format"
+#define kRecolorCorePluginName					"Adobe Recolor Core"
+#define kFontSessionPluginName                  "Adobe Font Session"
+#define kAISafeModePluginName					"AI Safe Mode Plugin"
+#define kRepeatArtsUIPluginName				    "Adobe Repeat Arts UI"
+#if defined(ILLUSTRATOR_MINIMAL)
+#define kShapeAwareTransformPluginName          "Shape Aware Xform"
 #endif
+#define kGeometry3DPluginName				"Adobe Geometry3D"
+#define kGeometry3DUIPluginName				"Adobe Geometry3DUI"
+#define kMaterialsPluginName				"Adobe Materials"
+#define kCommentingPluginName				"Adobe Commenting"
+#define kCloudDocumentLinkPluginName            "Adobe Cloud Document Link"

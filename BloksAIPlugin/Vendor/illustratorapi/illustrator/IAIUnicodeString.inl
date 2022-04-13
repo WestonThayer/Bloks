@@ -157,25 +157,28 @@ ai::UnicodeString::size_type ai::UnicodeString::getToBuffer ( const PStr&  pasca
 ai::UnicodeString::UnicodeString (const CFStringRef& cfString)
 : fImpl(0)
 {
-	const UniChar* uc = CFStringGetCharactersPtr(cfString);
-	CFIndex cfLength = CFStringGetLength(cfString);
+    if (cfString != nullptr)
+    {
+        const UniChar* uc = CFStringGetCharactersPtr(cfString);
+        CFIndex cfLength = CFStringGetLength(cfString);
 
-	if(cfLength > 0)
-	{
-		if ( uc != 0 )
-		{
-			*this = UnicodeString(uc, cfLength);
-		}
-		else
-		{
-			CFRange cfRange;
-			cfRange.location = 0;
-			cfRange.length = cfLength;
-			std::vector<UniChar> buf(cfLength);
-			CFStringGetCharacters(cfString, cfRange, &buf[0]);
-			*this = UnicodeString(&buf[0], cfLength);
-		}
-	}
+        if (cfLength > 0)
+        {
+            if (uc != nullptr)
+            {
+                *this = UnicodeString(uc, cfLength);
+            }
+            else
+            {
+                CFRange cfRange;
+                cfRange.location = 0;
+                cfRange.length = cfLength;
+                std::vector<UniChar> buf(cfLength);
+                CFStringGetCharacters(cfString, cfRange, &buf[0]);
+                *this = UnicodeString(&buf[0], cfLength);
+            }
+        }
+    }
 }
 
 CFStringRef ai::UnicodeString::as_CFString ( CFAllocatorRef alloc ) const

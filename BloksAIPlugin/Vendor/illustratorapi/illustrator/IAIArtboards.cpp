@@ -19,9 +19,11 @@
 #include "AIArtboard.h"
 #include <algorithm>
 
-
-#ifdef _IAIARTBOARD_SUITE_INCLUDE_H_
-#include _IAIARTBOARD_SUITE_INCLUDE_H_
+#if AI_AUTO_SUITE_AVAILABLE
+	#include "AutoSuite.h"
+	use_suite_required(AIArtboard)
+#elif defined(_IAIARTBOARD_SUITE_INCLUDE_H_)
+	#include _IAIARTBOARD_SUITE_INCLUDE_H_
 #else
 #ifndef _IAIARTBOARD_SUITE_USE_C_LINKAGE_
 #define _IAIARTBOARD_SUITE_USE_C_LINKAGE_ 1
@@ -42,11 +44,18 @@ extern "C"
 
 #endif
 
+#include "AIErrorHandler.h"
+#include "AIAssert.hpp"
+#include "IAIStringUtils.h"
+
 namespace ai
 {
 	ArtboardProperties::~ArtboardProperties()
 	{
-		sAIArtboard->Dispose(*this);	
+		try{
+			sAIArtboard->Dispose(*this);	
+		}
+		catch(ai::Error&){}
 	}
 	ArtboardProperties::ArtboardProperties():fImpl(0)
 	{
@@ -117,16 +126,63 @@ namespace ai
 	{
 		return sAIArtboard->SetShowDisplayMark(*this,type,show);
 	}
+
+	AIErr ArtboardProperties::IsSelected(AIBoolean& isSelected) const
+	{
+		return sAIArtboard->IsSelected(*this, isSelected);
+	}
+
+	AIErr ArtboardProperties::GetUUIDAsString(ai::UnicodeString& uuid) const
+	{
+		return sAIArtboard->GetUUIDAsString(*this, uuid);
+	}
+    
+#ifdef ILLUSTRATOR_MINIMAL
+    AIErr ArtboardProperties::CloneWithUniqueUUID(const ArtboardProperties &source)
+    {
+        return sAIArtboard->CloneWithUniqueUUID(*this, source);
+    }
+#endif
+
 	ArtboardList::ArtboardList():fImpl(0)
 	{
 		sAIArtboard->GetArtboardList(*this);
 	}
 
+#ifdef AI_HAS_RVALUE_REFERENCES
+	ai::ArtboardList::iterator ArtboardList::begin()
+	{
+		return iterator(0, this);
+	}
+
+	ai::ArtboardList::iterator ArtboardList::end()
+	{
+		return iterator(size(), this);
+	}
+
+	ai::ArtboardList::value_type ArtboardList::at(ArtboardID artboardID)
+	{
+		return ai::ArtboardList::value_type(artboardID, this);
+	}
+
+	ArtboardID ArtboardList::size() const AINOEXCEPT
+	{
+		ArtboardID count = 0;
+		try{
+			GetCount(count);
+		}
+		catch(ai::Error&){}
+		return count;
+	}
+#endif //AI_HAS_RVALUE_REFERENCES
 
 	ArtboardList::~ArtboardList()
 	{
-		if(fImpl)
-			sAIArtboard->ReleaseArtboardList(*this);
+		try{
+			if(fImpl)
+				sAIArtboard->ReleaseArtboardList(*this);
+		}
+		catch(ai::Error&){}
 	}
 
 	AIErr ArtboardList::AddNew(ArtboardProperties& newArtboard, ArtboardID& index)
@@ -143,10 +199,21 @@ namespace ai
 	{
 		return sAIArtboard->Delete(*this,index);
 	}
+
+	AIErr ArtboardList::Delete(const std::vector<ai::ArtboardID>& artboardIDs)
+	{
+		ai::AutoBuffer<ai::ArtboardID> artboardIDBuffer(artboardIDs.size());
+
+		std::copy(artboardIDs.begin(), artboardIDs.end(), artboardIDBuffer.begin());
+
+		return sAIArtboard->DeleteArtboards(*this, artboardIDBuffer);
+	}
+
 	AIErr ArtboardList::GetCount(ArtboardID&index) const
 	{
 		return sAIArtboard->GetCount(*this,index);
 	}
+
 	ArtboardProperties ArtboardList::GetArtboardProperties(ArtboardID index)
 	{
 		ArtboardProperties object(NULL);
@@ -165,7 +232,92 @@ namespace ai
 	{
 		return sAIArtboard->Update(*this,index,artboard);
 	}
+
+	AIErr ArtboardList::Select(ai::ArtboardID artboardID, bool exclusively)
+	{
+		return sAIArtboard->SelectArtboard(*this, artboardID, exclusively);
+	}
+
+	AIErr ArtboardList::Select(const std::vector<ai::ArtboardID>& artboardIDs, bool exclusively)
+	{
+		ai::AutoBuffer<ai::ArtboardID> artboardIDBuffer(artboardIDs.size());
+		
+		std::copy(artboardIDs.begin(), artboardIDs.end(), artboardIDBuffer.begin());
+
+		return sAIArtboard->SelectArtboards(*this, artboardIDBuffer, exclusively);
+	}
+
+	AIErr ArtboardList::SelectAll()
+	{
+		return sAIArtboard->SelectAllArtboards(*this);
+	}
+
+	AIErr ArtboardList::Deselect(ai::ArtboardID artboardID)
+	{
+		return sAIArtboard->DeselectArtboard(*this, artboardID);
+	}
+
+	AIErr ArtboardList::DeselectAll()
+	{
+		return sAIArtboard->DeselectAllArtboards(*this);
+	}
+
+	AIErr ArtboardList::InsertUsingArtboardPropertiesUUID(ArtboardProperties& artboard, ArtboardID& index)
+	{
+		return sAIArtboard->InsertUsingArtboardPropertiesUUID(*this, artboard, index);
+	}
+
+#ifdef AI_HAS_RVALUE_REFERENCES
+	ArtboardList::Artboard::Artboard(ArtboardID artboardID, container_type artboardListPtr) :
+		mArtboardID(artboardID),
+		mArtboardListPtr(artboardListPtr)
+	{
+		if (mArtboardID < mArtboardListPtr->size())
+		{
+			mProps = mArtboardListPtr->GetArtboardProperties(mArtboardID);
+		}
+	}
+
+	AIErr ArtboardList::Artboard::Update()
+	{
+		AIMsgAssert(mArtboardID < mArtboardListPtr->size(), "Invalid artboard ID !!!");
+		return mArtboardListPtr->Update(mArtboardID, mProps);
+	}
+
+	ArtboardList::iterator::iterator(size_type index, container_type artboardListPtr) :
+		mValue(index, artboardListPtr),
+		mArtboardListPtr(artboardListPtr),
+		mArtboardCount(artboardListPtr->size())
+	{
+	}
+
+	ArtboardList::iterator& ArtboardList::iterator::operator++()
+	{
+		AIMsgAssert(mArtboardCount == mArtboardListPtr->size(), "Iterator is no longer valid!");
+		auto curID = mValue.GetID();
+		if (curID < mArtboardCount)
+		{
+			++curID;
+			ArtboardList::iterator::value_type newVal(curID, mArtboardListPtr);
+			mValue.swap(newVal);
+		}
+		return *this;
+	}
 	
+	bool ArtboardList::iterator::operator==(const iterator& rhs) const
+	{
+		AIMsgAssert(compatible(rhs), "Incompatible iterator");
+		return	(mArtboardListPtr == rhs.mArtboardListPtr)	&&
+				(mValue.GetID() == rhs.mValue.GetID())	&&
+				(mArtboardCount == rhs.mArtboardCount);
+	}
+
+	bool ArtboardList::iterator::compatible(const iterator& rhs) const
+	{
+		return (mArtboardListPtr->fImpl == rhs.mArtboardListPtr->fImpl);
+	}
+
+#endif //AI_HAS_RVALUE_REFERENCES
 	namespace ArtboardUtils
 	{
 		/** Retrieves the name of the specified artboard. if the index is -1 it gets the name of the active artboard
@@ -181,6 +333,8 @@ namespace ai
 			if(index == kActiveArtboard)
 				error = list.GetActive(index);
 			ArtboardProperties artboardProps(list.GetArtboardProperties(index));
+			if (!artboardProps.IsValid()) return kBadParameterErr;
+
 			artboardProps.GetName(name);
 			AIBoolean isDefaultName = FALSE;
 			artboardProps.IsDefaultName(isDefaultName);
@@ -189,12 +343,11 @@ namespace ai
 				isDefaultName=TRUE;
 				const char* abString = "$$$/Artboards/Name/Str=Artboard";
 				name = ai::UnicodeString(ZREF(abString));
-				char artboardnum[4];
-				::sprintf(artboardnum,"%d",index+1);
-				name.append(ai::UnicodeString(" "));
-				name.append(ai::UnicodeString(artboardnum));
+				name.append(ai::UnicodeString::FromRoman(" "));
+				name.append(ai::UnicodeString::FromRoman(ai::to_string(index+1)));
 				artboardProps.SetName(name);
 				artboardProps.SetIsDefaultName(TRUE);
+				list.Update(index, artboardProps);
 			}
 			isDefault = (isDefaultName == 1);
 
@@ -226,7 +379,12 @@ namespace ai
 			}
 			return kNotFoundErr;
 		}
-	}
 
-}
+		AIErr AreAnyArtboardsOverlapping(ai::ArtboardList &artboardList, AIBoolean &isOverlapping)
+		{
+			return sAIArtboard->AreAnyArtboardsOverlapping(artboardList, isOverlapping);
+		}
+	
+	} // namespace ArtboardUtils
 
+} // namespace ai

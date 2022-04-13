@@ -32,6 +32,8 @@
 #endif
 
 
+#include "IAIFilePath.hpp"
+
 #include "AIHeaderBegin.h"
 
 /** @file AIDictionary.h */
@@ -43,13 +45,13 @@
  **/
 
 #define kAIDictionarySuite						"AI Dictionary Suite"
-#define kAIDictionarySuiteVersion8				AIAPI_VERSION(8)
-#define kAIDictionarySuiteVersion				kAIDictionarySuiteVersion8
+#define kAIDictionarySuiteVersion10				AIAPI_VERSION(10)
+#define kAIDictionarySuiteVersion				kAIDictionarySuiteVersion10
 #define kAIDictionaryVersion					kAIDictionarySuiteVersion
 
 #define kAIDictionaryIteratorSuite				"AI Dictionary Iterator Suite"
-#define kAIDictionaryIteratorSuiteVersion3		AIAPI_VERSION(3)
-#define kAIDictionaryIteratorSuiteVersion		kAIDictionaryIteratorSuiteVersion3
+#define kAIDictionaryIteratorSuiteVersion5		AIAPI_VERSION(5)
+#define kAIDictionaryIteratorSuiteVersion		kAIDictionaryIteratorSuiteVersion5
 #define kAIDictionaryIteratorVersion			kAIDictionaryIteratorSuiteVersion
 
 
@@ -120,6 +122,15 @@ struct AIDictionarySuite {
 		*/
 	AIAPI AIErr (*CreateDictionary) ( AIDictionaryRef* dictionary );
 
+	/** Opens a JSON file from the provided path and parses it to a newly created dictionary.
+	  	The JSON file must have an object as top-level element.
+		Dictionaries are reference counted;
+		the initial reference count is 1.
+			@param dictionary [out] A buffer in which to return the new dictionary reference.
+			@param file The path to the JSON file
+			@see \c #AddRef(), \c #Release()
+		*/
+	AIAPI AIErr (*CreateDictionaryFromJSONFile) ( AIDictionaryRef* dictionary, const ai::FilePath &file );
 
 	/**  Increments the reference count of a dictionary.
 			@param dictionary The dictionary reference.
@@ -309,7 +320,7 @@ struct AIDictionarySuite {
 		(Note that this function returns an entry object, not an error code.)
 			@param dictionary The dictionary.
 			@param key The entry key.
-			@return The entry object or a nil entry if an entry with the given key does not exist..
+			@return The entry object or a null entry if an entry with the given key does not exist..
 		*/
 	AIAPI AIEntryRef (*Get) ( ConstAIDictionaryRef dictionary, AIDictKey key );
 
@@ -458,6 +469,17 @@ struct AIDictionarySuite {
 		*/
 	AIAPI AIErr (*TouchArt) ( ConstAIDictionaryRef dictionary );
 
+	/** Creates a new iterator object for the matched key. Iterators are reference counted.
+		@param dict The dictionary.
+		@param key The key to find
+		@param iterator [out] A buffer in which to return the iterator object.
+			use AIDictionaryIteratorSuite::GetEntry to get value directly from iterator
+		returns kNoSuchKey if the key is not found.
+		@see \c #AIDictionaryIteratorSuite::AddRef(), \c #AIDictionaryIteratorSuite::Release()
+	*/
+	AIAPI AIErr(*Find) (ConstAIDictionaryRef dict, AIDictKey key, AIDictionaryIterator* iterator);
+
+
 };
 
 
@@ -536,6 +558,12 @@ struct AIDictionaryIteratorSuite {
 		*/
 	AIAPI AIDictKey (*GetKey) ( AIDictionaryIterator iterator );
 
+	/** Retrieves a dictionary entry for the dictionary iterator
+	(Note that this function returns an entry object, not an error code.)
+	@param iterator The iterator object.
+	@return The entry object or a null entry if the iterator is at the end
+	*/
+	AIAPI AIEntryRef(*GetEntry) (AIDictionaryIterator iterator);
 };
 
 

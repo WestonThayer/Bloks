@@ -28,9 +28,9 @@
  **/
 
 #include "SPTypes.h"
-#include "SPMdata.h"
+#include "SPMData.h"
 #include "SPPiPL.h"
-#include "AiBasicTypes.h"
+#include "AIBasicTypes.h"
 
 #include "SPHeaderBegin.h"
 

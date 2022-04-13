@@ -1,24 +1,23 @@
 #ifndef __AIArt__
 #define __AIArt__
 
-/*
- *        Name:	AIArt.h
- *   $Revision: 25 $
- *      Author:
- *        Date:
- *     Purpose:	Adobe Illustrator  Artwork Object Suite.
+/*************************************************************************
  *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2014 Adobe Systems Incorporated.
- * All rights reserved.
+ * ADOBE CONFIDENTIAL
  *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file
- * in accordance with the terms of the Adobe license agreement
- * accompanying it. If you have received this file from a source other
- * than Adobe, then your use, modification, or distribution of it
- * requires the prior written permission of Adobe.
+ * Copyright 1986 Adobe
  *
- */
+ * All Rights Reserved.
+ *
+ * NOTICE: Adobe permits you to use, modify, and distribute this file in
+ * accordance with the terms of the Adobe license agreement accompanying
+ * it. If you have received this file from a source other than Adobe,
+ * then your use, modification, or distribution of it requires the prior
+ * written permission of Adobe.
+ *
+ **************************************************************************/
+
+#pragma once
 
 
 /*******************************************************************************
@@ -28,8 +27,8 @@
  **/
 
 #include "AITypes.h"
-#include "AILayer.h"
-
+#include "IAIAutoBuffer.h"
+#include "IAIUnicodeString.h"
 
 #include "AIHeaderBegin.h"
 
@@ -42,8 +41,8 @@
  **/
 
 #define kAIArtSuite				"AI Art Suite"
-#define kAIArtSuiteVersion18	AIAPI_VERSION(18)
-#define kAIArtSuiteVersion		kAIArtSuiteVersion18
+#define kAIArtSuiteVersion21	AIAPI_VERSION(21)
+#define kAIArtSuiteVersion		kAIArtSuiteVersion21
 #define kAIArtVersion			kAIArtSuiteVersion
 
 
@@ -78,6 +77,32 @@
  	*/
 #define kAIAlignmentKeyArtChangedNotifier	"AI Alignment Key Art Changed Notifier"
 
+/** @ingroup Notifiers
+	   This notifier is in an experimental state, it is not completely production-ready.
+	   
+	   Notifies about the ArtObjects on idle event. Provides the lists of UUIDs of the art objects 
+       that are inserted, removed, or modified in the current artwork. 
+
+       Notification about art objects that are part of the Styled Art, belong to the result group of 
+	   Plugin Art, accommodated in dictionary, or belong to a global object are not added in the lists.
+	   (Let's say that these objects are Non-Notified Objects and the remaining objects are Notified Objects).
+
+       Inserted Objects: An object is considered as an Inserted Object when it is created, comes to
+       In-Scope, or moves from the Non-Notified Objects group to the Notified Objects group.
+       
+       Removed Objects: An object is considered as a Removed Object when it gets deleted, goes to
+       Out-Scope, or moves from the Notified Objects group to the Non-Notified Objects group.
+	   If an object's dictionary is acquired and not released, then the notification of that object will be 
+	   delayed till the dictionary is released. (It is not recommended to acquire and hold the dictionary 
+	   reference for future use)
+       
+       Modified Object: An object is considered as a Modified Object when the time stamp of that object
+       gets updated.
+
+	   See \c #ArtObjectsChangedNotifierData
+	*/
+#define kAIArtObjectsChangedNotifier	    "AI Art Objects Changed Notifier"
+
 /** Type constants for drawing modes. */
 enum AIDrawingMode
 {
@@ -86,7 +111,7 @@ enum AIDrawingMode
 	kAIDrawInsideMode
 };
 
-/** Type constants for art objects. Some values are only for use in matching, and are never
+/** Type constants for art objects. Some values are only for use in matching and are never
 	returned from \c #AIArtSuite::GetArtType(). */
 enum AIArtType {
 	/** Special type never returned as an art object type, but used
@@ -137,6 +162,17 @@ enum AIArtType {
 	kLegacyTextArt,
 	/** Chart Art (Deprecated) */
 	kChartArt,
+    
+    /** Radial Repeat Art */
+    kRadialRepeatArt,
+    /** Grid Repeat Art */
+    kGridRepeatArt,
+    /** Symmetry Art */
+    kSymmetryArt,
+    /** Concentric Repeat Art */
+    kConcentricRepeatArt,
+    
+    kLastArtType = kSymmetryArt,
 };
 
 
@@ -251,7 +287,10 @@ enum AIArtUserAttr {
 	kMatchArtNotIntoPluginGroups = 0x00080000,
 
 	/** Contents of graph objects are included in the search for matching art, valid only for matching.*/
-	kMatchArtInCharts = 0x00100000
+	kMatchArtInCharts = 0x00100000,
+    
+    /** No Main arts of repeat objects are included in the search for matching art, valid only for matching.*/
+	kMatchArtIntoRepeats = 0x00200000
 };
 
 /** Flags for \c #AIArtSuite::GetArtTransformBounds() and \c #AIArtSuite::GetArtRotatedBounds()
@@ -288,11 +327,11 @@ enum AIArtBoundsOptions {
 /** The values for the \c action parameter of \c #AIArtSuite::ModifyTargetedArtSet().
 	Determines what action is taken to modify the current object set.*/
 enum AIArtTargettingAction {
-	/** Replace current set with the set specified in \c list */
+	/** Replaces current set with the set specified in \c list */
 	kReplaceAction				= 0x0001,
-	/** Append the set specified in \c list to current set */
+	/** Appends the set specified in \c list to current set */
 	kAppendAction				= 0x0002,
-	/** Remove the set specified in \c list from the current set */
+	/** Removes the set specified in \c list from the current set */
 	kRemoveAction				= 0x0003,
 	/** Moves targeting up one level (ignores \c list and \c count) */
 	kUpAction					= 0x0004,
@@ -394,9 +433,30 @@ enum AIArtTimeStampOptions
 	// Example Usecase: Hiding/Showing a Layer in Layer Panel does not update the thumbnail of that Layer because timestamp of Layer's group art changes but that of its children does not.
 	kAITimeStampOfChildren = kAITimeStampOfArt << 1,
 	// Example Usecase: Thumbnail of Assets contained in Export Assets Panel are in sync with the visibility of that art on the document. 
-	//					So if an group, added as an asset in Export Assets Panel, is shown/hidden (or its children are shown/hidden) then the thumbnail of that group in Asset Panel updates accordingly.
+	//					So if a group, added as an asset in Export Assets Panel, is shown/hidden (or its children are shown/hidden) then the thumbnail of that group in Asset Panel updates accordingly.
 	kAITimeStampMaxFromArtAndChildren = kAITimeStampOfChildren << 1
 };
+
+namespace ai
+{
+	//Forward declaration
+	class uuid;
+
+	/** struct to keep list of the UUIDs of inserted, removed, and modified objects*/
+	struct ArtObjectsChangedData
+	{
+		AutoBuffer<uuid> insertedObjList;
+		AutoBuffer<uuid> removedObjList;
+		AutoBuffer<uuid> modifiedObjList;
+	};
+
+	/** struct for notification data of <b>kAIArtObjectsChangedNotifier</b>*/
+	struct ArtObjectsChangedNotifierData
+	{
+		ArtObjectsChangedData artObjsChangedData;
+		size_t refStamp;
+	};
+}
 
 /** @ingroup Errors
 	See \c #AIArtSuite */
@@ -423,6 +483,12 @@ enum AIArtTimeStampOptions
 	See \c #AIArtSuite */
 #define kInvalidArtTypeForDestErr  	'~VAT'
 
+/**
+	@ingroup Errors
+	See \c #AIArtSuite */
+#define kAIArtHandleOutOfScopeErr		'AHOS'
+
+
 
 /*******************************************************************************
  **
@@ -440,7 +506,7 @@ enum AIArtTimeStampOptions
 
 	The Art suite is fundamental to implementing most plug-ins. An Illustrator document
 	consists of a collection of art objects referenced by an \c #AIArtHandle. This
-	is an opaque pointer to an art object in the document’s artwork database. Access
+	is an opaque pointer to an art object in the document's artwork database. Access
 	the fields through the Art suite's accessor functions.
 
 	An art object can represent an individual entity, such as a path, block of text or
@@ -466,7 +532,7 @@ error = sArt->NewArt(kPathArt, kPlaceInsideOnTop, group, &new_art);
 			@endcode
 			This places \c new_art on top of all artwork in the document.
 			@code
-error = sArt->NewArt(kPathArt, kPlaceAboveAll, nil, &new_art);
+error = sArt->NewArt(kPathArt, kPlaceAboveAll, nullptr, &new_art);
 			@endcode
 
 		@param type The art type. See \c ::AIArtType.
@@ -509,12 +575,12 @@ error = sArt->NewArt(kPathArt, kPlaceAboveAll, nil, &new_art);
 
 	/** Retrieves the first art object in a layer, which is the group that contains all of the art in that layer.
 		You can use this to traverse the art objects contained in the layer.
-			@param layer The layer. Use \c nil for the current layer. See \c #AILayerSuite
+			@param layer The layer. Use \c nullptr for the current layer. See \c #AILayerSuite
 			@param art [out] A buffer in which to return the new art object.
 	 		@see  \c #GetArtFirstChild(), \c #GetArtParent(), \c #GetArtSibling(), \c #GetArtPriorSibling() */
 	AIAPI AIErr (*GetFirstArtOfLayer) ( AILayerHandle layer, AIArtHandle *art );
 
-	/** Retrieves an art object’s parent layer, if any.
+	/** Retrieves an art object's parent layer, if any.
 		This function is useful with \c #AIMatchingArtSuite::GetSelectedArt() and \c #AIMatchingArtSuite::GetMatchingArt(),
 		which give you a list of art objects. For example, if your filter gets all of the selected objects and
 		creates a path on top of each layer with objects on it, you would need to know the layer of the objects
@@ -535,7 +601,7 @@ error = sArt->NewArt(kPathArt, kPlaceInsideOnTop, group, &new_path);
 	AIAPI AIErr (*GetLayerOfArt) ( AIArtHandle art, AILayerHandle *layer );
 
 	/** Retrieves the type of an art object.
-	Before you begin manipulating an object’s type-specific attributes you need to know
+	Before you begin manipulating an object's type-specific attributes you need to know
 	what kind of art object it is. For example, you can call path functions if the art
 	is a path, or text functions if it is text.
 	@code
@@ -636,7 +702,7 @@ switch (type) {
 	@endcode
 			@param art The art object.
 			@param child [out] A buffer in which to return the child object, or a null object if
-				the specified art object is not a container such as a group, graph, or text frame,
+				the specified art object is not a container such as a group, a graph, or a text frame,
 				or is an empty container.
 	  */
 	AIAPI AIErr (*GetArtFirstChild) ( AIArtHandle art, AIArtHandle *child );
@@ -704,7 +770,7 @@ if (!art){
 error = sArt->GetArtCenterPointVisible (art, &visible);
 if (error) return error;
 if (!visible) {
-    // it’s not visible so we do something based on that fact
+    // its not visible so we do something based on that fact
     ...
 	@endcode
 		@param art The art object.
@@ -732,7 +798,7 @@ if (!visible) {
 	 */
 	AIAPI AIErr (*GetArtTransformBounds) ( AIArtHandle art, AIRealMatrix *transform, ai::int32 flags, AIRealRect *bounds );
 
-	/* New in Illustrator 7.0 */
+	/* Introduced in Illustrator 7.0 */
 
 	/** Checks whether any linked objects (linked images or placed objects)
 		contained in the subtree of a given container need updating, and updates them if needed.
@@ -741,10 +807,10 @@ if (!visible) {
 
 			@param art The art object.
 			@param force When true, objects are updated regardless of whether they have changed.
-			@param updated [out] Optional, a buffer in which to return true if any objects were updated. */
+			@param updated [out] Optional, a buffer in which the output as to return true if any objects were updated. */
 	AIAPI AIErr (*UpdateArtworkLink) ( AIArtHandle art, AIBoolean force, AIBoolean *updated );
 
-	/* New in Illustrator 8.0 */
+	/* Introduced in Illustrator 8.0 */
 
 	/** Returns true if an art object reference is valid.
 	(Note that the function returns a boolean value, not an error code.)
@@ -834,13 +900,13 @@ if (!visible) {
 			@param art The art object.
 			@param paintorder The position in the paint order, relative to the specified art object.
 			See \c #AITypes::AIPaintOrder for the possible positions.
-			@param editable [out] A buffer in which to return true if it is possible to create art
+			@param editable [out] A buffer in which to return the output as true if it is possible to create art
 			at the returned position. For example, you cannot create art in a locked layer.
 			Pass null if not needed.
 		*/
 	AIAPI AIErr (*GetInsertionPoint) ( AIArtHandle *art, short *paintorder, AIBoolean *editable );
 
-	/** Sets the insertion point for a document.
+	/** Sets the insertion point in a document.
 		This is the position in the art tree at which a drawing tool should create new art.
 		The new position is a paint-order position with respect to the given art object.
 		See \c #AITypes::AIPaintOrder for details.
@@ -862,23 +928,57 @@ if (!visible) {
 
 
 	/** Clears the key object for object alignment. The key object is the one to which
-		other objects are aligned. It is usually the object most recently clicked with the
-		Select tool.
+		other objects are aligned. It is usually the object that is most recently clicked using the
+		Selection tool.
 			@deprecated */
 	AIAPI AIErr (*CancelKeyArt) (void);
 
-	/** Retrieves the dictionary associated with an art object. Arbitrary data can be
-		attached to an art object in its dictionary. See the \c #AIDictionarySuite..
-		The same dictionary is accessed by the \c #AITagSuite for setting and getting
-		string values.
+	/**	Retrieves the dictionary associated with an art object. Creates a new, empty
+		dictionary if one is not found.
+
+		Arbitrary data can be attached to an art object in its dictionary.
+		See the \c #AIDictionarySuite.
+		The same dictionary is accessed by the \c #AITagSuite for
+		setting and getting string values.
 
 		Dictionaries are reference counted. You must call \c sAIDictionary->Release()
 		when you no longer need the reference. It is recommended that you use the C++
 		\c #ai::Ref template class, which takes care memory management.
 			@param art The art object.
 			@param dictionary [out] A buffer in which to return a pointer to the dictionary reference.
+
+			@note This call creates an empty dictionary if one is not found.
+				To check for the existence of an item in the art dictionary,
+				first check that the dictionary exists and is not empty.
+			@see \c #IsDictionaryEmpty() and \c #HasDictionary()
 		*/
 	AIAPI AIErr (*GetDictionary) ( AIArtHandle art, struct _AIDictionary** dictionary );
+
+	/**	Reports whether a dictionary is associated with an art object.
+		(Note that the function returns a boolean value, not an error code.)
+
+			@param art The art object.
+			@return True if a dictionary is associated with the art object, false otherwise.
+			@note If you need to check for the existence of an item in the art dictionary,
+				first check that the dictionary exists and is not empty. Calling \c #GetDictionary()
+				when no dictionary exists creates an unneeded dictionary object.
+
+			@see \c #IsDictionaryEmpty() and \c #GetDictionary()
+		*/
+	AIAPI AIBoolean (*HasDictionary) ( AIArtHandle art );
+
+	/**	Reports whether the dictionary associated with an art object is empty or does not exist.
+		(Note that the function returns a boolean value, not an error code.)
+
+			@param art The art object.
+			@return True if a dictionary exists and is empty or if no dictionary exists.
+				False if a dictionary associated with the art object contains any entries.
+			@note For best performance, check for existence of a dictionary before calling \c #GetDictionary().
+				Calling  \c #GetDictionary() when no dictionary exists creates an unneeded dictionary object.
+
+			@see \c #HasDictionary() and \c #GetDictionary()
+		*/
+	AIAPI AIBoolean (*IsDictionaryEmpty) ( AIArtHandle art );
 
 	/** Sets the name of an art object. This is the name that appears in the Layers
 		palette.
@@ -891,7 +991,7 @@ if (!visible) {
 		palette.
 			@param art The art object.
 			@param name [out] A buffer in which to return the name.
-			@param isDefaultName [out] A buffer in which to return true if the returned name is a
+			@param isDefaultName [out] A buffer in which to return the output as true if the returned name is a
 			default descriptive name, rather than a user-assigned name. May be null.
 		*/
 	AIAPI AIErr (*GetArtName) (AIArtHandle art, ai::UnicodeString& name, ASBoolean *isDefaultName);
@@ -943,7 +1043,7 @@ if (!visible) {
 	AIAPI AIBoolean (*IsArtClipping) (AIArtHandle art);
 
 
-	/* New in Illustrator 10.0 */
+	/* Introduced in Illustrator 10.0 */
 
 	/** Transfers attributes from a source art object to a destination art object.
 		Use, for example, when converting an art object from one type to another.
@@ -953,12 +1053,12 @@ if (!visible) {
 				\c #AIArtTransferAttrsOptions values. */
 	AIAPI AIErr (*TransferAttributes) (AIArtHandle srcart, AIArtHandle dstart, ai::uint32 which);
 
-	/* New in Illustrator 11.0 */
+	/* Introduced in Illustrator 11.0 */
 
 	/**	Retrieves the last child of a container art object. Applies to container
 		objects such as groups, graphs and text frame objects.
 			@param art The art object.
-			@param child [out] A buffer in which to return the last child art object, or nil if
+			@param child [out] A buffer in which to return the last child art object, or nullptr if
 				the specified art object is not a container or is an empty container.
 		*/
 	AIAPI AIErr (*GetArtLastChild) ( AIArtHandle art, AIArtHandle *child );
@@ -984,7 +1084,7 @@ if (!visible) {
 			@param art The art object.
 			@param offset [out] A buffer in which to return the distance in points from
 				the geometric outline of an object that defines an offset for wrapping.
-			@param invert [out] A buffer in which to return true if text wraps inside the outline
+			@param invert [out] A buffer in which to return the output as true if text wraps inside the outline
 				of the offset object, or false if text wraps around the outside of the offset object.
 			@return \c kBadParameterErr if the object does not have the \c kArtIsTextWrap attribute set. */
 	AIAPI AIErr (*GetArtTextWrapProperty) ( AIArtHandle art, AIReal *offset, AIBoolean *invert );
@@ -1004,7 +1104,7 @@ if (!visible) {
 		*/
 	AIAPI AIErr (*DestroyCopyScope) (AICopyScopeHandle scope);
 
-	/* New in Illustrator 12.0 */
+	/* Introduced in Illustrator 12.0 */
 
 	/** Checks to see if it is OK to create or insert an art object of a given type at a given insertion point.
 			@param paintOrder The insertion point in the paint order, relative to the \c prep object. See \c AITypes::AIPaintOrder.
@@ -1024,8 +1124,6 @@ if (!visible) {
 			@param prep The prepositional object for the \c paintOrder position.
 			@return \c kNoErr if it is OK. Possible non-OK returns are \c #kTooDeepNestingErr,
 		\c #kInvalidArtTypeForDestErr, and \c #kUntouchableArtObjectErr.
-
-
 	*/
 	AIAPI AIErr (*PreinsertionFlightCheck) (AIArtHandle candidateArt, ai::int16 paintOrder, AIArtHandle prep);
 
@@ -1094,20 +1192,20 @@ if (!visible) {
 		*/
 	AIAPI AIErr (*UncheckedDisposeArt) ( AIArtHandle art );
 
-	/* New in Illustrator 13.0 */
+	/* Introduced in Illustrator 13.0 */
 
 	/** Reports whether an art object is a graph object type.
 		Graphs (for historical reasons) have no specific art type in
 		\c #AIArtType enum, and get the type \c #kUnknownArt.
 			@param art The art object to query.
-			@param artisgraph [out] A buffer in which to return true if the object
+			@param artisgraph [out] A buffer in which to return the output as true if the object
 				is a graph.
 		*/
 	AIAPI AIErr (*ArtIsGraph)(AIArtHandle art, AIBoolean *artisgraph);
 
-	/* New in Illustrator 14.0 */
+	/* Introduced in Illustrator 14.0 */
 
-	/** Sets the art as KeyArt for object alignment.The key object is the one to which other objects are aligned.
+	/** Sets the art as KeyArt for object alignment. The key object is the one to which other objects are aligned.
 		If art is NULL, it cancels key art. Use this API to Cancel KeyArt instead of CancelKeyArt().
 		@param art [in] The art object to be set as Key Art
 				The art needs to be currently selected.
@@ -1134,7 +1232,7 @@ if (!visible) {
 		@param art [out] The art object.
 		@param paintorder [out] The position in the paint order, relative to the specified art object.
 		See \c #AITypes::AIPaintOrder for the possible positions.
-		@param editable [out] A buffer in which to return true if it is possible to create art
+		@param editable [out] A buffer in which to return the output as true if it is possible to create art
 		at the returned position. For example, you cannot create art in a locked layer.
 		Pass null if not needed.
 	*/
@@ -1145,7 +1243,7 @@ if (!visible) {
 		@param art [out] The art object.
 		@param paintorder [out] The position in the paint order, relative to the specified art object.
 								See \c #AITypes::AIPaintOrder for the possible positions.
-		@param editable [out] A buffer in which to return true if it is possible to create art
+		@param editable [out] A buffer in which to return the output as true if it is possible to create art
 							at the returned position. For example, you cannot create art in a locked layer.
 							Pass null if not needed.
 	*/
@@ -1172,8 +1270,8 @@ if (!visible) {
 	*/
 	AIAPI AIErr (*SetPixelPerfect) (AIArtHandle art, AIBoolean isPixelPerfect);
 
-	/** Compare two art objects to determine if they are equivalient in geometry, appearance attributes,
-	    and dictionary contents.Typically, one object is in the current document, and the other
+	/** Compare two art objects to determine if they are equivalent in geometry, appearance attributes,
+	    and dictionary contents. Typically, one object is in the current document and the other
 		is in another document. This function uses the same sense of equivalence in which two patterns
 		or symbol definitions are considered equivalent when retargeting an external symbol or pattern
 		to the current document. In particular, if one object is in a document with a different color
@@ -1194,8 +1292,8 @@ if (!visible) {
 	    This is a simulated layer that functions as a group, except when isolated or expanded.
 		It is not a layer object and cannot be manipulated with the \c #AILayerSuite.
 		@param art [in] The art object
-		@param isLayerInSymbol [out] A buffer in which to return true if
-			this is a simulated layer in a symbol pattern, false otherwise.
+		@param isLayerInSymbol [out] A buffer in which to return the output as true if
+			this is a simulated layer in a symbol pattern; false otherwise.
 	*/
 	AIAPI AIErr (*IsArtALayerInSymbol) ( AIArtHandle art, AIBoolean* isLayerInSymbol );
 
@@ -1216,9 +1314,48 @@ if (!visible) {
 
 	AIAPI AIErr (*ConvertAreaTypeToPointType) ( AIArtHandle art, AIArtHandle* newArtHandle );
 
+	/**	Marks an art object for redraw by incrementing the modification time stamp.
+			@param art[in] The art object
+			@param markStyleDirty[in] Pass true to dirty the artstyle of the object otherwise artstyle will not be re-executed
+		*/
+	AIAPI AIErr (*MarkDirty) ( AIArtHandle art, AIBoolean markStyleDirty );
+
+	/** Retrieves the SafeArt object associated with an art object. The SafeArt object
+		can be cached for the lifetime of the document. Use \c #GetArtHandle() to
+		retrieve the art object if it is still valid, or report if the art has been
+		deleted or moved to the undo stack.
+		@param art [in] The art object.
+		@param safeArt [out] A buffer in which to return the SafeArt object.
+		@see \c #GetArtHandle()
+	*/
+	AIAPI  AIErr (*GetSafeArtHandle) ( AIArtHandle art, AISafeArtHandle* safeArt );
+
+	/** Retrieves the art object associated with a SafeArt object, if the art
+		is still in scope.
+		@param safeArt [in] The SafeArt object.
+		@param art [in] A buffer in which to return the valid art object,
+		or a null pointer if the art object has been deleted or
+		has moved to the undo stack.
+		@return  \c #kAIArtHandleOutOfScopeErr if the associated art is
+		no longer valid.
+	*/
+	AIAPI AIErr (*GetArtHandle) ( AISafeArtHandle safeArt, AIArtHandle* art );
+
+
+	/**	Retrieves the default name of an art object.
+		@param art The art object.
+		@param name [out] A buffer in which to return the name.
+	*/
+	AIAPI AIErr (*GetArtDefaultName) ( AIArtHandle art, ai::UnicodeString &name );
+
+	/**	Retrieves an art object's document.
+	 	@param art The art object.
+	 	@param document [out] A buffer in which to return the document object. See \c #AIDocumentSuite
+	 */
+	AIAPI AIErr (*GetDocumentOfArt) ( AIArtHandle art, AIDocumentHandle *document );
+
 } AIArtSuite;
 
 #include "AIHeaderEnd.h" // __cplusplus
 
 #endif // __AIArt__
-

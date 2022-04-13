@@ -46,7 +46,7 @@
 **/
 #ifdef WIN_ENV
 typedef HWND AIControlBarPlatformWindow;
-#elif MAC_ENV
+#elif defined(MAC_ENV)
 	#ifdef __OBJC__
 	@class NSView;
 	typedef NSView*	AIControlBarPlatformWindow;

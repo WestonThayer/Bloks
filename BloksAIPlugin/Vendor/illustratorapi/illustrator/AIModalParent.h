@@ -46,7 +46,7 @@
 **/
 #ifdef WIN_ENV
 typedef HWND AIPlatformWindow;
-#elif MAC_ENV
+#elif defined(MAC_ENV)
 	#ifdef __OBJC__
 	@class NSWindow;
 	typedef NSWindow*	AIPlatformWindow;

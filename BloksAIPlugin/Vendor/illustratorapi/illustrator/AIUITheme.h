@@ -94,6 +94,9 @@ enum AIUIComponentColor
 
 	/** Current UI text edit background color.  */
 	kAIUIComponentColorEditTextBackground,
+    
+    /** Current UI border color, */
+    kAIUIComponentColorBorder,
 
 	/** Internal use  */
 	kAIUIComponentColorLast = 0xFFFF

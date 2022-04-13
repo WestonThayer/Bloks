@@ -20,7 +20,7 @@
 /**
 
 	SPConfig.h is the environment configuration file for Sweet Pea. It
-	defines MAC_ENV or WIN_ENV. These are used to control platform-specific
+	defines MAC_ENV/WIN_ENV/IOS_ENV/LINUX_ENV. These are used to control platform-specific
 	sections of code.
 
  **/
@@ -73,11 +73,19 @@
  *	Make certain that one and only one of the platform constants is defined.
  */
 
-#if !defined(WIN_ENV) && !defined(MAC_ENV)
+#if !defined(WIN_ENV) && !defined(MAC_ENV) && !defined(IOS_ENV) && !defined(LINUX_ENV)
 	#error
 #endif
 
 #if defined(WIN_ENV) && defined(MAC_ENV)
+	#error
+#endif
+
+#if defined(WIN_ENV) && defined(LINUX_ENV)
+	#error
+#endif
+
+#if defined(LINUX_ENV) && defined(MAC_ENV)
 	#error
 #endif
 

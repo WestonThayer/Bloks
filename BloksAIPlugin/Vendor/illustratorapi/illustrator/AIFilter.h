@@ -96,7 +96,7 @@
 typedef struct _t_AIFilterOpaque *AIFilterHandle;
 
 
-#if Macintosh || MSWindows
+#if Macintosh || MSWindows || LINUX_ENV
 /** A developer-defined structure that holds parameters required
 	for your filter. It is a platform handle; allocate space with
 	\c #AIMdMemorySuite::MdMemoryNewHandle().*/
@@ -183,7 +183,7 @@ typedef struct {
 			@param options Not currently used. Pass 0.
 			@param filter [out] A buffer in which to return the filter reference.
 				 If you install multiple filters, store this reference in the
-				 plug-in’s \c globals record, so that your plug-in can use it
+				 plug-inï¿½s \c globals record, so that your plug-in can use it
 				 to determine which filter command is to be processed.
 	*/
 	AIAPI AIErr (*AddFilter) ( SPPluginRef self, char *name,
@@ -229,7 +229,7 @@ typedef struct {
 	AIAPI AIErr (*SetFilterParameters) ( AIFilterHandle filter, PlatformFilterParameters parameters );
 
 	/** Retrieves the menu-item reference for a filter. Your plug-in can then modify
-		the menu item’s appearance using the \c #AIMenuSuite functions.
+		the menu itemï¿½s appearance using the \c #AIMenuSuite functions.
 			@param filter The filter reference.
 			@param menuItem [out] A buffer in which to return the menu item reference.
 		*/

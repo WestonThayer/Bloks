@@ -53,7 +53,7 @@
 #define kAILayerVersion				kAILayerSuiteVersion
 
 /** @ingroup Notifiers
-	Sent when a new layer becomes current,	but there are no changes to the layers
+	Sent when a new layer becomes current,	but no changes are made to the layers
 	themselves (options, names, ordering, and so on.)
 	 */
 #define kAICurrentLayerNotifier			"AI Current Layer Notifier"
@@ -73,6 +73,10 @@
 	lock status, visibility, view mode, and so on.)
 	*/
 #define kAILayerOptionsNotifier			"AI Layer Options Notifier"
+	/** @ingroup Notifiers
+	Sent when an art style is applied to a layer
+	*/
+#define kAILayerArtStyleChangeNotifier	"AI Layer Art Style Change Notifier"
 
 
 /** @ingroup Errors
@@ -103,7 +107,7 @@
 	placed art as dimmed. A layer reference is opaque; use the functions
 	in this suite to get and set layer properties.
 
-    Several layer properties affect whether artwork on the layer is editable.
+    Several layer properties affect whether the artwork on the layer is editable.
 	Normally objects on a non-editable layer cannot be selected, so plug-ins
 	that operate on the current selection need not check.  However, in
 	iterating through layers or artwork, call \c #GetLayerEditable() on each
@@ -177,7 +181,7 @@ typedef struct {
 		*/
 	AIAPI AIErr	(*GetNextLayer) ( AILayerHandle prev, AILayerHandle *next );
 
-	/** Adds a new layer to a document, inserting it into the layers lists
+	/** Adds a new layer to a document, inserting it into the layers' lists
 		at a position in the paint order relative to an existing layer.
 			@param layer The prepositional layer for \c paintOrder values
 				\c #kPlaceAbove and \c #kPlaceBelow, or \c NULL for values
@@ -226,7 +230,7 @@ typedef struct {
 		artwork of a sublayer is not drawn, even if the sublayer's visibility
 		status is true.
 			@param layer The layer.
-			@param visible [out] A buffer in which to return true if art
+			@param visible [out] A buffer in which to return the output as true if art
 				in this layer is visible.
 		*/
 	AIAPI AIErr (*GetLayerVisible) ( AILayerHandle layer, AIBoolean *visible );
@@ -246,7 +250,7 @@ typedef struct {
 		rendered in outline mode regardless of the sublayer settings.
 			@param layer The layer.
 			@param preview [out] A buffer in which to return true if
-				this layer specifies preview mode, false if it
+				this layer specifies preview mode; false if it
 				specifies outline mode.
 		*/
 	AIAPI AIErr (*GetLayerPreview) ( AILayerHandle layer, AIBoolean *preview );
@@ -265,7 +269,7 @@ typedef struct {
 		cannot be edited, regardless of the sublayer settings.
 			@param layer The layer.
 			@param editable [out] A buffer in which to return true if
-				this layer is editable, false if it is locked.
+				this layer is editable; false if it is locked.
 	  */
 	AIAPI AIErr (*GetLayerEditable) ( AILayerHandle layer, AIBoolean *editable );
 
@@ -283,7 +287,7 @@ typedef struct {
 		You can print all layers, visible layers or printable, visible layers.
 			@param layer The layer.
 			@param printed [out] A buffer in which to return true if
-				this layer is printable, false if it is not.
+				this layer is printable; false if it is not.
 		*/
 	AIAPI AIErr (*GetLayerPrinted) ( AILayerHandle layer, AIBoolean *printed );
 
@@ -300,7 +304,7 @@ typedef struct {
 		are dimmed regardless of the sublayer setting.
 			@param layer The layer.
 			@param dimmed [out] A buffer in which to return true if
-				this layer is dimmed, false if it is not.
+				this layer is dimmed; false if it is not.
 		*/
 	AIAPI AIErr (*GetLayerDimPlacedImages) ( AILayerHandle layer, AIBoolean *dimmed );
 
@@ -318,7 +322,7 @@ typedef struct {
 	/** Reports whether a layer is selected.
 			@param layer The layer.
 			@param selected [out] A buffer in which to return true if
-				this layer is selected, false if it is not.
+				this layer is selected; false if it is not.
 			@note This function is provided for backward
 				compatibility with Illustrator 6.0.
 	*/
@@ -326,7 +330,7 @@ typedef struct {
 
 	/** Sets whether a layer is selected.
 			@param layer The layer.
-			@param selected True to select this layer is selected, false
+			@param selected True to select this layer, false
 				to deselect it.
 			@note This function is provided for backward
 				compatibility with Illustrator 6.0.
@@ -345,14 +349,14 @@ typedef struct {
 	/** Reports whether a layer contains objects other than sublayers.
 			@param layer The layer.
 			@param hasArt [out] A buffer in which to return true if
-				this layer contains art objects, false if it does not.
+				this layer contains art objects; false if it does not.
 		*/
 	AIAPI AIErr (*LayerHasArt) ( AILayerHandle layer, AIBoolean *hasArt );
 
 	/** Reports whether a layer contains any selected artwork.
 			@param layer The layer.
 			@param hasSel [out] A buffer in which to return true if
-				this layer contains selected art, false if it does not.
+				this layer contains selected art; false if it does not.
 		*/
 	AIAPI AIErr (*LayerHasSelectedArt) ( AILayerHandle layer, AIBoolean *hasSel );
 
@@ -372,7 +376,7 @@ typedef struct {
 		template layer are also template layers.
 			@param layer The layer.
 			@param isTemplate [out] A buffer in which to return true if
-				this layer is a template layer, false if it is not.
+				this layer is a template layer; false if it is not.
 		*/
 	AIAPI AIErr (*GetLayerIsTemplate) ( AILayerHandle layer, AIBoolean *isTemplate );
 
@@ -380,7 +384,7 @@ typedef struct {
 		template layer are also template layers.
 			@param layer The layer.
 			@param isTemplate True to make this a template layer, false to
-				make it not a template. */
+				not make it a template layer. */
 	AIAPI AIErr (*SetLayerIsTemplate) ( AILayerHandle layer, AIBoolean isTemplate );
 
 	/** Retrieves the layer above a given layer in the stacking order.

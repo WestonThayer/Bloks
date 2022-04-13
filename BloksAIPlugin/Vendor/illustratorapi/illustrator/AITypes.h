@@ -1,43 +1,42 @@
 #ifndef __AITypes__
 #define __AITypes__
 
-/*
- *        Name:	AITypes.h
- *   $Revision: 17 $
- *      Author:
- *        Date:
- *     Purpose:	Adobe Illustrator core type definitions.
- *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2015 Adobe Systems Incorporated.
- * All rights reserved.
- *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file 
- * in accordance with the terms of the Adobe license agreement 
- * accompanying it. If you have received this file from a source other 
- * than Adobe, then your use, modification, or distribution of it 
- * requires the prior written permission of Adobe.
- *
- */
-
+/*************************************************************************
+*
+* ADOBE CONFIDENTIAL
+*
+* Copyright 1986 Adobe
+*
+* All Rights Reserved.
+*
+* NOTICE: Adobe permits you to use, modify, and distribute this file in
+* accordance with the terms of the Adobe license agreement accompanying
+* it. If you have received this file from a source other than Adobe,
+* then your use, modification, or distribution of it requires the prior
+* written permission of Adobe.
+*
+**************************************************************************/
 
 /*******************************************************************************
  *
  *  Includes
  *
  */
+#include "./config/AIConfig.h"
+
 #ifdef __cplusplus
 #include <exception>
 #endif
 
 #include "AIBasicTypes.h"
+#include "AIErrorCodes.h"
 
 #ifndef __ASTypes__
 #include "ASTypes.h"
 #endif
 
 #include "ADMStdTypes.h"// This is a new file we have added in shared\illustrator\public\api\...  
-							// It contains definition of ADMRect, ADMPoint, ADMUnits ... It has nothing to do with ADM except that the name contains ADM.
+							// It contains definition of ADMRect, ADMPoint, ADMUnits ... It has nothing to do with ADM, except that the name contains ADM.
 
 #ifdef WIN_ENV
 #include "AIWinDef.h"
@@ -85,9 +84,29 @@
 #define kPluginInterfaceVersion19001	0x19000001	// AI 19.0
 #define kPluginInterfaceVersion19021	0x19000021	// AI 19.2
 #define kPluginInterfaceVersion20001	0x20000001	// AI 20.0
+#define kPluginInterfaceVersion20011	0x20000011	// AI 20.1
+#define kPluginInterfaceVersion21001	0x21000001	// AI 21.0
+#define kPluginInterfaceVersion21011	0x21000011	// AI 21.1
+#define kPluginInterfaceVersion22001	0x22000001	// AI 22.0
+#define kPluginInterfaceVersion22011	0x22000011	// AI 22.1
+#define kPluginInterfaceVersion23001	0x23000001	// AI 23.0
+#define kPluginInterfaceVersion23011	0x23000011	// AI 23.1
+#define kPluginInterfaceVersion24001    0x24000001  // AI 24.0
+#define kPluginInterfaceVersion24011    0x24000011  // AI 24.1
+#define kPluginInterfaceVersion24021    0x24000021  // AI 24.2
+#define kPluginInterfaceVersion24031    0x24000031  // AI 24.3
+#define kPluginInterfaceVersion25001    0x25000001  // AI 25.0
+#define kPluginInterfaceVersion25011    0x25000011  // AI 25.1
+#define kPluginInterfaceVersion25021    0x25000021  // AI 25.2
+#define kPluginInterfaceVersion25031    0x25000031  // AI 25.3
+#define kPluginInterfaceVersion25041    0x25000041  // AI 25.4
+#define kPluginInterfaceVersion26001    0x26000001  // AI 26.0
 
-#define kPluginInterfaceVersion			kPluginInterfaceVersion20001
+#define kPluginInterfaceVersion			kPluginInterfaceVersion26001
 
+#ifdef LINUX_ENV
+#define AIAPI_VERSION(x) (x + 2000)
+#endif
 
 #ifdef MAC_ENV
 #define AIAPI_VERSION(x) (x + 1000)
@@ -97,7 +116,7 @@
 #define AIAPI_VERSION(x) (x)
 #endif
 
-#define kPlatformUnloadedSuiteProc	NULL
+#define kPlatformUnloadedSuiteProc	nullptr
 
 #if !defined(__BUILD_PLUGIN__)
 #if defined(ILLUSTRATOR_H)
@@ -151,6 +170,16 @@
 /** @ingroup Errors
 	Undo/Redo Can't be done properly.  */
 #define kUndoRedoErr			'UND!'
+/**	@ingroup Errors
+	Art bounds are invalid. */
+#define kAIInvalidArtBoundsErr	'IABD'
+
+/**	@ingroup Errors
+	Resource Permission error.
+*/
+#define kAIResourcePermissionErr '!PRM'
+
+#define kImageTooBigError		 '!I2B'
 
 /*******************************************************************************
  *
@@ -158,25 +187,35 @@
  *
  */
 
-#define AIAPI ASAPI
+//Decorators for describing if apis are thread safe or not
+#define AI_THREAD_SAFE_API 
+#define AI_MAIN_THREAD_API
+
+#define AIAPI AI_MAIN_THREAD_API
+
 
 /** Opaque reference to an art object. Access using \c #AIArtSuite. */
 typedef struct ArtObject *AIArtHandle;
 typedef const struct ArtObject *ConstAIArtHandle;
+
+/** Opaque reference to an Safe Art Handle. Access using \c #AIArtSuite*/
+typedef struct _t_AISafeArtOpaque *AISafeArtHandle;
+
 /** Opaque reference to a layer. Access using \c #AILayerSuite.  */
 typedef struct _t_AILayerOpaque *AILayerHandle;
+
+/** Opaque reference to a document. Access using \c #AIDocumentSuite. */
+typedef struct _t_AIDocument *AIDocumentHandle;
+
 /** Fixed number (obsolete) See \c #AIFixedMathSuite. */
 typedef ASFixed AIFixed;
 /** A fractional number greater than -2 and less than 2. Obsolete, use \c AIReal. */
 typedef ASFract AIFract;
 /** An unsigned fractional number greater than 0 and less than 4. Obsolete, use \c AIReal.  */
 typedef ai::uint32 AIUFract;
-/** Real number. See \c #AIRealMathSuite. */
-typedef	double AIReal, *AIRealPtr;
-/** Floating-point numeric value */
-typedef float AIFloat;
-/** Double-byte numeric value */
-typedef double AIDouble;
+
+typedef    AIReal* AIRealPtr;
+
 /** Data stream */
 typedef struct _t_AIStreamOpaque *AIStream;
  /** Rectangle specified with \c #AIFixed coordinates. Obsolete, use \c #AIRealRect. */
@@ -185,35 +224,8 @@ typedef ASFixedRect AIFixedRect;
 typedef ASFixedPoint AIFixedPoint;
  /** Transformation matrix specified with \c #AIFixed values. Obsolete, use \c #AIRealMatrix. */
 typedef ASFixedMatrix AIFixedMatrix;
- /** Rectangle specified with \c #AIReal coordinates.*/
-typedef struct _t_AIRealRect {
-	AIReal left, top, right, bottom;
-} AIRealRect, *AIRealRectPtr;
-
-typedef struct _t_AIFloatRect {
-	AIFloat left, top, right, bottom;
-} AIFloatRect, *AIFloatRectPtr;
-//typedef AIRealRect AIRealRect, *AIRealRectPtr;
-/** Point specified with \c #AIReal coordinates.*/
-typedef struct _t_AIRealMatrix {
-	AIReal a, b, c, d, tx, ty;
-	/** Sets to Identity.*/
-	void Init()
-	{
-		a = 1.0; b = 0.0;
-		c = 0.0; d = 1.0;
-		tx = 0.0; ty = 0.0;
-	}
-} AIRealMatrix, *AIRealMatrixPtr;
-
-//typedef struct _t_AIFloatMatrix {
-//	AIFloat a, b, c, d, tx, ty;
-//} AIFloatMatrix, *AIFloatMatrixPtr;
 
 typedef ASRealMatrix AIFloatMatrix;
-typedef struct _t_AIRealPoint {
-	AIReal h, v;
-} AIRealPoint, *AIRealPointPtr;
 
 //typedef struct _t_AIFloatPoint {
 //	AIFloat h, v;
@@ -223,22 +235,11 @@ typedef ASRealPoint AIFloatPoint;// *AIRealPointPtr;
 /** Transformation matrix specified with \c #AIReal values.*/
 
 //typedef AIRealMatrix AIRealMatrix, *AIRealMatrixPtr;
-/** True (1) or false (0) */
-typedef ASBoolean AIBoolean;
 /** 1-byte boolean value, true (1) or false (0) */
 typedef ASByte AIBool8;
 
-typedef ADMRect AIRect;
-
-typedef ADMPoint AIPoint;
-
 /** Opaque reference to a Platform View, NSView* on Mac and HWND on Windows . */
 typedef struct _t_AIPlatformViewOpaque *AIPlatformViewRef;
-
-/** Rectangle specified with \c #AIDouble coordinates.*/
-struct AIDoubleRect {
-	AIDouble left, top, right, bottom;
-};
 
 #ifdef MAC_ENV
 /** Port reference, Mac OS only, same as Mac OS \c CGrafPtr. */
@@ -262,8 +263,21 @@ typedef HWND AIWindowRef;
 typedef HWND AIDialogRef;
 #endif
 
+#ifdef LINUX_ENV
+/** Port reference, Windows only, same as Windows \c HDC. */
+typedef void* AIPortRef;
+
+/** Window reference, Windows only, same as Windows \c HWND. */
+typedef void* AIWindowRef;
+
+/** Dialog reference, Windows only, same as Windows \c HWND. */
+typedef void* AIDialogRef;
+
+typedef /* [wire_marshal] */ void *HMENU;
+#endif
+
 /** Opaque RGB color, access with \c #AIColorConversionSuite. */
-// AIRGBColor is the same as a Macintosh RGBColor on Macintosh and Windows.
+// AIRGBColor is the same as Macintosh RGBColor on Macintosh and Windows.
 /** RGB color record */
 struct AIRGBColor {
 	/** Color values */
@@ -271,14 +285,14 @@ struct AIRGBColor {
 };
 
 /** Event information structure, used by \c #AIToolSuite, \c #AICursorSnapSuite.
-	AIEvent is the same as a Macintosh EventRecord on Macintosh and Windows. */
+	AIEvent is the same as Macintosh EventRecord on Macintosh and Windows. */
 /** Event record. */
 typedef struct _t_AIEvent {
 	/** The type of event */
 	unsigned short	what;
 	/** The event message */
 	unsigned long	message;
-	/** The time the event occurred */
+	/** The time when the event occurred */
 	unsigned long	when;
 	/** The location of the event */
 	AIPoint			where;
@@ -305,7 +319,11 @@ typedef ai::uint32 AICommandID;
 	type is specified, the function expects a ZString.
 	You can cast it back to a \c char* if you need to look inside it. */
 typedef const struct ZREFStruct *ZRef;
-#define ZREF(x) ((ZRef)(x))
+
+inline ZRef ZREF(const char* str)
+{
+	return reinterpret_cast<ZRef>(str);
+}
 
 /** The position of an art object, which determines how it is drawn relative to another,
 	overlapping art object, known as the prep (prepositional) object,
@@ -366,8 +384,18 @@ namespace ai
 		kFirstQuadrant = 1,
 		kSecondQuadrant,
 		kThirdQuadrant,
-		kFourthQuadrant
+		kFourthQuadrant	
 	} Quadrant;
+	
+/** 
+	Icon Types to be given by clients.
+*/
+	enum class IconType: ai::uint8 {
+		kInvalid = 0,
+		kSVG,
+		kPNG
+	};
+   
 }
 
 /** These constants identify the various shipping versions of Illustrator. */
@@ -391,7 +419,14 @@ typedef enum AIVersion {
 	kAIVersion17,
 	kAIVersion18,
 	kAIVersion19,
-	kAIVersion20
+	kAIVersion20,
+	kAIVersion21,
+	kAIVersion22,
+	kAIVersion23,
+	kAIVersion24,
+    kAIVersion25,
+    kAIVersion26,
+	kAIVersionLatest = kAIVersion26
 } AIVersion;
 
 /** These constants identify the various units used in Illustrator. */
@@ -419,11 +454,22 @@ typedef enum AIUnits {
 	/** Pixels */
 	kAIPixelUnits = 10,
 	/** Time */
-	kAITimeUnits = 11,
-	/** Minimum default */
+    kAITimeUnits = 11,
+    /** Feets units */
+    kAIFeetUnits = 12,
+    /** Ha*/
+    kAIHaUnits = 13,
+    /** Feet Inch*/
+    kAIFeetInchUnits = 14,
+    /** Meter*/
+    kAIMeterUnits = 15,
+    /** Yards*/
+    kAIYardUnits = 16,
+    
+    /** Minimum default */
 	kAIMinNormalUnits = kAIPointUnits,
 	/** Maximum default */
-	kAIMaxNormalUnits = kAITimeUnits,
+	kAIMaxNormalUnits = kAIYardUnits,
 
 	/** App constant */
 	kAIAppUnits1 = 101,
@@ -452,14 +498,22 @@ typedef enum AIUnits {
 	kAIDummyUnits = 0xFFFFFFFF
 } AIUnits;
 
-typedef struct 
+struct AISize
 {
-	AIReal width;
-	AIReal height;
-}AISize;
+	AISize(AIReal w = 0, AIReal h = 0):width(w),height(h)
+	{}
+	AIReal width = 0;
+	AIReal height = 0;
+};
 
 #ifdef __cplusplus
 namespace ai {
+
+#ifdef AI_HAS_NOEXCEPT
+#define AINOEXCEPT noexcept
+#else
+#define AINOEXCEPT
+#endif
 
 /** This macro is used to decorate C++ functions and methods that are
 	guaranteed not to throw. Due to the current state of compiler support
@@ -468,15 +522,28 @@ namespace ai {
 
 
 /** Exception class thrown by C++ classes */
-class Error : public std::exception {
+class Error : public std::exception 
+{
 public:
-	Error (AIErr _err) : err(_err)
-		{}
-	operator AIErr () const
-		{return err;}
+	Error (AIErr err) : mErr(err) {}
+	
+	const char* what() const AINOEXCEPT override { return "AI Exception"; }
+
+	operator AIErr () const AINOEXCEPT { return mErr; }
 
 protected:
-	AIErr err;
+	AIErr mErr;
+};
+
+class LogicError : public Error
+{
+public:
+	LogicError(AIErr err, const char* msg) : Error(err), mMsg(msg) {}
+
+	const char* what() const AINOEXCEPT override { return mMsg; }
+
+protected:
+	const char* mMsg;
 };
 
 } // end namespace ai
@@ -487,12 +554,31 @@ protected:
 
 // Note:
 // 1) Functions which throw must be declared after the AIHeaderEnd.h inclusion
-//    as AIHeaderBegin puts everything into an extern C.  You cannot declare a
+//    as AIHeaderBegin puts everything into an extern C. You cannot declare a
 //    template to have 'C' linkage.
 // 2) Exceptions must not be thrown across the API boundary so be sure to catch
 //    any potential exceptions before exiting your plug-in.
 
 #ifdef __cplusplus
+
+// == and != operators
+inline bool operator==(const AIPoint& l, const AIPoint& r)
+{
+	return l.h == r.h && l.v == r.v;
+}
+inline bool operator!=(const AIPoint& l, const AIPoint& r)
+{
+	return !(l == r);
+}
+inline bool operator==(const AIRect& l, const AIRect& r)
+{
+	return l.left == r.left && l.top == r.top && l.right == r.right && l.bottom == r.bottom;
+}
+inline bool operator!=(const AIRect& l, const AIRect& r)
+{
+	return !(l == r);
+}
+
 namespace ai {
 
 /** Validate an AIErr error code. Throw an ai::Error exception if the provided
@@ -519,6 +605,19 @@ inline void check_precondition(T condition, AIErr err = kBadParameterErr)
 		throw ai::Error(err);
 }
 
+/**
+	Inline method to suppress unused variable warning/error. Compiler optimizes away any call to this method.
+	e.g.
+		catch(const ai::Error& e)
+		{
+			ai::NOTUSED(e);
+		}
+*/
+template <class T> inline void NOTUSED(const T& result)
+{
+	static_cast<void>(result);
+}
+
 /** Provides compile-time errors that are similar to run-time assertions.
     This is an implementation of Andrei Alexandrescu's CompileTimeChecker.
 	Use the AI_STATIC_CHECK macro to instantiate a \c CompileTimeChecker object.
@@ -528,6 +627,10 @@ inline void check_precondition(T condition, AIErr err = kBadParameterErr)
 		AI_STATIC_CHECK(sizeof(wchar_t) == sizeof(unsigned short), wchar_t_size_does_not_match_unsigned_short_size);
 </code>
 */
+
+#ifdef AI_HAS_STATIC_ASSERT
+#define AI_STATIC_CHECK(expr, msg) static_assert(expr, #msg);
+#else
 template<bool> struct CompileTimeChecker
 {
 	CompileTimeChecker(...);
@@ -546,6 +649,7 @@ template<> struct CompileTimeChecker<false> {};
 	class ERROR_##msg {};\
 	(void)sizeof(ai::CompileTimeChecker<(expr) != 0>((new ERROR_##msg())));\
 }
+#endif // AI_HAS_STATIC_ASSERT
 
 } //end namespace ai
 #endif // __cplusplus 

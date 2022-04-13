@@ -51,10 +51,6 @@
 #include "AIHTMLConversion.h"
 #endif
 
-#ifndef AIFLASHPREFS_H
-#include "AIFlashPrefs.h"
-#endif
-
 #ifndef _AISVGACTION_H_
 #include "AISVGAction.h"
 #endif
@@ -115,8 +111,6 @@ enum ASOptimizedFileFormat
 	asffInvalidFormat,
 	/** Mixed formats ("mixed") */
 	asffMixedFormat,
-	/** SWF format */
-	asffSWF,
 	/** SVG format */
 	asffSVG
 	};
@@ -195,8 +189,8 @@ typedef struct
 
 	/** True to do automatic reduction. */
 	AIBoolean autoReduced;
-	/** True to use a rollover master palette. */
-	AIBoolean rolloverMasterPalette;
+	/** True to use a rollover Primary palette. */
+	AIBoolean rolloverPrimaryPalette;
 
 	/** Percentage of tolerance level [0...100] for shifting colors to the closest web palette equivalents.
 	A higher value shifts more colors.*/
@@ -258,8 +252,8 @@ typedef struct
 
 	/** True to do automatic reduction. */
 	AIBoolean autoReduced;
-	/** True to use a rollover master palette. */
-	AIBoolean rolloverMasterPalette;
+	/** True to use a rollover Primary palette. */
+	AIBoolean rolloverPrimaryPalette;
 	/** Percentage of tolerance level [0...100] for shifting colors to the closest web palette equivalents.
 	A higher value shifts more colors.*/
 	ai::int32 webShiftedPercentage;
@@ -326,30 +320,6 @@ typedef struct
 	AIBoolean optimize;
 	} ASSVGSettings;
 
-/** SWF optimization settings.
-See \c #ASOptimizationSettings, \c #AIOptimizationSettingsSuite. */
-typedef struct
-	{
-	/** Export options for layers */
-	FlashExportOption exportOption;
-	/** The frame rate. */
-	AIReal frameRate;
-	/** True to create a continuous loop. */
-	AIBoolean loop;
-	/** True to make SWF read-only. */
-	AIBoolean readOnly;
-	/** The curve quality, [0..10] where 10 is best quality. */
-	ai::int32 curveQuality;
-	/** True to preserve appearance. */
-	AIBoolean preserveAppearance;
-	/** True to compress SWF. */
-	AIBoolean compressed;
-	/** True to save text as outline. */
-	AIBoolean outlineText;
-	/** The Flash Player version [1..8]*/
-	ai::int32 flashPlayerVersion;
-	} ASSWFSettings;
-
 /** Optimization settings for appropriate format.
 See \c #ASOptimizationSettings, \c #AIOptimizationSettingsSuite. */
 typedef union
@@ -359,7 +329,6 @@ typedef union
 	ASPNG8Settings	png8;
 	ASPNG24Settings	png24;
 	ASSVGSettings	svg;
-	ASSWFSettings	swf;
 	} ASOptimizationSettingsUnion;
 
 /** File format for save with appropriate optimization settings.

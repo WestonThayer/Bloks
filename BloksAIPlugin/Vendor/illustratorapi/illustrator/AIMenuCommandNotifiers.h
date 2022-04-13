@@ -31,6 +31,8 @@
 #define kAIOpenCommandPostNotifierStr                                "AI Command Notifier: After Open"                              //File:Open
 #define kAICloseCommandPreNotifierStr                                "AI Command Notifier: Before Close"                            //File:Close
 #define kAICloseCommandPostNotifierStr                               "AI Command Notifier: After Close"                             //File:Close
+#define kAICloseAllCommandPreNotifierStr                             "AI Command Notifier: Before Close All"                            //File:Close All
+#define kAICloseAllCommandPostNotifierStr                            "AI Command Notifier: After Close All"                             //File:Close All
 #define kAISaveCommandPreNotifierStr                                 "AI Command Notifier: Before Save"                             //File:Save
 #define kAISaveCommandPostNotifierStr                                "AI Command Notifier: After Save"                              //File:Save
 #define kAISaveAsCommandPreNotifierStr                               "AI Command Notifier: Before Save As"                          //File:Save As
@@ -83,6 +85,8 @@
 #define kAIPasteInPlaceCommandPostNotifierStr                        "AI Command Notifier: After Paste in Place"                    //Edit:Paste in Place
 #define kAIPasteInAllArtboardsCommandPreNotifierStr                  "AI Command Notifier: Before Paste in All Artboards"           //Edit:Paste on All Artboards
 #define kAIPasteInAllArtboardsCommandPostNotifierStr                 "AI Command Notifier: After Paste in All Artboards"            //Edit:Paste on All Artboards
+#define kAIPasteWithoutFormattingCommandPreNotifierStr               "AI Command Notifier: Before Paste without Formatting"         //Edit:Paste without Formatting
+#define kAIPasteWithoutFormattingCommandPostNotifierStr              "AI Command Notifier: After Paste without Formatting"          //Edit:Paste without Formatting
 #define kAIClearCommandPreNotifierStr                                "AI Command Notifier: Before Clear"                            //Edit:Clear
 #define kAIClearCommandPostNotifierStr                               "AI Command Notifier: After Clear"                             //Edit:Clear
 #define kAIFindAndReplaceCommandPreNotifierStr                       "AI Command Notifier: Before Find and Replace"                 //Edit:Find and Replace
@@ -1018,5 +1022,6 @@
 #define kAIGlyphSubstitutionOptionsCommandPreNotifierStr             "AI Command Notifier: Before Glyph Substitution Options"
 #define kAIGlyphSubstitutionOptionsCommandPostNotifierStr            "AI Command Notifier: After Glyph Substitution Options"
 #define kAIAfterAltOptionDragCopyCommandPostNotifierStr				 "AI Command Notifier: After Alt/Option Drag Copy"
+#define kAIAfterDragTransformCommandPostNotifierStr					 "AI Command Notifier: After Alt/Option Drag Transform"
 
 #endif // AIMenuCommandNotifiers_h__

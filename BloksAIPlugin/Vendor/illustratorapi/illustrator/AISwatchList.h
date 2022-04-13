@@ -83,6 +83,10 @@
 #define kAICreateNewSwatchNotifier					"AI Create New Swatch Notifier"	// used only by PaintStyle
 
 /** @ingroup Notifier
+ Sent when a  selected swatch is deleted. See \c #AISwatchListSuite. */
+#define kAIDeleteSwatchNotifier                    "AI Delete Selected Swatch Notifier"    // used only by PaintStyle
+
+/** @ingroup Notifier
 	Sent when a  new swatch is created. See \c #AISwatchListSuite. */
 #define kAICreateNewSwatchWithDefaultParamNotifier					"AI Create New Swatch With Default Param Notifier"	// used only by PaintStyle
 
@@ -280,7 +284,7 @@ typedef struct {
 	/** Sets the name of a swatch. If the swatch identifies a custom color, pattern, or gradient,
 		also changes the name of the underlying object.
 			@param swatch The swatch reference.
-			@param name The new name string.
+			@param name The new name string.Limit is 31 chars, more than 31 chars will be removed
 		*/
 	ASErr ASAPI (*SetSwatchName)			(AISwatchRef swatch, const ai::UnicodeString& name);
 

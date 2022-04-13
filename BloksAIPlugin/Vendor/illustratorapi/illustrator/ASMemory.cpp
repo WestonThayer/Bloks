@@ -29,13 +29,13 @@ extern "C" SPBasicSuite *sSPBasic;
 
 void * operator new[](size_t size)  throw(std::bad_alloc)
 {
-	void *addr = nil;
+	void *addr = nullptr;
 	
 	if (sSPBasic)
 	{
 		 ASErr error = sSPBasic->AllocateBlock(size, &addr);
 		 if (error)
-		 	addr = nil; 	
+		 	addr = nullptr; 	
 	}
 //	else
 //		DebugStr("\p new() called without sSPBlocks");
@@ -45,13 +45,13 @@ void * operator new[](size_t size)  throw(std::bad_alloc)
 
 void * operator new(size_t size)  throw(std::bad_alloc)
 {
-	void *addr = nil;
+	void *addr = nullptr;
 	
 	if (sSPBasic)
 	{
 		 ASErr error = sSPBasic->AllocateBlock(size, &addr);
 		 if (error)
-		 	addr = nil; 	
+		 	addr = nullptr; 	
 	}
 //	else
 //		DebugStr("\p new() called without sSPBlocks");
@@ -83,13 +83,13 @@ void operator delete [] (void * p) throw()
 // -------------------------------------------------------
 void * operator new[](size_t size, const std::nothrow_t&) throw()
 {
-	void *addr = nil;
+	void *addr = nullptr;
 	
 	if (sSPBasic)
 	{
 		 ASErr error = sSPBasic->AllocateBlock(size, &addr);
 		 if (error)
-		 	addr = nil; 	
+		 	addr = nullptr; 	
 	}
 //	else
 //		DebugStr("\p new() called without sSPBlocks");
@@ -99,13 +99,13 @@ void * operator new[](size_t size, const std::nothrow_t&) throw()
 
 void * operator new(size_t size, const std::nothrow_t&) throw()
 {
-	void *addr = nil;
+	void *addr = nullptr;
 	
 	if (sSPBasic)
 	{
 		 ASErr error = sSPBasic->AllocateBlock(size, &addr);
 		 if (error)
-		 	addr = nil; 	
+		 	addr = nullptr; 	
 	}
 //	else
 //		DebugStr("\p new() called without sSPBlocks");

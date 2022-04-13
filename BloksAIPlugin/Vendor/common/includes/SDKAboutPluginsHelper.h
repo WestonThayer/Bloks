@@ -1,8 +1,8 @@
 //========================================================================================
 //  
-//  $File: //ai_stream/rel_20_0/devtech/sdk/public/samplecode/common/includes/SDKAboutPluginsHelper.h $
+//  $File$
 //
-//  $Revision: #1 $
+//  $Revision$
 //
 //  Copyright 1987 Adobe Systems Incorporated. All rights reserved.
 //  

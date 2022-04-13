@@ -52,8 +52,8 @@
  **/
 
 #define kAIToolboxSuite			"AI Toolbox Suite"
-#define kAIToolboxVersion6		AIAPI_VERSION(6)
-#define kAIToolboxVersion		kAIToolboxVersion6
+#define kAIToolboxVersion7		AIAPI_VERSION(7)
+#define kAIToolboxVersion		kAIToolboxVersion7
 #define kAIToolboxSuiteVersion	kAIToolboxVersion
 
 /** @ingroup Callers
@@ -127,6 +127,10 @@
 	See \c #AIToolboxSuite::SetTool().*/
 #define kSelectorAISoftCycleTool		"AI Toolbox Soft Cycle Tool"
 
+/** 
+	Tool icon Types to be given by clients.
+*/
+
 /*******************************************************************************
  **
  ** Types
@@ -136,27 +140,51 @@
 /** Opaque reference to a toolbox, never dereferenced. Access with the \c #AIToolboxSuite. */
 typedef struct _t_AIToolboxOpaque *AIToolboxHandle;
 
+/** \c #AIBuiltInToolBox constants.
+ */
+enum AIBuiltInToolBox : ai::int16
+{
+    /* Basic Toolbox. */
+    kAIBasicToolbox               =        0,
+    /* Advanced Toolbox. */
+    kAIAdvancedToolbox            =        1,
+};
+
 
 /** The contents of a toolbox message. Valid fields depend on the
 	selector type. */
-typedef struct {
+struct AIToolboxMessage{
 	/** The message data. */
-	SPMessageData d;
+	SPMessageData d = {};
 	/** The toolbox reference. */
-	AIToolboxHandle toolbox;
+	AIToolboxHandle toolbox = {};
 	/** The tool reference. */
-	AIToolType tool;
+	AIToolType tool = 0;
 	/** The icon shown in the Tools palette.  */
 	AIDataStackRef iconResourceDictionary;
 	/** Unique identifying name for the tool */
-	char *name;
-	/** Localized display name for the tool. */
-	char *title;
-	/** Short descriptive string shown when tool is activated. */
-	char *tooltip;
-	/** The Help system identifier. */
-	ASHelpID helpID;
-} AIToolboxMessage;
+    char *name = nullptr;
+    /** This is a deprecated field and will only be filled with an empty string */
+    char *title_deprecated = nullptr;
+    /** This is a deprecated field and will only be filled with an empty string */
+    char *tooltip_deprecated = nullptr;
+    /** This is a deprecated field and will not be used */
+    ASHelpID helpID_deprecated = 0;
+	
+	/* Specifies the type of the incoming icons 
+		enum IconType in AITypes.h*/
+	ai::IconType iconType = ai::IconType::kInvalid;
+    /**This is for internal purpose only to hold plugin's priority for group.**/
+    AIToolType      sameGroupAs =0 ;
+    /**This is for internal purpose only to hold plugin's priority for set.**/
+    AIToolType      sameSetAs = 0;
+    /**This is for internal purpose only to hold a plugin is third party plugin or not.**/
+    bool            isThirdPartyPlugin = false;
+    /** Localized display name for the tool. */
+    ai::UnicodeString title;
+    /** Short descriptive string shown when tool is activated. */
+    ai::UnicodeString tooltip;
+};
 
 /*******************************************************************************
  **
@@ -245,6 +273,13 @@ struct AIToolboxSuite {
 		 */
 	AIAPI AIErr (*GetCurrentToolType) (AIToolType *toolNum);
 
+    /** Retrieves the visibility for a built-in toolbox.
+     toolBox [in] A built-in toolbox taking \c #AIBuiltInToolBox value.
+     visible [out] The visibility of the toolbox
+     
+     */
+    AIAPI AIErr (*GetBuiltInToolboxVisibility) (ai::int16 toolBox, AIBoolean& visible);
+    
 };
 
 

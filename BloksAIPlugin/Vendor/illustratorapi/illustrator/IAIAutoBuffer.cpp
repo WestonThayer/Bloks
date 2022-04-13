@@ -25,7 +25,10 @@
 
 #include "AITypes.h"	// For ai::Error & inclusion of ASTypes.h 
 
-#ifdef _IAIAUTOBUFFER_SUITE_INCLUDE_H_
+#if AI_AUTO_SUITE_AVAILABLE
+	#include "AutoSuite.h"
+	use_suite(SPBlocks)
+#elif defined(_IAIAUTOBUFFER_SUITE_INCLUDE_H_)
     #include _IAIAUTOBUFFER_SUITE_INCLUDE_H_
 #else
     #ifndef _IAIAUTOBUFFER_SUITE_USE_C_LINKAGE_

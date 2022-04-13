@@ -63,10 +63,10 @@
  **/
 
 #define kAIRasterizeSuite				"AI Rasterize Suite"
-#define kAIRasterizeSuiteVersion10		AIAPI_VERSION(10)
+#define kAIRasterizeSuiteVersion12		AIAPI_VERSION(12)
 
 /* Latest version */
-#define kAIRasterizeSuiteVersion		kAIRasterizeSuiteVersion10
+#define kAIRasterizeSuiteVersion		kAIRasterizeSuiteVersion12
 #define kAIRasterizeVersion				kAIRasterizeSuiteVersion
 
 /** The default anti-aliasing factor when rasterizing with anti-aliasing. */
@@ -160,32 +160,34 @@ enum AIRasterizeOptions {
 	/** Clear all options */
 	kRasterizeOptionsNone = 0,
 	/** When set, incorporates layer attributes (such as opacity and blend mode)
-		into the raster result. Otherwise, ignore layers in the input set. */
-	kRasterizeOptionsDoLayers = 1,
+		into the raster result. Otherwise, ignores layers in the input set. */
+	kRasterizeOptionsDoLayers = 1<<0,
 	/** When set, rasterize against a black background, rather than white. */
-	kRasterizeOptionsAgainstBlack = 2,
-	/** When set, do not align 72 dpi images to the pixel grid. */
-	kRasterizeOptionsDontAlign = 4,
-	/** When set, convert text to outlines before rasterizing it. */
-	kRasterizeOptionsOutlineText = 8,
-	/** When set, do not supersample; preserve type hinting. */
-	kRasterizeOptionsHinted = 16,
-	/** When set, use the Document Raster Effects Settings resolution. */
-	kRasterizeOptionsUseEffectsRes = 32,
-	/** When set, use a minimum of 5 tiles when rasterizing with
+	kRasterizeOptionsAgainstBlack = 1<<1,
+	/** When set, does not align 72 dpi images to the pixel grid. */
+	kRasterizeOptionsDontAlign = 1<<2,
+	/** When set, converts text to outlines before rasterizing it. */
+	kRasterizeOptionsOutlineText = 1<<3,
+	/** When set, does not supersamples; preserves type hinting. */
+	kRasterizeOptionsHinted = 1<<4,
+	/** When set, uses the Document Raster Effects Settings resolution. */
+	kRasterizeOptionsUseEffectsRes = 1<<5,
+	/** When set, uses a minimum of 5 tiles when rasterizing with
 		anti-alias on (useful for better user feedback on progress bars). */
-	kRasterizeOptionsUseMinTiles = 64,
+	kRasterizeOptionsUseMinTiles = 1<<6,
 	/** When set, matte transparency with CMYK white. */
-	kRasterizeOptionsCMYKWhiteMatting = 128,
-	/** When set, rasterize to spot-color raster when a single separation channel is sufficient. */
-	kRasterizeOptionsSpotColorRasterOk = 256,
+	kRasterizeOptionsCMYKWhiteMatting = 1<<7,
+	/** When set, rasterizes to spot-color raster when a single separation channel is sufficient. */
+	kRasterizeOptionsSpotColorRasterOk = 1<<8,
 	/** When set, rasterization to NChannel image is allowed. */
-	kRasterizeOptionsNChannelOk = 512
+	kRasterizeOptionsNChannelOk = 1<<9,
+	/** [Internal] When set, fill path and stroke with black color and ignore transparency */
+    kFillBlackAndIgnoreTransparancy = 1<<10
 };
 
 /** Rasterization settings are collected into a single structure
 	describing the type of raster desired, resolution, amount of
-	anti-aliasing and other options. */
+	anti-aliasing, and other options. */
 struct AIRasterizeSettings {
 	AIRasterizeSettings () :
 		type(kRasterizeGrayscale),
@@ -242,7 +244,7 @@ struct AIRasterizeSettings {
 	AIRasterizeOptions options;
 	/** Color conversion options, a logical OR of \c #AIColorConvertOptions. */
 	AIColorConvertOptions ccoptions;
-	/** When true, preserve spot colors when possible. */
+	/** When true, preserve spot colors wherever possible. */
 	AIBoolean preserveSpotColors;
 };
 
@@ -261,7 +263,7 @@ enum AIResamplingType {
 	this procedure to display a progress bar during a lengthy operation.
 		@param current The index of the current tile being rasterized.
 		@param total The total number of tiles to be rasterized.
-		@return False to cancel the operation, otherwise true.
+		@return False to cancel the operation; otherwise true.
 	*/
 typedef AIAPI AIBoolean (*AIRasterizeProgressProc)(ai::int32 current, ai::int32 total);
 
@@ -300,7 +302,7 @@ typedef struct {
 /** Creates a raster art object from an art set.
 		@param artSet The art set object.
 		@param settings Settings that describe the type of raster desired,
-			resolution, amount of anti-aliasing and other options.
+			resolution, amount of anti-aliasing, and other options.
 		@param artBounds The bounding rectangle for the art
 			to rasterize, which can be the one returned by \c #ComputeArtBounds().
 		@param paintOrder The paint order, relative to the \c prep object,
@@ -325,7 +327,7 @@ typedef struct {
 	This is the same as setting "Create Clipping Mask" when using
 	the Object > Rasterize menu command.
 		@param artSet The art set object. The function disposes of the art
-			objects contained in this set, but does not dispose of this variable.
+			objects contained in this set, but does not dispose off this variable.
 		@param paintOrder The paint order, which determines how the
 			new mask group is placed relative to the raster art.
 			Must be \c #kPlaceAbove or \c #kPlaceBelow.
@@ -338,11 +340,11 @@ typedef struct {
 								AIArtHandle rasterArt,
 								AIArtHandle *maskGroup );
 
-/**	Creates a raster art object from an art set, adding padding.
-	in both the horizontal and vertical dimension.
+/**	Creates a raster art object from an art set, adding padding
+	in both the horizontal and vertical dimensions.
 		@param artSet The art set object.
 		@param settings Settings that describe the type of raster desired,
-			resolution, amount of anti-aliasing and other options.
+			resolution, amount of anti-aliasing, and other options.
 			If the setting specify an alpha channel, the padding pixels
 			are fully transparent. Otherwise, they are white.
 		@param artBounds The bounding rectangle for the art
@@ -412,6 +414,39 @@ typedef struct {
 
 	AIAPI AIErr (*CheckSpotColorPreservation) (AIArtSet artSet,
 									AIBoolean *canPreserveSpotColor);
+
+	AIAPI void (*SnapRasterRectToPixelGrid)(AIRealRect &rect, AIReal ppi);
+    
+    
+    /**    Creates a raster art object from an art set, adding padding
+     in both the horizontal and vertical dimensions.
+     @param artSet The art set object.
+     @param settings Settings that describe the type of raster desired,
+     resolution, amount of anti-aliasing, and other options.
+     If the setting specify an alpha channel, the padding pixels
+     are fully transparent. Otherwise, they are white.
+     @param artBounds The bounding rectangle for the art
+     to rasterize, which can be the one returned by \c #ComputeArtBounds().
+     @param paintOrder The paint order, relative to the \c prep object,
+     for the placement of the new object, an \c #AITypes::AIPaintOrder value.
+     @param prep The prepositional art object for the paint order.
+     @param raster [out] A buffer in which to return the new raster art object.
+     @param progressProc    A callback function that presents a progress dialog
+     during a lengthy operation.
+     @param padding The amount of padding to add to the resulting raster image,
+     a number of document points.
+     @param bgColor The color to be filled in the padded area. Supported color types are RGB and CMYK process colors.
+     */
+    AIAPI AIErr (*RasterizeWithPaddingAndBGColor) ( AIArtSet artSet,
+                                         AIRasterizeSettings *settings,
+                                         AIRealRect *artBounds,
+                                         short paintOrder,
+                                         AIArtHandle prepArt,
+                                         AIArtHandle *raster,
+                                         AIRasterizeProgressProc progressProc,
+                                         AIReal padding,
+                                         AIColor* bgColor);
+
 
 } AIRasterizeSuite;
 

@@ -1,25 +1,20 @@
-#ifndef __AIFOConversion__
-#define __AIFOConversion__
+/*************************************************************************
+*
+* ADOBE CONFIDENTIAL
+*
+* Copyright 2002 Adobe
+*
+* All Rights Reserved.
+*
+* NOTICE: Adobe permits you to use, modify, and distribute this file in
+* accordance with the terms of the Adobe license agreement accompanying
+* it. If you have received this file from a source other than Adobe,
+* then your use, modification, or distribution of it requires the prior
+* written permission of Adobe.
+*
+**************************************************************************/
 
-/*
- *        Name:	AIFOConversion.h
- *		$Id $
- *      Author:
- *        Date:
- *     Purpose:	Adobe Illustrator Foreign Object Conversion Suite.
- *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 2002-2007 Adobe Systems Incorporated.
- * All rights reserved.
- *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file 
- * in accordance with the terms of the Adobe license agreement 
- * accompanying it. If you have received this file from a source other 
- * than Adobe, then your use, modification, or distribution of it 
- * requires the prior written permission of Adobe.
- *
- */
-
+#pragma once
 
 /*******************************************************************************
  **
@@ -27,22 +22,12 @@
  **
  **/
 
-#ifndef __AITypes__
 #include "AITypes.h"
-#endif
-
-#ifndef __AIForeignObject__
 #include "AIForeignObject.h"
-#endif
-
-#ifndef __AIFont__
 #include "AIFont.h"
-#endif
-
 
 #include "AIHeaderBegin.h"
 
-/** @file AIFOConversion.h */
 
 /*******************************************************************************
  **
@@ -51,8 +36,8 @@
  **/
 
 #define kAIFOConversionSuite				"AI FO Conversion Suite"
-#define kAIFOConversionSuiteVersion3		AIAPI_VERSION(3)
-#define kAIFOConversionSuiteVersion			kAIFOConversionSuiteVersion3
+#define kAIFOConversionSuiteVersion4		AIAPI_VERSION(4)
+#define kAIFOConversionSuiteVersion			kAIFOConversionSuiteVersion4
 #define kAIFOConversionVersion				kAIFOConversionSuiteVersion
 
 
@@ -105,9 +90,9 @@ typedef enum AIFOConversionInfoSelector
 } AIFOConversionInfoSelector;
 
 
-/** Types of information about the contents of foreign object that can
-	be collected and sent to a callback from
-	\c #AIFOConversionSuite::EnumerateContents(), */
+/** Types of information about the contents of foreign object that can be collected
+	and sent to a callback from \c #AIFOConversionSuite::EnumerateContents() or 
+	\c #AIFOConversionSuite::EnumerateContentsEx(). */
 typedef enum AIFOContentInfoSelector
 {
 	/** No information is collected.
@@ -154,6 +139,52 @@ typedef enum AIFOContentInfoSelector
 
 } AIFOContentInfoSelector;
 
+
+
+/** Flags to indicate the type of information about the foreign object
+	contents that needs to be collected and sent to a callback from
+	\c #AIFOConversionSuite::EnumerateContentsEx(), */
+#define AI_FO_MAKE_CONTENT_INFO_FLAG(f)	((f) == 0 ? 0 : (1 << (f)))
+typedef enum AIFOContentInfoSelectorFlag : ai::uint32
+{
+	/** \c #kAIFOContentInfoNone needs to be sent. */
+	kAIFOContentInfoNoneFlag = AI_FO_MAKE_CONTENT_INFO_FLAG(kAIFOContentInfoNone),
+	/** \c #kAIFOContentInfoHasTransparency needs to be sent. */
+	kAIFOContentInfoHasTransparencyFlag = AI_FO_MAKE_CONTENT_INFO_FLAG(kAIFOContentInfoHasTransparency),
+	/** \c #kAIFOContentInfoMarksProcessPlates needs to be sent. */
+	kAIFOContentInfoMarksProcessPlatesFlag = AI_FO_MAKE_CONTENT_INFO_FLAG(kAIFOContentInfoMarksProcessPlates),
+	/** \c #kAIFOContentInfoMarksCMYKPlates needs to be sent. */
+	kAIFOContentInfoMarksCMYKPlatesFlag = AI_FO_MAKE_CONTENT_INFO_FLAG(kAIFOContentInfoMarksCMYKPlates),
+	/** \c #kAIFOContentInfoHasOverPrint needs to be sent. */
+	kAIFOContentInfoHasOverPrintFlag = AI_FO_MAKE_CONTENT_INFO_FLAG(kAIFOContentInfoHasOverPrint),
+	/** \c #kAIFOContentInfoHasText needs to be sent. */
+	kAIFOContentInfoHasTextFlag = AI_FO_MAKE_CONTENT_INFO_FLAG(kAIFOContentInfoHasText),
+	/** \c #kAIFOContentInfoHasGradient needs to be sent. */
+	kAIFOContentInfoHasGradientFlag = AI_FO_MAKE_CONTENT_INFO_FLAG(kAIFOContentInfoHasGradient),
+	/** \c #kAIFOContentInfoHasGradientMesh needs to be sent. */
+	kAIFOContentInfoHasGradientMeshFlag = AI_FO_MAKE_CONTENT_INFO_FLAG(kAIFOContentInfoHasGradientMesh),
+	/** \c #kAIFOContentInfoSpotColor needs to be sent. */
+	kAIFOContentInfoSpotColorFlag = AI_FO_MAKE_CONTENT_INFO_FLAG(kAIFOContentInfoSpotColor),
+	/** \c #kAIFOContentInfoRasterTransform needs to be sent. */
+	kAIFOContentInfoRasterTransformFlag = AI_FO_MAKE_CONTENT_INFO_FLAG(kAIFOContentInfoRasterTransform),
+	/** \c #kAIFOContentInfoPaintServerRasterRecord needs to be sent. */
+	kAIFOContentInfoPaintServerRasterRecordFlag = AI_FO_MAKE_CONTENT_INFO_FLAG(kAIFOContentInfoPaintServerRasterRecord),
+	/** \c #kAIFOContentInfoHasNonImage needs to be sent. */
+	kAIFOContentInfoHasNonImageFlag = AI_FO_MAKE_CONTENT_INFO_FLAG(kAIFOContentInfoHasNonImage),
+	/** All supported types of information need to be sent. */
+	kAIFOContentInfoAllFlag =	kAIFOContentInfoHasTransparencyFlag |
+								kAIFOContentInfoMarksProcessPlatesFlag |
+								kAIFOContentInfoMarksCMYKPlatesFlag |
+								kAIFOContentInfoHasOverPrintFlag |
+								kAIFOContentInfoHasTextFlag |
+								kAIFOContentInfoHasGradientFlag |
+								kAIFOContentInfoHasGradientMeshFlag |
+								kAIFOContentInfoSpotColorFlag |
+								kAIFOContentInfoRasterTransformFlag |
+								kAIFOContentInfoPaintServerRasterRecordFlag |
+								kAIFOContentInfoHasNonImageFlag,
+
+} AIFOContentInfoSelectorFlag;
 
 /** Flags for conversion of a foreign object. A logical OR of
 	\c #AIFOConversionFlagValue bit flags. */
@@ -220,13 +251,13 @@ typedef void (*AIVisitFontProc)(AIFontKey fontkey, void *data);
 	*/
 typedef void (*AIVisitFontExtendedProc)(AIFontKey fontkey, AIBoolean wasEmbedded, void *data);
 
-/** The prototype for a callback function from \c #AIFOConversionSuite::EnumerateContents()
-	that acts on information about the contents of a foreign object.
+/** The prototype for a callback function from \c #AIFOConversionSuite::EnumerateContents() and
+	\c #AIFOConversionSuite::EnumerateContentsEx() that acts on information about the contents of a foreign object.
 		@param selector Identifies the type of information being supplied.
 		@param info A pointer to information specific to the \c selector. To inspect its
 			contents, cast it to an appropriate type according to the \c selector.
-		@param data A pointer to developer-defined data, passed back from
-			\c #AIFOConversionSuite::EnumerateContents().
+		@param data A pointer to developer-defined data, passed back from \c #AIFOConversionSuite::EnumerateContents()
+			or \c #AIFOConversionSuite::EnumerateContentsEx().
 	*/
 typedef void (*AIVisitContentProc)(AIFOContentInfoSelector selector, void *info, void *data);
 
@@ -338,16 +369,28 @@ typedef struct AIFOConversionSuite {
 			@param art The art object.
 			@param visitor The callback procedure.
 			@param data	The developer-defined data to pass to the callback.
+			@note If client is interested in only some of the types of information from
+				\c #AIFOContentInfoSelector (not all), then caling \c #EnumerateContentsEx()
+				with appropriate flags is recommended for better performance.
+			@see  \c #EnumerateContentsEx().
 		*/
 	AIAPI AIErr (*EnumerateContents)(AIArtHandle art, AIVisitContentProc visitor, void *data);
 
-	/** Converts a legacy text object to outlines. Attempts to perform the
-		conversion in such a way that the result is identical to the result
-		that would be obtained by doing the conversion in the legacy version of
-		the application. This is intended for use by plug-in groups or
-		Live Effects that need to execute against legacy text,
-		to ensure that the results of execution are the same as in the legacy
-		version.
+	/** Enumerates only the requested information required to draw the contents of the art object.
+		Pass on this information to a callback along with the developer-defined data.
+			@param art The art object.
+			@param visitor The callback procedure.
+			@param flags The type of information that the callback procedure needs to receive,
+			a logical OR of \c #AIFOContentInfoSelectorFlag values.
+			@param data	The developer-defined data for the callback.
+		*/
+	AIAPI AIErr (*EnumerateContentsEx)(AIArtHandle art, AIVisitContentProc visitor, AIFOContentInfoSelectorFlag flags, void *data);
+
+	/** Converts a legacy text object to outlines. Attempts to perform the conversion in a way
+		such that the result is identical with the result in the legacy application version.
+		This is intended for use by plug-in groups or Live Effects that need to be executed
+		against the legacy text. It ensures that the execution results are the same as that of
+		the legacy version.
 			@param art The art object.
 			@param paintOrder The position for the new artwork in the
 					paint order, relative to the \c prep object.
@@ -368,8 +411,4 @@ typedef struct AIFOConversionSuite {
 } AIFOConversionSuite;
 
 
-
 #include "AIHeaderEnd.h"
-
-
-#endif // __AIFOConversion__

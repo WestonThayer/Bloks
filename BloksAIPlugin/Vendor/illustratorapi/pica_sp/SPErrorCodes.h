@@ -58,6 +58,9 @@
 /** @ingroup Errors
 	PICA access error. See \c #SPAccessSuite. */
 #define kSPPluginAlreadyReleasedError		'AlRl'
+/** @ingroup Errors
+	PICA access error. See \c #SPAccessSuite */
+#define kSPWrongArchitectureError			'WrAr'
 
 // SPAdaptsSuite errors
 /** @ingroup Errors

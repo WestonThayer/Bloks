@@ -49,7 +49,8 @@ enum {
 	kAIAGMOptionAATextPreview = 0x8000,
 	kAIAGMOptionUnhintedText = 0x40000,
 	kAIAGMOptionOverscannedText = 0x80000,
-	kAIAGMOptionIllustratorPixelPerfectDrawing = 0x200000
+	kAIAGMOptionIllustratorPixelPerfectDrawing = 0x200000,
+	kAIAGMOptionUseFloatReducer = 0x8000000
 };
 
 // Keep these synchronized with enum AGMBlendingMode!
@@ -81,6 +82,12 @@ struct AIAGMColorTab	{
 	ai::int32	numColors;
 	/** Pointer to the color data. */
 	void*	theColors;
+    
+    void Init()
+    {
+        numColors = 0;
+        theColors = nullptr;
+    }
 };
 
 /** Rectangle structure. */
@@ -93,6 +100,14 @@ struct AIAGMInt16Rect {
 	ai::int16	xMax;
 	/** Top edge. */
 	ai::int16	yMax;
+    
+    void Init()
+    {
+        xMin = 0;
+        yMin = 0;
+        xMax = 0;
+        yMax = 0;
+    }
 }
 ;
 
@@ -113,6 +128,17 @@ struct AIAGMImageRecord	{
 	AIFloat*		decodeArray;
 	/** Color table. */
 	AIAGMColorTab	colorTab;
+    
+    void Init()
+    {
+        baseAddr = nullptr;
+        byteWidth = 0;
+        colorSpace = 0;
+        bitsPerPixel = 0;
+        decodeArray = nullptr;
+		bounds.Init();
+		colorTab.Init();
+    }
 };
 
 

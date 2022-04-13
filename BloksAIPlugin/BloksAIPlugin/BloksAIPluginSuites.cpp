@@ -15,5 +15,5 @@ ImportSuite gImportSuites[] =
 	kSPBlocksSuite, kSPBlocksSuiteVersion, &sSPBlocks,
 	kAIUnicodeStringSuite, kAIUnicodeStringVersion, &sAIUnicodeString,
 	kAIStringFormatUtilsSuite, kAIStringFormatUtilsSuiteVersion, &sAIStringFormatUtils,
-	nil, 0, nil
+	nullptr, 0, nullptr
 };

@@ -82,6 +82,7 @@
 #define kViewExtMenuGroup 		"View Extension"
 #define kViewSnapMenuGroup		"View Snap"
 
+#define kAlignObjectMenuGroup   "Align Objects"
 #define kObjectAttribsMenuGroup "Object Attributes"
 #define kObjectUtilsMenuGroup 	"Object Utilities"
 #define kObjectsMenuGroup 		"Objects"

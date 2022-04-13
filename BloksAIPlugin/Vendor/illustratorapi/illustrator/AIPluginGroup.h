@@ -314,6 +314,13 @@
  	If this does not make sense for a particular plug-in group, ignore the call. */
  #define kSelectorAIShowContents		"AI Plugin Group Show Contents"
 
+	/** @ingroup Selectors
+	   Sent to plug-ins whose art objects have been changed after changing the document scale
+		The plug-in should make changes to the data associated with the corresponding art object 
+		w.r.t the new scale of the document*/
+#define  kSelectorAIPluginArtDocScaleChange	"AI Plugin Group Adjust New Document Scale"
+
+
 /** Options for \c #AIPluginGroupSuite::AddAIPluginGroup().
 	Options affect how operations on a plug-in group affect the
 	result group, and whether the notifications are	sent after an operation.
@@ -1089,6 +1096,12 @@ struct AIPluginGroupMessage {
 		\c #kWriteOperationCode. The version of the Illustrator file
 	    being read from or written to. For other operations, the value is 0. */
 	AIVersion			aiVersion;
+
+	/**For \c #kSelectorAIPluginArtDocScaleChange, supplied if there is a change in the document scale,
+		the corresponding plugin can make changes according to the relative scale  
+	 */
+	AIReal  relativeScaleFactor;
+
 
 };
 

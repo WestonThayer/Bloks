@@ -1,23 +1,21 @@
-#ifndef __AIAnnotatorDrawer__
-#define __AIAnnotatorDrawer__
+#pragma once
 
-/*
-*        Name:	AIAnnotatorDrawer.h
-*      Author: Started by Chris Quartetti
-*        Date: 2007
-*     Purpose:	Adobe Illustrator Annotator Suite.
-*
-* ADOBE SYSTEMS INCORPORATED
-* Copyright 2007-2009 Adobe Systems Incorporated.
-* All rights reserved.
-*
-* NOTICE:  Adobe permits you to use, modify, and distribute this file
-* in accordance with the terms of the Adobe license agreement
-* accompanying it. If you have received this file from a source other
-* than Adobe, then your use, modification, or distribution of it
-* requires the prior written permission of Adobe.
-*
-*/
+/*************************************************************************
+ * ADOBE CONFIDENTIAL
+ *
+ *  Copyright 2018 Adobe Systems Incorporated
+ *  All Rights Reserved.
+ *
+ * NOTICE:  All information contained herein is, and remains
+ * the property of Adobe Systems Incorporated and its suppliers,
+ * if any.  The intellectual and technical concepts contained
+ * herein are proprietary to Adobe Systems Incorporated and its
+ * suppliers and are protected by all applicable intellectual property
+ * laws, including trade secret and copyright laws.
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained
+ * from Adobe Systems Incorporated.
+ **************************************************************************/
 
 
 /*******************************************************************************
@@ -53,8 +51,8 @@
 **/
 
 #define kAIAnnotatorDrawerSuite				"AI Annotator Drawer Suite"
-#define kAIAnnotatorDrawerSuiteVersion5		AIAPI_VERSION(5)
-#define kAIAnnotatorDrawerSuiteVersion		kAIAnnotatorDrawerSuiteVersion5
+#define kAIAnnotatorDrawerSuiteVersion8		AIAPI_VERSION(8)
+#define kAIAnnotatorDrawerSuiteVersion		kAIAnnotatorDrawerSuiteVersion8
 #define kAIAnnotatorDrawerVersion			kAIAnnotatorDrawerSuiteVersion
 
 
@@ -106,6 +104,7 @@ Annotator drawing port option bit constants.
 enum AIAnnotatorPortOption
 {
 	kAIOptionAAGraphics = 0x1,		///< Enable antialiasing of all graphic paths including clips and images
+	kAIAGMAnnotationRotate = 0x2,		///< Enable Annotation Rotation for plugin annotators
 	kDummyPortOption = 0x80000000	///< Dummy value to ensure 32 bit enums
 };
 
@@ -257,8 +256,9 @@ struct AIAnnotatorDrawerSuite
 	@param drawer The annotation drawer object.
 	@param text The text string.
 	@param bottomLeft The point at which to place the bottom left corner of the text.
+    @param allowScaling[in] Scale text drawing with respect to UI scaling
 	*/
-	AIAPI AIErr (*DrawText)(AIAnnotatorDrawer *drawer, const ai::UnicodeString &text, const AIPoint &bottomLeft);
+	AIAPI AIErr (*DrawText)(AIAnnotatorDrawer *drawer, const ai::UnicodeString &text, const AIPoint &bottomLeft, AIBoolean allowScaling);
 
 	/** Draws text into a rectangle in an annotation, with given alignment. The text does not wrap.
 	@param drawer The annotation drawer object.
@@ -266,8 +266,9 @@ struct AIAnnotatorDrawerSuite
 	@param horizAlign The horizontal alignment of content.
 	@param vertAlign The vertical alignment of content.
 	@param rect The rectangle in which to draw.
+    @param allowScaling[in] Scale text drawing with respect to UI scaling
 	*/
-	AIAPI AIErr (*DrawTextAligned)(AIAnnotatorDrawer *drawer, const ai::UnicodeString &text, const AIHorizAlignment horizAlign, const AIVertAlignment vertAlign, const AIRect &rect);
+	AIAPI AIErr (*DrawTextAligned)(AIAnnotatorDrawer *drawer, const ai::UnicodeString &text, const AIHorizAlignment horizAlign, const AIVertAlignment vertAlign, const AIRect &rect, AIBoolean allowScaling);
 
 	/**	Finds the bounds of text if it were drawn in the current font at the current size.
 	@param drawer The annotation drawer object.
@@ -276,8 +277,9 @@ struct AIAnnotatorDrawerSuite
 	@param useFontFallback [in] Use system font if it is not possible to draw with current font.
 	@param bounds [out]	A buffer in which to return the coordinates of the text boundary.
 	If a location is not specified, top left is [0,0].
+     @param allowScaling[in] returned Scaled text bound
 	*/
-	AIAPI AIErr (*GetTextBounds)(AIAnnotatorDrawer *drawer, const ai::UnicodeString &text, AIPoint *location,  AIBoolean useFontFallback, AIRect &bounds);
+	AIAPI AIErr (*GetTextBounds)(AIAnnotatorDrawer *drawer, const ai::UnicodeString &text, AIPoint *location,  AIBoolean useFontFallback, AIRect &bounds, AIBoolean allowScaling);
 
 	/** Sets the font size for text drawn into a annotation.
 	@param drawer The annotation drawer object.
@@ -387,6 +389,20 @@ struct AIAnnotatorDrawerSuite
 	@param rect The rectangle.
 	*/
 	AIAPI AIErr (*DrawPNGImageCentered)(AIAnnotatorDrawer *drawer, const ai::uint8* inPNGImageData, ai::uint32 inDataSize, const AIRect &rect);
+    
+    /**  Draws a PNG Image in an annotation without scaling the image to document dpi.
+     @param drawer The annotation drawer object.
+     @param inPNGImageData The raw PNG image data.
+     @param topLeft The point at which to draw the top left corner.
+     */
+    AIAPI AIErr (*DrawPNGImageUnscaled)(AIAnnotatorDrawer *drawer, const ai::uint8* inPNGImageData,  ai::uint32 inDataSize, const AIPoint &topLeft);
+    
+    /** Draws a PNG Image centered in a rectangle in an annotation without scaling the image to document dpi.
+     @param drawer The annotation drawer object.
+     @param inPNGImageData The raw PNG image data.
+     @param rect The rectangle.
+     */
+    AIAPI AIErr (*DrawPNGImageCenteredUnscaled)(AIAnnotatorDrawer *drawer, const ai::uint8* inPNGImageData, ai::uint32 inDataSize, const AIRect &rect);
 
 	/** Retrieves an AGM port for an annotation.
 	Note that this function returns a port object pointer, not an error code. 
@@ -411,7 +427,7 @@ struct AIAnnotatorDrawerSuite
 	a logical OR of \c #AIAnnotatorPortOption values masked by the which-options mask.
 	*/
 	AIAPI AIErr(*GetPortOptions)(AIAnnotatorDrawer* drawer, ai::uint32 whichOptions, ai::uint32 &options);
-
+    
 	/** Sets the port options for an annotation.  Currently, the only public
 	port option is anti-aliasing mode, represented by the option constant
 	\c #AIAnnotatorPortOption::kAIOptionAAGraphics.
@@ -437,11 +453,19 @@ struct AIAnnotatorDrawerSuite
 
 	*/
 	AIAPI AIReal (*GetOpacity)(AIAnnotatorDrawer* drawer);
+	
+	    /** Save current state of drawer's rendering
+     @param drawer The annotation drawer object.
+    */
+    AIAPI AIErr(*Save)( AIAnnotatorDrawer* drawer);
+    
+    /** Restore last of drawer's rendering
+     @param drawer The annotation drawer object.
+    */
+    AIAPI AIErr(*Restore)( AIAnnotatorDrawer* drawer);
 };
 
 
 #include "AIHeaderEnd.h"
 
-
-#endif
 

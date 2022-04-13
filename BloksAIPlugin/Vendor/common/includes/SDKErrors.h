@@ -1,8 +1,8 @@
 //========================================================================================
 //  
-//  $File: //ai_stream/rel_20_0/devtech/sdk/public/samplecode/common/includes/SDKErrors.h $
+//  $File$
 //
-//  $Revision: #1 $
+//  $Revision$
 //
 //  Copyright 1987 Adobe Systems Incorporated. All rights reserved.
 //  
@@ -24,7 +24,7 @@ namespace aisdk
 	inline void check_ai_error(AIErr err)
 	{ if (err) throw ai::Error(err); }
 
-	/** Throws exception if the given pointer is nil.
+	/** Throws exception if the given pointer is nullptr.
 		@param p IN void pointer.
 		@param err IN error code.
 	*/

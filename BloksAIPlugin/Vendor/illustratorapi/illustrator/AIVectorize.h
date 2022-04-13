@@ -155,6 +155,10 @@
 #define kTracingLibraryName					"adobe/vectorize/ip/LibraryName"
 
 /** @ingroup DictKeys
+	Tracing option key for palette swatch library path. String*/
+#define kTracingLibraryPath					"adobe/vectorize/ip/LibraryPath"
+
+/** @ingroup DictKeys
 	Tracing option key for color group name of palette swatch library. String*/
 #define kTracingColorGroupName				"adobe/vectorize/ip/ColorGroupName"
 
@@ -246,7 +250,7 @@
 /** Internal */
 #define kTracingSourceArtChangedDefault		(true)
 
-
+#define kVectorizedObject					"Adobe Vectorized Object"
 
 /*******************************************************************************
  **

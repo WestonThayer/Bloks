@@ -525,7 +525,7 @@ struct AIBeautifulStrokesSuite
 		@param outArt			[optional] A pointer to an AIArtHandle in which to return the AIArtHandle for the generated output art.
 		@param progressProc		A callback procedure for displaying a progress bar during
 								computation (from which the user can cancel the operation)
-								or \c nil to show no progress bar.
+								or \c nullptr to show no progress bar.
 	*/
 	AIAPI AIErr (*GenerateArt)(ConstAILiveEffectParameters effectParams, AIArtHandle inArt, AIArtHandle sourceArt,
 							   AIBoolean outputOnTop, AIArtHandle outGroup, AIArtHandle *outArt, AIGenerateArtProgressProc progressProc);

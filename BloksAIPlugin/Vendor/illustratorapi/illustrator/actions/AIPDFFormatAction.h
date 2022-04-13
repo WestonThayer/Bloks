@@ -316,10 +316,10 @@ const ActionParamKeyID kAIPDFFlattenPrinterResolutionKey	= 'fprs'; // real, flat
 const ActionParamKeyID kAIPDFUserPasswordRequiredKey		= 'usrq'; // bool, user password
 /** Parameter to \c #kAIExportDocumentAction for PDF. The user password string. */
 const ActionParamKeyID kAIPDFUserPasswordKey				= 'usps'; // string, user password
-/** Parameter to \c #kAIExportDocumentAction for PDF. The to include master password protection. */
-const ActionParamKeyID kAIPDFMasterPasswordRequiredKey		= 'msrq'; // bool, master password
-/** Parameter to \c #kAIExportDocumentAction for PDF. The master password string. */
-const ActionParamKeyID kAIPDFMasterPasswordKey				= 'msps'; // string, master password
+/** Parameter to \c #kAIExportDocumentAction for PDF. The to include Permissions Password protection. */
+const ActionParamKeyID kAIPDFPermissionsPasswordRequiredKey		= 'msrq'; // bool, Permissions Password
+/** Parameter to \c #kAIExportDocumentAction for PDF. The Permissions Password string. */
+const ActionParamKeyID kAIPDFPermissionsPasswordKey				= 'msps'; // string, Permissions Password
 
 /** Parameter to \c #kAIExportDocumentAction for PDF. The type of printing allowed, an \c #AIPDFPrintingPermit value. */
 const ActionParamKeyID kAIPDFPrintingPermKey 				= 'pmpr'; // enum, Printing Allowed

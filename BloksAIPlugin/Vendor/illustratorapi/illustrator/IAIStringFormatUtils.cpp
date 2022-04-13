@@ -24,7 +24,10 @@
 #include "AIStringFormatUtils.h"
 #include "SPBlocks.h"
 
-#ifdef _IAISTRINGFORMATUTILS_SUITE_INCLUDE_H_
+#if AI_AUTO_SUITE_AVAILABLE
+	#include "AutoSuite.h"
+	use_suite_required(AIStringFormatUtils)
+#elif defined(_IAISTRINGFORMATUTILS_SUITE_INCLUDE_H_)
     #include _IAISTRINGFORMATUTILS_SUITE_INCLUDE_H_
 #else
     #ifndef _IAISTRINGFORMATUTILS_SUITE_USE_C_LINKAGE_
@@ -68,7 +71,10 @@ std::string ai::Locale::getLocale(const ai::LocaleID id)
 
 	if ( locale.GetCount() > 0 )
 	{
-		return std::string(locale.GetBuffer(), locale.GetCount());
+		auto size = locale.GetCount();
+		if (locale[size - 1] == 0) //avoid trailing zero in the std::string
+			--size;
+		return std::string(locale.GetBuffer(), size);
 	}
 	else
 	{
@@ -130,8 +136,12 @@ ai::NumberFormat::NumberFormat (const NumberFormat& s)
 
 ai::NumberFormat::~NumberFormat()
 {
-	if (fImpl)
-		sAIStringFormatUtils->Destroy(*this);
+	try
+	{
+		if (fImpl)
+			sAIStringFormatUtils->Destroy(*this);
+	}
+	catch (...) {} //avoiding any exception leak in destructor
 }
 
 ai::NumberFormat ai::NumberFormat::getFormat(const ai::LocaleID locale)

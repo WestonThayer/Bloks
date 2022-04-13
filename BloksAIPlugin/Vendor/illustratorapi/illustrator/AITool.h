@@ -1,5 +1,4 @@
-#ifndef __AITool__
-#define __AITool__
+#pragma once
 
 /*
  *        Name:	AITool.h
@@ -8,7 +7,7 @@
  *     Purpose:	Adobe Illustrator Tool Suite.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2011 Adobe Systems Incorporated.
+ * Copyright 1986-2017 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file
@@ -26,44 +25,21 @@
  **
  **/
 
-#ifndef __AITypes__
 #include "AITypes.h"
-#endif
-
-#ifndef __AIArt__
 #include "AIArt.h"
-#endif
-
-#ifndef __AIEvent__
 #include "AIEvent.h"
-#endif
-
-#ifndef __AIFixedMath__
 #include "AIFixedMath.h"
-#endif
-
-#ifndef __AIPlugin__
 #include "AIPlugin.h"
-#endif
-
-#ifndef __AIToolNames__
 #include "AIToolNames.h"
-#endif
-
-
-#ifndef __ASHelp__
 #include "ASHelp.h"
-#endif
-
-#ifndef __AIColor__
 #include "AIColor.h"
-#endif
 
 #ifndef FLT_MAX
 #include <float.h>
 #endif
 
 #include "AIHeaderBegin.h"
+
 /** @file AITool.h */
 
 
@@ -74,15 +50,17 @@
  **/
 
 #define kAIToolSuite			"AI Tool Suite"
-#define kAIToolSuiteVersion16	AIAPI_VERSION(16)
-#define kAIToolSuiteVersion		kAIToolSuiteVersion16
+#define kAIToolSuiteVersion19	AIAPI_VERSION(19)
+#define kAIToolSuiteVersion		kAIToolSuiteVersion19
 #define kAIToolVersion			kAIToolSuiteVersion
 
 /** @ingroup Notifiers
    	Sent when effective tool is changed, either permanently or temporarily
-	using modifier keys (such as Cmd, Cntl, or Spacebar). Data is \c #AIEffectiveToolChangeData
-	Replaces individual notifiers for tool suspend and resume actions that have been deprecated.
-	 */
+	using modifier keys (such as Cmd, Cntl, or Spacebar). Data is
+	\c #AIEffectiveToolChangeData.
+	Replaces individual notifiers for tool suspend and resumes actions that have
+	been deprecated.
+	@note	This notifier is not sent during application startup. */
 #define kAIEffectiveToolChangedNotifier			"AI Effective Tool Changed Notifier"
 
 /** @deprecated	Use \c #kAIEffectiveToolChangedNotifier instead
@@ -117,7 +95,7 @@
 	Sent when a tool's rollover tooltip is changed.  */
 #define kAIToolTooltipChangedNotifier	"AI Tool Tooltip Changed Notifier"
 /** @ingroup Notifiers
-	Sent when a tool's help ID is changed. See \c #AIToolSuite::SetToolHelpID() */
+	Obsolete. Not sent anymore. */
 #define kAIToolHelpIDChangedNotifier	"AI Tool Help ID Changed Notifier"
 /** @ingroup Notifiers
 Sent when a tool's icon resources are changed. See \c #AIToolSuite::SetToolIcons() */
@@ -172,6 +150,21 @@ Sent when a tool's icon resources are changed. See \c #AIToolSuite::SetToolIcons
 	an \c #AIEyedropperDragNotifyData specifying the event and whether the
 	path style has changed as a result. */
 #define kAIEyedropperDragNotifier		"AI Eyedropper Drag Notifier"
+
+/** @ingroup Callers
+	The radial device caller. see #AIRadialDeviceMessage
+*/
+#define kCallerRadialDevice				"AI Radial Device"
+
+/** #ingroup Selectors
+	Sent when the radial device is rotated
+*/
+#define kSelectorAIRadialDeviceRotated	"Radial Device Rotated"
+
+/** #ingroup Selectors
+	Sent when the radial device is clicked
+*/
+#define kSelectorAIRadialDeviceClicked	"Radial Device Clicked"
 
 /** @ingroup Callers
 	The tool caller. See \c #AIToolSuite. */
@@ -312,7 +305,23 @@ enum AIToolOptions {
 
 	/** Indicates that tool does want OS to draw its wet ink and provide its final Ink points to render rather than listening to mouse events
 	*/
-	kToolWantsOSHandleInk = (1<<9)
+	kToolWantsOSHandleInk = (1<<9),
+
+	/** Indicates that the tool has a double-click action associated with it.
+	*/
+	kToolHasAlternateAction = (1<<10),
+
+	/**  Indicates that the tool wants to handle radial device events such as rotate and click
+	*/
+	kToolWantsRadialDeviceEvents = (1 << 11),
+
+	/**	 Indicates that the tool does not want art style execution suspension while in drag loop
+	*/
+	kToolDoesntWantArtStyleExecutionSuspender = (1 << 12),
+
+	/**	 Indicates that the tool handles its own drag loop and don't use the default toolDragLoop
+	*/
+	kToolHasItsOwnDragLoop = (1 << 13)
 
 };
 
@@ -352,7 +361,7 @@ enum AIToolInfoVariable {
 	kInfoText5,
 	kInfoText6,
 	kInfoLongText3,
-    /** New in AI15: Pass Custom String for: X Y W H display in info palette */
+    /** Pass Custom String for: X Y W H display in info palette */
 	kInfoTextX,
 	kInfoTextY,
 	kInfoTextW,
@@ -386,7 +395,7 @@ enum AIToolInfoVariable {
 
 /** A tool number used to indicate a tool group or toolset.
 	See @ref Toolsets and \c #AIToolSuite::GetToolNumberFromName() */
-typedef short AIToolType;
+typedef ai::int16 AIToolType;
 
 /** Tool numbers less than this value are built-in,
 	numbers greater than this are plug-in. See @ref Toolsets
@@ -421,12 +430,12 @@ typedef double AIToolTime; //Time in Seconds
 typedef struct _t_AIToolOpaque *AIToolHandle;
 
 /** Information about the change that caused a
-	\c #kAIEffectiveToolChangedNotifier notification */
+	\c #kAIEffectiveToolChangedNotifier notification. */
 struct AIEffectiveToolChangeData
 {
-	/** Name of currently effective tool */
+	/** Name of currently effective tool. */
 	const char*			currentToolName;
-	/** Name of previous effective tool */
+	/** Name of previous effective tool. */
 	const char*			lastToolName;
 	/** True if tool change is temporary, false if it
 		is permanent. Temporary changes occur when user
@@ -439,28 +448,33 @@ struct AIEffectiveToolChangeData
 		Can be null if previous tool was select or direct-select,
 		or if tool has not yet been changed since app launch. */
 	AIToolHandle		lastToolHandle;
+	/** Tool number of the currently effective tool. */
+	AIToolType			currentToolNum;
+	/** Tool number of the previously effective tool. */
+	AIToolType			lastToolNum;
 };
 
 /** Information needed to add a tool using \c #AIToolSuite::AddTool(). */
 struct AIAddToolData {
 	/** Display name for tool. */
-	const char *title;
+    ai::UnicodeString title;
 	/** Short descriptive string shown when tool is activated. */
-	const char *tooltip;
-	/** The Help system identifier. */
-	ASHelpID helpID;
+    ai::UnicodeString tooltip;
 	/** The icon shown in the Tools palette; must be of type 'PNGI' */
-	ai::uint32 normalIconResID;
+	ai::uint32 normalIconResID = 0;
 	/** The icon shown in the Tools palette in dark mode; must be of type 'PNGI' */
-	ai::uint32 darkIconResID;
+	ai::uint32 darkIconResID = 0;
 	/** The Tools palette group to which this tool belongs.
 		A tool number or \c #kNoTool to create a new group.
 		See @ref Toolsets. */
-	AIToolType sameGroupAs;
+	AIToolType sameGroupAs = 0;
 	/** The Tools palette toolset to which this tool belongs.
 		A tool number or \c #kNoTool to create a new toolset.
 		See @ref Toolsets. */
-	AIToolType sameToolsetAs;
+	AIToolType sameToolsetAs = 0;
+	/* Specifies the type of the incoming icons 
+		enum IconType in AITypes.h*/
+	ai::IconType iconType = ai::IconType::kPNG;
 };
 
 /** For internal use only. */
@@ -469,21 +483,22 @@ typedef struct _AIDataStack *AIDataStackRef;
 /** For internal use only. */
 struct AIAddToolDataPrivate {
 	/** Display name for tool. */
-	const char *title;
+    ai::UnicodeString title;
 	/** Short descriptive string shown when tool is activated. */
-	const char *tooltip;
-	/** The Help system identifier. */
-	ASHelpID helpID;
-	/** The icon shown in the Tools palette. */
+    ai::UnicodeString tooltip;
+	/** @deprecated Obsolete. Do not use. */
 	AIDataStackRef iconResourceDictionary;
 	/** The Tools palette group to which this tool belongs.
 		A tool number or \c #kNoTool to create a new group.
 		See @ref Toolsets. */
-	AIToolType sameGroupAs;
+	AIToolType sameGroupAs = 0;
 	/** The Tools palette toolset to which this tool belongs.
 		A tool number or \c #kNoTool to create a new toolset.
 		See @ref Toolsets. */
-	AIToolType sameToolsetAs;
+	AIToolType sameToolsetAs = 0;
+	/* Specifies the type of the incoming icons
+	   enum IconType in AITypes.h*/
+	ai::IconType iconType = ai::IconType::kInvalid;
 };
 
 /** An \c #AIToolTabletPointerTypeValue describing a type of pointing device.
@@ -542,8 +557,8 @@ enum AIToolAngleValue
 	kAIToolMaxRotation = kAIToolAngle180,
 	kAIToolNormalRotation = kAIToolAngle0,
 
-	/** Tilt ranges from 0 to 90 where 0 means the pen barrel is perpendicular to the tablet's plane
-		and 90 means the pen barrel is parallel to the tablet's plane. */
+	/** Tilt ranges from 0 to 90 where 0 means that the pen barrel is perpendicular to the tablet's plane
+		and 90 means that the pen barrel is parallel to the tablet's plane. */
 	kAIToolMinTilt = kAIToolAngle0,
 	kAIToolMaxTilt = kAIToolAngle90,
 	kAIToolNormalTilt = kAIToolMinTilt
@@ -569,6 +584,18 @@ enum AITabletCapabilities
 	/* Clockwise rotation of the cursor around its own axis. */
 	kTwistOrientation		=		1 << 7
 };
+
+
+enum AIToolMessageFlags
+{
+	/*Indicates that it is a simulated Tool Message of InkStrokes*/
+	kAIToolMsgInkSimulationFlag				=		1 << 0,
+	kAIToolMsgModifierKeyPressedDuringInk	=		1 << 1,
+	
+	/*Indicates that it is a tool drag over message*/
+	kAIToolMsgIsDragOver					=		1 << 2
+};
+
 /** History Data associated with an Event. */
 struct AIEventHistoryData
 {
@@ -609,8 +636,27 @@ struct AIToolMessage {
 	AIToolAngle bearing;
 	/**  Rotation of the tool, measured clockwise in degrees around the tool's barrel. */
 	AIToolAngle rotation;
+	
+	/** To give more information to listeners of AIToolMessage, it will be composed of values from AIToolMessageFlags  */
+	ai::int32	flags;
 	/** The history data associated with the event */
 	ai::AutoBuffer<AIEventHistoryData> eventHistoryData;
+};
+
+/** The content of a radial device message. */
+struct AIRadialDeviceMessage
+{
+	/** The message data. */
+	SPMessageData d;
+	
+	/** The tool plug-in receiving the message.
+	If the plug-in has more than one tool installed, it can
+	determine which one is selected by comparing this handle
+	to those it saves in the \c globals variable. */
+	AIToolHandle tool = nullptr;
+
+	/** Rotation value */
+	AIReal rotation = 0.0;
 };
 
 /** The contents of a tool notification. */
@@ -638,7 +684,18 @@ struct AIDocumentInkParams
 	PenTipShape fShape;
 	AIColor fColor;
 	AIPoint fSize;
-
+	ai::AutoBuffer<ai::uint32> fModifiersList;
+	AIReal  fRotation;
+	AIBoolean fSupportPressure;
+	AIBoolean fCustomModifierHandling;	// Specifying it as true turns off direct ink when a mod key is pressed.
+	enum PressureBasedVariant
+	{
+		kPressuteBasedVariantNone = 1 << 0,
+		kPressuteBasedVariantDia = 1 << 1,
+		kPressuteBasedVariantRoundness = 1 << 2,
+		kPressuteBasedVariantAngle = 1 << 3,
+	};
+	ai::int32 fPressureBasedVariants;
 	AIDocumentInkParams() :fShape(kPenTipShapeCircle)
 	{
 		fColor.kind = kThreeColor;
@@ -647,6 +704,10 @@ struct AIDocumentInkParams
 		fColor.c.rgb.blue = 0.0f;
 		fSize.h = 1;
 		fSize.v = 1;
+		fRotation = 0.0f;
+		fSupportPressure = false;
+		fPressureBasedVariants = 0;
+		fCustomModifierHandling = false;
 	}
 };
 
@@ -676,6 +737,10 @@ struct AIDocumentInkPoint
 struct AIToolDryInkMessage {
 	/** The message data. */
 	SPMessageData d;
+
+	/** To give more information to the listeners of AIToolDryInkMessage, it will be composed of values from AIToolMessageFlags  */
+	ai::int32	flags = 0;
+
 	/** The tool plug-in receiving the message.
 	If the plug-in has more than one tool installed, it can
 	determine which one was selected by comparing this handle
@@ -687,7 +752,7 @@ struct AIToolDryInkMessage {
 
 	ai::AutoBuffer<AIDocumentInkPoint> inkStrokes;
 
-	AIToolDryInkMessage() :tool(0), event(nil)
+	AIToolDryInkMessage() :tool(0), event(nullptr)
 	{}
 };
 
@@ -703,7 +768,7 @@ struct AIToolDryInkMessage {
 	Plug-in tools can work on existing artwork or create new objects.
 	Tools that you add appear in the Illustrator Tool palette in their own set,
 	or as part of an existing tool set. Use the functions in this suite
-	to add tools, set options, and control the tool’s appearance in the palette.
+	to add tools, set options, and control the tool's appearance in the palette.
 
 	Typically, you set the options that control the behavior of a plug-in tool
 	when you install the tool with \c #AIToolSuite::AddTool(). You can modify
@@ -787,7 +852,6 @@ error = sTool->GetToolNumberFromName("MyTool2", &toolData.sameToolsetAs);
 	<br> \c #kAIToolClearStateNotifier
 	<br> \c #kAIToolTitleChangedNotifier
 	<br> \c #kAIToolTooltipChangedNotifier
-	<br> \c #kAIToolHelpIDChangedNotifier
 	<br> \c #kAIToolChangedNotifier
 	<br> \c #kAIToolWindowChangedNotifier
 	<br> \c #kAIToolSuspendNotifier
@@ -807,22 +871,24 @@ struct AIToolSuite {
 				install multiple tools, save to compare to the tool reference in tool
 				message data.
 		*/
-	AIAPI AIErr (*AddTool) ( SPPluginRef self, const char *name,
-				AIAddToolData *data, ai::int32 options,
-				AIToolHandle *tool );
-
+    AIAPI AIErr (*AddTool) ( SPPluginRef self, const char *name,
+                const AIAddToolData &data, ai::int32 options,
+                AIToolHandle *tool );
+    
 	/** For internal use only */
-	AIAPI AIErr (*AddToolPrivate) ( SPPluginRef self, const char *name,
-		AIAddToolDataPrivate *data, ai::int32 options,
-		AIToolHandle *tool );
-
+    AIAPI AIErr (*AddToolPrivate) ( SPPluginRef self, const char *name,
+        const AIAddToolDataPrivate &data, ai::int32 options,
+        AIToolHandle *tool );
+    
 	/** Retrieves the unique identifying name of a tool.
 		To get the localizable title that appears in the UI, use \c #GetToolTitle().
 			@param tool The tool reference.
 			@param name [out] A pointer to point to the name string. Do
 				not modify this string.
+	  		@note	It is more efficient to work with tool numbers rather than
+					names. See \c #GetToolNumberFromHandle().
 		*/
-	AIAPI AIErr (*GetToolName) ( AIToolHandle tool, char **name );
+    AIAPI AIErr (*GetToolName) ( AIToolHandle tool, char **name );
 
 	/** Retrieves the option flags of a tool. To retain the existing flags when
 		setting options with \c #SetToolOptions(), obtain them with this function
@@ -893,7 +959,7 @@ struct AIToolSuite {
 				can be found in \c AIToolNames.h.
 			@param toolNum [out] A buffer in which to return the tool number.
 		*/
-	AIAPI AIErr (*GetToolNumberFromName) ( const char *name, AIToolType *toolNum );
+    AIAPI AIErr (*GetToolNumberFromName) ( const char *name, AIToolType *toolNum );
 
 	/** Retrieves a tool number for a tool. Use to find the numbers of
 		plug-in tools, in order to place your tool in an existing group or toolset.
@@ -908,7 +974,7 @@ struct AIToolSuite {
 			@param name	[out] A pointer to point to the name string. Do not modify
 				this string. Copy it immediately to use it.
 		 */
-	AIAPI AIErr (*GetToolNameFromNumber) ( AIToolType toolNum, char **name );
+    AIAPI AIErr (*GetToolNameFromNumber) ( AIToolType toolNum, char **name );
 
 	/** Retrieves the localizable title of a tool, which appears in the UI.
 		To get the unique, identifying name, use \c #GetToolName().
@@ -916,13 +982,13 @@ struct AIToolSuite {
 			@param title [out] A pointer to point to the title string. Do not modify
 				this string.
 		*/
-	AIAPI AIErr (*GetToolTitle) ( AIToolHandle tool, char **title );
+    AIAPI AIErr (*GetToolTitle) ( AIToolHandle tool, ai::UnicodeString& title );
 
 	/** Sets the localizable title of a tool, which appears in the UI.
 			@param tool The tool reference.
 			@param title The new title string.
 		*/
-	AIAPI AIErr (*SetToolTitle) ( AIToolHandle tool, const char *title );
+    AIAPI AIErr (*SetToolTitle) ( AIToolHandle tool, ai::UnicodeString title );
 
 
 	/** Retrieves the tooltip string for a tool.
@@ -930,33 +996,20 @@ struct AIToolSuite {
 			@param tooltip [out] A pointer to point to the tooltip string. Do not modify
 				this string.
 		*/
-	AIAPI AIErr (*GetTooltip) ( AIToolHandle tool, char **tooltip );
+    AIAPI AIErr (*GetTooltip) ( AIToolHandle tool, ai::UnicodeString& tooltip );
 
 	/** Sets the tooltip string for a tool.
 			@param tool The tool reference.
 			@param tooltip The new tooltip string.
 		 */
-	AIAPI AIErr (*SetTooltip) ( AIToolHandle tool, const char *tooltip );
-
-	/** Retrieves the help-system identifier for a tool.
-			@param tool The tool reference.
-			@param helpID [out] A buffer in which to return the help ID,
-				which can be an integer or a pooled string.
-		*/
-	AIAPI AIErr (*GetToolHelpID) ( AIToolHandle tool, ASHelpID *helpID );
-
-	/** Sets the help-system identifier for a tool.
-			@param tool The tool reference.
-			@param helpID The new help ID, which can be an integer or a pooled string.
-		 */
-	AIAPI AIErr (*SetToolHelpID) ( AIToolHandle tool, ASHelpID helpID );
+    AIAPI AIErr (*SetTooltip) ( AIToolHandle tool, ai::UnicodeString tooltip );
 
 	/** Determines which labeled fields are displayed in the Info palette for a tool.
 		Typically called once at startup to initialize the Info palette.
 			@param tool The tool reference.
 			@param infoVars A pointer to the first member of an array of
 				information variables, which correspond to labeled fields
-				in Illustrator’s Info palette, as defined in \c #AIToolInfoVariable.
+				in Illustrator's Info palette, as defined in \c #AIToolInfoVariable.
 				Only the fields included in this array are shown for the tool.
 				To initialize or set the values in the fields, use \c #SetToolInfoVarValues().
 		 */
@@ -966,7 +1019,7 @@ struct AIToolSuite {
 		\c #SetToolInfoVars() are displayed in the palette.
 			@param infoVars A pointer to the first member of an array of
 				information variables, which correspond to labeled fields
-				in Illustrator’s Info palette. This is the same array specified
+				in Illustrator'AITs Info palette. This is the same array specified
 				by \c #SetToolInfoVars().
 			@param values A pointer to the first member of an array of values,
 				whose positions match those in the \c infoVars array.
@@ -1006,15 +1059,11 @@ AIErr UpdateInfoPalette( AIToolHandle tool, AIRealPoint origin, AIArtHandle art 
 		*/
 	AIAPI AIErr (*SystemHasPressure) ( AIBoolean *hasPressure );
 
-	// New for AI10
-
 	/** @deprecated Obsolete. Do not use. */
 	AIAPI AIErr (*GetToolNullEventInterval) (AIToolHandle tool, AIToolTime *outTime);
 
 	/** @deprecated Obsolete. Do not use. */
 	AIAPI AIErr (*SetToolNullEventInterval) (AIToolHandle tool, AIToolTime inTime);
-
-	// New for AI13
 
 	/** Selects a plug-in tool, but does not highlight
 		it in the palette or show its tool name in the status bar of the document
@@ -1039,7 +1088,7 @@ AIErr UpdateInfoPalette( AIToolHandle tool, AIRealPoint origin, AIArtHandle art 
 			@param tool This tool.
 			@param name A buffer in which to return the name of the alternate selection tool.
 	*/
-	AIAPI AIErr (*GetAlternateSelectionToolName) (AIToolHandle tool, char **name);
+    AIAPI AIErr (*GetAlternateSelectionToolName) (AIToolHandle tool, char **name);
 
 	/** Sets the tool that will be temporarily selected by pressing Ctrl (in Windows)
 		or Cmd (in Mac OS) key while using this tool.
@@ -1047,24 +1096,48 @@ AIErr UpdateInfoPalette( AIToolHandle tool, AIRealPoint origin, AIArtHandle art 
 			@param tool This tool.
 			@param name The name of the alternate selection tool.
 	*/
-	AIAPI AIErr (*SetAlternateSelectionToolName) (AIToolHandle tool, const char* alternateTool);
-
-	// New for AI16: support for plug-in access to built-in tools
-
+    AIAPI AIErr (*SetAlternateSelectionToolName) (AIToolHandle tool, const char* alternateTool);
+    
 	/** Retrieves the unique name of the currently selected tool. This is the same
 	    name you get from calling \c #AIToolboxSuite::GetCurrentToolType()
 	    followed by \c #GetToolNameFromNumber().
 	 	@param name	[out] A pointer to point to the name string. Do not modify
 				this string. Copy it immediately to use it.
+	  	@note	It is more efficient to work with tool numbers rather than
+				names. See \c #GetCurrentToolNumber().
 	 */
-	AIAPI AIErr (*GetCurrentToolName) ( const char **name );
+    AIAPI AIErr (*GetCurrentToolName) ( const char **name );
+
+	/** Retrieves the number of the currently selected tool.
+	 	@param toolNum [out] A buffer in which to return the tool number.
+	 */
+	AIAPI AIErr (*GetCurrentToolNumber) ( AIToolType *toolNum );
+
+	/** Retrieves the currently active plug-in tool. If the currently active
+		tool is a built-in tool, returns NULL. This is the same value you get
+		from \c #currentToolHandle in \c #AIEffectiveToolChangeData.
+		See \c #GetCurrentEffectiveToolNumber() or \c #GetCurrentEffectiveToolName()
+		for retrieving the current effective tool including built-in tools.
+		@param tool	[out] A buffer in which to return the tool reference.
+	  	@note	It is more efficient to work with tool numbers rather than
+				names.
+		*/
+	AIAPI AIErr (*GetCurrentEffectiveTool) ( AIToolHandle *tool );
 
 	/** Retrieves the unique name of the currently active tool. This is the same
-	name you get from \c #currentToolName from \c #AIEffectiveToolChangeData.
-	@param name	[out] A pointer to point to the name string. Do not modify
-	this string. Copy it immediately to use it.
+		value you get from \c #currentToolName in \c #AIEffectiveToolChangeData.
+		@param name	[out] A pointer to point to the name string. Do not modify
+				this string. Copy it immediately to use it.
+	  	@note	It is more efficient to work with tool numbers rather than
+				names. See \c #GetCurrentEffectiveToolNumber().
 	*/
-	AIAPI AIErr(*GetCurrentEffectiveToolName) (const char **name);
+    AIAPI AIErr (*GetCurrentEffectiveToolName) ( const char **name );
+
+	/** Retrieves the number of the currently active tool. This is the same
+		value you get from \c #currentToolNum in \c #AIEffectiveToolChangeData.
+		@param toolNum [out] A buffer in which to return the tool number.
+	*/
+	AIAPI AIErr (*GetCurrentEffectiveToolNumber) ( AIToolType *toolNum );
 
 	/** Retrieves the numerical identifier of the most recently used built-in selection tool,
             and optionally retrieves the unique name of the tool, from \c AIToolNames.h.
@@ -1074,18 +1147,24 @@ AIErr UpdateInfoPalette( AIToolHandle tool, AIRealPoint origin, AIArtHandle art 
             	@return The numerical identifier.
     */
 
-	AIAPI AIToolType (*GetLastUsedSelectionTool) ( const char **name );
+    AIAPI AIToolType (*GetLastUsedSelectionTool) ( const char **name );
 
 	/** Select a tool by its unique name identifier. Can be either the name of a plug-in tool,
 	    returned by \c #GetToolName(), or one of the tool name constants from \c AIToolNames.h.
-	   	 @param name The name of the tool to be selected.
+		@param name The name of the tool to be selected.
+	  	@note	It is more efficient to work with tool numbers rather than
+				names. See \c #SetSelectedToolByNumber().
 	 */
-	AIAPI AIErr (*SetSelectedToolByName) ( const char *name );
+    AIAPI AIErr (*SetSelectedToolByName) ( const char *name );
+    
+	/** Select a tool using its tool number.
+	   	 @param toolNum The tool number.
+	 */
+	AIAPI AIErr (*SetSelectedToolByNumber) ( AIToolType toolNum );
 
 	/** Reports the hardware capabilities of a graphical tablet or integrated digitizer.
             	@param hardwareCapabilities     [out] A buffer in which to return a
-            				logical OR of \c #AITabletCapabilities contants.
-
+            				logical OR of \c #AITabletCapabilities constants.
     */
 	AIAPI AIErr (*GetTabletHardwareCapabilities) ( ai::int32* hardwareCapabilities );
 
@@ -1094,22 +1173,31 @@ AIErr UpdateInfoPalette( AIToolHandle tool, AIRealPoint origin, AIArtHandle art 
 	@param normalIconResource[in] Base file name (without extension) of the PNG icon resource for the light UI theme.
 	@param darkNormalIconResource[in] Base file name (without extension) of the PNG icon resource for the dark UI theme.
 	*/
-	AIAPI AIErr (*SetToolIcons) (AIToolHandle tool, const char *normalIconResourceName, const char *darkNormalIconResourceName);
+    AIAPI AIErr (*SetToolIcons) (AIToolHandle tool, const char *normalIconResourceName, const char *darkNormalIconResourceName);
 
 	/**Retrieves the base filenames (without extension) of the PNG icon resources associated with a tool.
 	   @param tool[in] The tool reference.
 	   @param normalIconResource[out] A buffer in which to return the resource name for light UI theme icon.
 	   @param darkNormalIconResource[out]  A buffer in which to return the resource name for dark UI theme icon.
 	*/
-	AIAPI AIErr(*GetToolIcons) (const AIToolHandle tool, char **normalIconResourceName, char **darkNormalIconResourceName);
+    AIAPI AIErr(*GetToolIcons) (const AIToolHandle tool, char **normalIconResourceName, char **darkNormalIconResourceName);
 
 	/**
 	*/
 	AIAPI AIErr(*SetDocumentInkParams)(const AIToolHandle tool, const AIDocumentInkParams& inDocInkParams);
+
+	/** Retrieves the options associated with the tool corresponding to the given tool number.
+		@param options [out] A buffer in which to return the options value.
+	*/
+	AIAPI AIErr (*GetToolOptionsFromNumber) (AIToolType toolNum, ai::int32 *options);
+
+	/** Retrieves the options associated with the tool corresponding to the given tool name.
+		@param options [out] A buffer in which to return the options value.
+	  	@note	It is more efficient to work with tool numbers rather than
+				names. See \c #GetToolOptionsFromNumber().
+	*/
+    AIAPI AIErr (*GetToolOptionsFromName) (const char *toolName, ai::int32 *options);
 };
 
 
 #include "AIHeaderEnd.h"
-
-
-#endif

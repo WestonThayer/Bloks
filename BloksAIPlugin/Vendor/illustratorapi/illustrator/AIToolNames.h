@@ -146,14 +146,29 @@
 // New for AI18.1
 #define kAdobeCurvatureTool "Adobe Curvature Tool"
 
-//New for CC Charts	
-#define kIGTool "CC Charts Tool"
+//New for Charts
+#define kIGTool "Adobe Charts Tool"
 
 //New for 19.0
 #define kAdobeShaperTool "Adobe Shaper Tool"
 
 //New for 19.3 (October release)
 #define kAdobeSymmetryTool "Adobe Symmetry Tool"
+
+// New for 22.0 (MAX release)
+#define kAdobePuppetWarpTool "Adobe Puppet Warp Tool"
+
+// New for 22.0 (MAX release)
+#define kDiffusionColoringTool "Adobe Diffusion Coloring Tool"
+
+// New for 23.0 (MAX release)
+#define kSmartEditTool "Adobe Smart Edit Tool"
+
+// New for 24.3
+#define kColorThemePickerTool "Adobe Color Theme Picker Tool"
+
+//// New for 25.3
+#define kAdobeRotateCanvasTool       "Adobe Rotate Canvas Tool"
 
 /** @} */
 

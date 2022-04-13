@@ -1,8 +1,8 @@
 //========================================================================================
 //  
-//  $File: //ai_stream/rel_20_0/devtech/sdk/public/samplecode/common/source/AppContext.cpp $
+//  $File$
 //
-//  $Revision: #1 $
+//  $Revision$
 //
 //  Copyright 1987 Adobe Systems Incorporated. All rights reserved.
 //  
@@ -27,7 +27,7 @@ extern "C" AIAppContextSuite *sAIAppContext;
 
 AppContext::AppContext(SPPluginRef pluginRef)
 {
-	fAppContext = nil;
+	fAppContext = nullptr;
 	if (sAIAppContext)
 		sAIAppContext->PushAppContext(pluginRef, (AIAppContextHandle *)&fAppContext);
 }

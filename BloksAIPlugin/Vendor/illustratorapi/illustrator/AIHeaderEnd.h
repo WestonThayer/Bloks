@@ -41,6 +41,4 @@
 	#pragma pack(pop)
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+AI_EXTERN_C_END

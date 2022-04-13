@@ -45,8 +45,8 @@
  **/
 
 #define kAIUIDPoolSuite							"AI UID Pool Suite"
-#define kAIUIDPoolSuiteVersion6					AIAPI_VERSION(6)
-#define kAIUIDPoolSuiteVersion					kAIUIDPoolSuiteVersion6
+#define kAIUIDPoolSuiteVersion7					AIAPI_VERSION(7)
+#define kAIUIDPoolSuiteVersion					kAIUIDPoolSuiteVersion7
 #define kAIUIDPoolVersion						kAIUIDPoolSuiteVersion
 
 #define kAIUIDSuite								"AI UID Suite"
@@ -66,13 +66,13 @@
 
 
 /** @ingroup Errors
-	A UID name was specified with an invalid syntax. See \c #AIUIDSuite. */
+	A UID name is specified with an invalid syntax. See \c #AIUIDSuite. */
 #define kUIDBadSyntax				'UIDx'
 /** @ingroup Errors
 	The name specified is already in use by another UID. See \c #AIUIDSuite. */
 #define kUIDNotUnique				'UIDu'
 /** @ingroup Errors
-	UID was not found. See \c #AIUIDSuite. */
+	UID is not found. See \c #AIUIDSuite. */
 #define kUIDNotFound				'UID!'
 
 
@@ -156,6 +156,14 @@ typedef struct AIUIDPoolSuite {
 		*/
 	AIAPI AIErr (*NewUID) ( AINamePoolRef pool, const ai::UnicodeString& name, AIUIDRef* uid );
 
+	/** Retrieves the UIDRef from its name.
+	@param pool The UID name pool.
+	@param name The UID name.
+	@param uid [out] A buffer in which to return the UID object,
+	or \c NULL if there is none.
+	*/
+	AIAPI AIErr(*GetUID) (AINamePoolRef pool, const ai::UnicodeString& name, AIUIDRef* uid);
+
 	/** Creates a new reference to a unique identifier with a name from the name pool.
 		The new UID reference has an initial reference count of 1.
 			@param pool The UID name pool.
@@ -180,7 +188,7 @@ typedef struct AIUIDPoolSuite {
 
 /**	@ingroup Suites
 	This suite allows you to access and manage unique identifiers.
-	A unique identifier (UID) is an object that can be stored in a
+	A unique identifier (UID) is an object that can be stored in
 	a dictionary or an array. A unique identifier cannot occur
    	in more than one container, or more than once in a container.
 
@@ -371,7 +379,7 @@ typedef struct AIUIDUtilsSuite {
 	/** Retrieves the UID reference for an art object, or assigns a new UID
 		and creates the reference if needed.
 			@param art The art object.
-			@param uidref [out] A buffer in which to return the UID reference object,
+			@param uidref [out] A buffer in which to return the UID reference object.
 		*/
 	AIAPI AIErr (*NewArtUIDREF) ( AIArtHandle art, AIUIDREFRef* uidref );
 
@@ -399,12 +407,12 @@ typedef struct AIUIDUtilsSuite {
 
 	/** Retrieves the name or XML identifier of an art object, depending on the setting of
 		the user preference "Identify Object by: Object Name/XML ID".
-		If the preference allows a user to entry arbitrary names,
-		they are translated internally to valid, unique, XML IDs. This
+		If the preference allows a user to enter arbitrary names,
+		they are internally translated to valid, unique, XML IDs. This
 		function translates back to the name that was entered.
 			@param art The art object.
 			@param name [out] A buffer in which to return the name string.
-			@param isDefaultName [out] A buffer in which to return true if the
+			@param isDefaultName [out] A buffer in which to return the output as true if the
 				art object has no name or UID, and the returned string is the default name.
 		*/
 	AIAPI AIErr (*GetArtNameOrUID) ( AIArtHandle art, ai::UnicodeString& name, ASBoolean* isDefaultName );
@@ -412,8 +420,8 @@ typedef struct AIUIDUtilsSuite {
 	/** Sets the name or XML identifier of an art object, depending on the setting of
 		the user preference "Identify Object by: Object Name/XML ID".
 			@param art The art object.
-			@param name The new name string. If the preference allows a user
-				to entry arbitrary names, this can be any string, which is
+			@param name The newly named string. If the preference allows a user
+				to enter arbitrary names, this can be any string, which is
 				translated internally to a valid, unique, XML ID. Otherwise, it
 				must conform to XML ID syntax.
 
@@ -477,7 +485,7 @@ typedef struct AIUIDUtilsSuite {
 		*/
 	AIAPI AIErr (*TransferArtUIDToStory) ( AIArtHandle art, AIArtHandle frame );
 
-	/* New for AI 12 */
+	/* Introduced in AI 12 */
 
 	/** Retrieves the source object from which an object being dragged and transformed was derived.
 			@param target The unique identifier (UID) for the object being dragged.

@@ -207,20 +207,20 @@ typedef enum
 typedef struct {
 
 	/** Creates an envelope for a given set of source art objects, or for the currently
-		selected art if \c art is \c nil or \c numArt is 0. By default, the new envelope
+		selected art if \c art is \c nullptr or \c numArt is 0. By default, the new envelope
 		is fully selected, and placed above the enveloped art object or objects in the paint order.
-			@param art An array of art objects to be enveloped, or \c nil to create an envelope
+			@param art An array of art objects to be enveloped, or \c nullptr to create an envelope
 				for the current selection. Cannot be an art object stored in a dictionary,
 				but can be the child of	art stored in a dictionary.
 			@param numArt The number of objects in \c art, or 0 to create an
 				envelope for the current selection.
 			@param envelopeObject The path art object to use as the new envelope,
-				or \c nil to use the bounding box of \c art (or of the current selection)
+				or \c nullptr to use the bounding box of \c art (or of the current selection)
 				to create a new envelope object. (This would be the topmost selected
 				object if you create the envelope using Object > Envelope Distort > Make
 				with Top Object.)
 			@param options A pointer to the structure that specifies deformation options
-				for the new envelope. Pass \c nil to use the default options, as specified
+				for the new envelope. Pass \c nullptr to use the default options, as specified
 				by application preferences.
 			@param envelope [out] A buffer in which to return the new envelope object.
 	 */
@@ -332,11 +332,11 @@ typedef struct {
 				Contains entries for these keys: \c #kAIDeformMeshKey, \c #kAIDeformFidelityKey,
 				\c #kAIDeformOptionsKey.
 			@param srcRect The bounding box of the source space (that is, the size the envelope
-				would be), or \c nil to use the bounds of the source art.
+				would be), or \c nullptr to use the bounds of the source art.
 			@param deformedArt [out] A buffer in which to return the resulting art object.
 			@param progressProc A callback procedure for displaying a progress bar during
 				computation (from which the user can cancel the operation)
-				or \c nil to show no progress bar.
+				or \c nullptr to show no progress bar.
 			@return The error \c #kCanceledErr if user cancels the operation from the
 				progress bar.
 		 */

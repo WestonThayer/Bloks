@@ -189,7 +189,11 @@ typedef enum AIFolderType
         kAIFrameworksDllsPath = 112,
 		kAIUserLocalSupportFolderType = 113,
         kAIAMTParentFolderType = 114,
-
+		kAIApplicationSupportCommonx86FolderType = 115,
+		kAILibraryHostPluginsFolderType = 116,
+		kAIModifiedPresetsToolsFolderType = 117,
+		kAIPresetToolsFolderType = 118,
+		kAISubstanceMaterialFolderType = 119,
 } AIFolderType;
 
 /** Types of files that can be acquired by \c #AIFoldersSuite::GetFileName() */
@@ -281,6 +285,7 @@ Adobe Illustrator x		<- kAIRootFolderType
 	  Flash Panels: <- kAIPresetFlashPanelsFolderType
   	    Welcome Screen: <- kAIPresetWelcomeScreenFolderType
 	  Workspaces:	<- kAIPresetWorkspacesFolderType
+	  Tools:	<- kAIPresetToolsFolderType
 
   	Fonts:		<- kAIFontsFolderType
   	  CMaps:	<- kAIFontsCMapsFolderType

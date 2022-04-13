@@ -2,19 +2,19 @@
 
     Copyright 2000-2006 Adobe Systems Incorporated. All Rights Reserved.
 
-    NOTICE:  Adobe permits you to use, modify, and distribute this file 
-    in accordance with the terms of the Adobe license agreement accompanying 
-    it. If you have received this file from a source other than Adobe, then 
-    your use, modification, or distribution of it requires the prior written 
+    NOTICE:  Adobe permits you to use, modify, and distribute this file
+    in accordance with the terms of the Adobe license agreement accompanying
+    it. If you have received this file from a source other than Adobe, then
+    your use, modification, or distribution of it requires the prior written
     permission of Adobe.
 
  ----------------------------------------------------------------------------------
 
-	File:	ATETypesDef.h
-		
-	Notes:	Machine Generated file from script version 1.45
-	        Please don't modify manually!
-	
+    File:   ATETypesDef.h
+
+    Notes:  Machine Generated file from script version 1.45
+            Please don't modify manually!
+
  ---------------------------------------------------------------------------------- */
 #ifndef __ATETypesDef__
 #define __ATETypesDef__
@@ -36,6 +36,8 @@ typedef struct _CompFontComponent* CompFontComponentRef;
 typedef struct _CompFontSet* CompFontSetRef;
 typedef struct _GlyphRun* GlyphRunRef;
 typedef struct _GlyphRunsIterator* GlyphRunsIteratorRef;
+typedef struct _ListStyle* ListStyleRef;
+typedef struct _ListStyleSet* ListStyleSetRef;
 typedef struct _MojiKumi* MojiKumiRef;
 typedef struct _MojiKumiSet* MojiKumiSetRef;
 typedef struct _TextFrame* TextFrameRef;
@@ -68,6 +70,8 @@ typedef struct _ArrayArrayReal* ArrayArrayRealRef;
 typedef struct _ArrayBurasagariType* ArrayBurasagariTypeRef;
 typedef struct _ArrayPreferredKinsokuOrder* ArrayPreferredKinsokuOrderRef;
 typedef struct _ArrayKinsokuRef* ArrayKinsokuRefRef;
+typedef struct _ArrayListStyleRef* ArrayListStyleRefRef;
+typedef struct _ArrayListStyleSetRef* ArrayListStyleSetRefRef;
 typedef struct _ArrayMojiKumiRef* ArrayMojiKumiRefRef;
 typedef struct _ArrayMojiKumiSetRef* ArrayMojiKumiSetRefRef;
 typedef struct _ArrayTabStopsRef* ArrayTabStopsRefRef;
@@ -75,6 +79,7 @@ typedef struct _ArrayLeadingType* ArrayLeadingTypeRef;
 typedef struct _ArrayFontRef* ArrayFontRefRef;
 typedef struct _ArrayGlyphID* ArrayGlyphIDRef;
 typedef struct _ArrayRealPoint* ArrayRealPointRef;
+typedef struct _ArrayFontSizeRefType* ArrayFontSizeRefTypeRef;
 typedef struct _ArrayRealMatrix* ArrayRealMatrixRef;
 #if SLO_COMPLEXSCRIPT
 typedef struct _ArrayParagraphDirection* ArrayParagraphDirectionRef;
@@ -119,8 +124,7 @@ typedef struct _ArrayLine* ArrayLineRef;
 typedef struct _ArrayComposerEngine* ArrayComposerEngineRef;
 
 #ifdef __cplusplus
-}// namespace ATE
+} // namespace ATE
 #endif
 
 #endif
-

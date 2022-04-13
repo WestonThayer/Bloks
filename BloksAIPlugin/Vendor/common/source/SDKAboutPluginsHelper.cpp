@@ -1,8 +1,8 @@
 //========================================================================================
 //  
-//  $File: //ai_stream/rel_20_0/devtech/sdk/public/samplecode/common/source/SDKAboutPluginsHelper.cpp $
+//  $File$
 //
-//  $Revision: #1 $
+//  $Revision$
 //
 //  Copyright 1987 Adobe Systems Incorporated. All rights reserved.
 //  
@@ -19,7 +19,7 @@
 
 /*
 */
-SDKAboutPluginsHelper::SDKAboutPluginsHelper() : fAIMenu(nil), fAIUser(nil)
+SDKAboutPluginsHelper::SDKAboutPluginsHelper() : fAIMenu(nullptr), fAIUser(nullptr)
 {
 }
 
@@ -39,11 +39,11 @@ AIErr SDKAboutPluginsHelper::AddAboutPluginsMenuItem(SPInterfaceMessage* message
 {
 	AIErr error = kNoErr;
 
-	if (fAIMenu == nil) {
+	if (fAIMenu == nullptr) {
 		error = message->d.basic->AcquireSuite( kAIMenuSuite, kAIMenuSuiteVersion, (const void **) &fAIMenu );
 	}
 	
-	if (!error && fAIMenu != nil) {
+	if (!error && fAIMenu != nullptr) {
 		// Add an about plug-ins menu group for the given company under Illustrator's about group.
 		bool exists = false;
 		error = this->GroupExists(companyMenuGroupName, exists);
@@ -51,30 +51,30 @@ AIErr SDKAboutPluginsHelper::AddAboutPluginsMenuItem(SPInterfaceMessage* message
 			AIPlatformAddMenuItemDataUS companyRootMenuData;
 			companyRootMenuData.groupName = kAboutMenuGroup;
 			companyRootMenuData.itemText = companyName;	
-			AIMenuItemHandle companyRootMenuItemHandle = nil;
+			AIMenuItemHandle companyRootMenuItemHandle = nullptr;
 			error = fAIMenu->AddMenuItem(message->d.self, NULL, &companyRootMenuData, kMenuItemNoOptions, &companyRootMenuItemHandle);
 			if (!error) {
-				AIMenuGroup companyRootMenuGroup = nil;
+				AIMenuGroup companyRootMenuGroup = nullptr;
 				error = fAIMenu->AddMenuGroupAsSubMenu(companyMenuGroupName, kMenuGroupSortedAlphabeticallyOption, companyRootMenuItemHandle, &companyRootMenuGroup);
 			}
 		}
 	}
 	
-	if (!error && fAIMenu != nil) {
+	if (!error && fAIMenu != nullptr) {
 		// Add menu item for this plug-in under the company's about plug-ins menu group.
 		AIPlatformAddMenuItemDataUS aboutPluginMenuData;
 		aboutPluginMenuData.groupName = companyMenuGroupName;
 		aboutPluginMenuData.itemText = ai::UnicodeString(pluginName);
-		AIMenuItemHandle aboutPluginMenuItemHandle = nil;
+		AIMenuItemHandle aboutPluginMenuItemHandle = nullptr;
 		error = fAIMenu->AddMenuItem(message->d.self, NULL, &aboutPluginMenuData, kMenuItemNoOptions, &aboutPluginMenuItemHandle);
 		if (!error) {
 			*menuItemHandle = aboutPluginMenuItemHandle;
 		}
 	}
 
-	if (fAIMenu != nil) {
+	if (fAIMenu != nullptr) {
 		message->d.basic->ReleaseSuite( kAIMenuSuite, kAIMenuSuiteVersion );
-		fAIMenu = nil;
+		fAIMenu = nullptr;
 	}
 
 	return error;
@@ -85,19 +85,19 @@ AIErr SDKAboutPluginsHelper::AddAboutPluginsMenuItem(SPInterfaceMessage* message
 void SDKAboutPluginsHelper::PopAboutBox(AIMenuMessage* message, const char* title, const char* description)
 {
 	AIErr error = kNoErr;
-	if (fAIUser == nil) {
+	if (fAIUser == nullptr) {
 		error = message->d.basic->AcquireSuite(kAIUserSuite, kAIUserSuiteVersion, (const void **) &fAIUser);
 	}
-	if (!error && fAIUser != nil) {
+	if (!error && fAIUser != nullptr) {
 		// Pop an about box for this plug-in.
 		ai::UnicodeString displayText(title);
 		displayText.append(ai::UnicodeString("\n\n"));
 		displayText.append(ai::UnicodeString(description));
 		fAIUser->MessageAlert(displayText);
 	}
-	if (fAIUser != nil) {
+	if (fAIUser != nullptr) {
 		message->d.basic->ReleaseSuite(kAIUserSuite, kAIUserSuiteVersion);
-		fAIUser = nil;
+		fAIUser = nullptr;
 	}
 }
 
@@ -108,7 +108,7 @@ AIErr SDKAboutPluginsHelper::GroupExists(const char* targetGroupName, bool& grou
 	AIErr error = kNoErr;
 	groupAlreadyMade = false;
 	ai::int32 count = 0;
-	AIMenuGroup dummyGroup = nil;
+	AIMenuGroup dummyGroup = nullptr;
 	error = fAIMenu->CountMenuGroups( &count );
 	if ( error ) return error;
 	for (ai::int32 i = 0; i < count; i++) {

@@ -2,25 +2,21 @@
 #ifndef __AIUnicodeString__
 #define __AIUnicodeString__
 
-/*
- *        Name:	AIUnicodeString.h
- *   $Revision: 6 $
- *      Author:
- *        Date:
- *     Purpose:	Adobe Illustrator Unicode String Suite.
- *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 2004-2007 Adobe Systems Incorporated.
- * All rights reserved.
- *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file 
- * in accordance with the terms of the Adobe license agreement 
- * accompanying it. If you have received this file from a source other 
- * than Adobe, then your use, modification, or distribution of it 
- * requires the prior written permission of Adobe.
- *
- */
-
+/*************************************************************************
+*
+* ADOBE CONFIDENTIAL
+*
+* Copyright 2004 Adobe
+*
+* All Rights Reserved.
+*
+* NOTICE: Adobe permits you to use, modify, and distribute this file in
+* accordance with the terms of the Adobe license agreement accompanying
+* it. If you have received this file from a source other than Adobe,
+* then your use, modification, or distribution of it requires the prior
+* written permission of Adobe.
+*
+**************************************************************************/
 
 /*******************************************************************************
  **
@@ -43,7 +39,7 @@
  **/
 
 #define kAIUnicodeStringSuite				"AI Unicode String Suite"
-#define kAIUnicodeStringSuiteVersion		AIAPI_VERSION(8)
+#define kAIUnicodeStringSuiteVersion		AIAPI_VERSION(9)
 #define kAIUnicodeStringVersion				kAIUnicodeStringSuiteVersion
 
 /*******************************************************************************
@@ -67,7 +63,8 @@
   	\li Acquire this suite using \c #SPBasicSuite::AcquireSuite() with the constants
 		\c #kAIUnicodeStringSuite and \c #kAIUnicodeStringVersion.
 	*/
-typedef struct {
+struct AIUnicodeStringSuite
+{
 
 	/** Initializes a Unicode string with the contents of a C string.
 			@param str [out] A buffer in which to return the Unicode string.
@@ -300,7 +297,7 @@ typedef struct {
 		ai::UnicodeString::size_type count);
 
 	/** Searches for the first occurrence of a substring of one Unicode string within
-		a substring of another Unicode string, performing a caseless compare.
+		a substring of another Unicode string, performing a caseless comparison.
 		(Note that this function returns a numeric value, not an error code.)
 			@param str The string to search in.
 			@param str2 The string to compare against.
@@ -414,6 +411,23 @@ typedef struct {
 		*/
 	AIAPI AIErr (*Resize) (ai::UnicodeString& str, ai::UnicodeString::size_type count, ai::UnicodeString::UTF32TextChar ch);
 
+	/** Retrieves number of characters (UTF code points) that this string can hold without reallocation.
+		This may be the same as or more than \c #Length().
+			@param str The string.
+			@return The number of characters that can be held in this string without reallocation.
+		*/
+	AIAPI ai::UnicodeString::size_type (*Capacity) (const ai::UnicodeString& str);
+
+	/** Request to change the capacity of this string to accommodate at least the specified number of characters.
+	 	If new capacity is greater than the current \c #Capacity(), new storage is allocated, and \c #Capacity()
+	 	is made equal or greater than new capacity.
+	 	If new capacity is less than or equal to the current \c #Capacity(), there is no effect.
+	 	(Note that this function does not return an error code.)
+			@param str The string, which is modified in place.
+			@param count The new desired capacity of this string in number of characters.
+		*/
+	AIAPI void (*Reserve) (ai::UnicodeString& str, ai::UnicodeString::size_type count);
+
 	/** Creates a substring of a Unicode string.
 			@param subString [in, out] A Unicode string in which to return the substring.
 				If it is uninitialized on input, it is initialized only if the source
@@ -478,8 +492,6 @@ typedef struct {
 		*/
 	AIAPI AIErr (*InitializeZString) (ai::UnicodeString& str, ZRef zStringKey);
 
-	/* New for AI13 */
-
 	/** Normalizes a Unicode string.
 	   		@param str The string.
 			@param form The normalization format.
@@ -487,11 +499,8 @@ typedef struct {
 	AIAPI AIErr (*Normalize) (ai::UnicodeString& str, ai::UnicodeString::NormalizedForm form);
 
 
-} AIUnicodeStringSuite;
-
+};
 
 #include "AIHeaderEnd.h"
-
-
 
 #endif // __AIUnicodeString__

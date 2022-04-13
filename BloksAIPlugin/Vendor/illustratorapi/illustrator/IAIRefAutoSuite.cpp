@@ -22,7 +22,7 @@
 #include "IAIRef.h"
 #include "AutoSuite.h"
 
-use_suite(AICountedObject)
+use_suite_required(AICountedObject)
 
 /**
 	This implements the GetAICountedObjectSuitePtr for autosuited AICountedObjectSuites.

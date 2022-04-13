@@ -1,23 +1,21 @@
 #ifndef __AISymbol__
 #define __AISymbol__
 
-/*
- *        Name:	AISymbol.h
- *      Author:
- *        Date:
- *     Purpose:	Adobe Illustrator Symbol Suite.
- *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 1990-2007 Adobe Systems Incorporated.
- * All rights reserved.
- *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file
- * in accordance with the terms of the Adobe license agreement
- * accompanying it. If you have received this file from a source other
- * than Adobe, then your use, modification, or distribution of it
- * requires the prior written permission of Adobe.
- *
- */
+/*************************************************************************
+*
+* ADOBE CONFIDENTIAL
+*
+* Copyright 1990 Adobe
+*
+* All Rights Reserved.
+*
+* NOTICE: Adobe permits you to use, modify, and distribute this file in
+* accordance with the terms of the Adobe license agreement accompanying
+* it. If you have received this file from a source other than Adobe,
+* then your use, modification, or distribution of it requires the prior
+* written permission of Adobe.
+*
+**************************************************************************/
 
 
 /*******************************************************************************
@@ -54,8 +52,8 @@
  **/
 
 #define kAISymbolSuite				"AI Symbol Suite"
-#define kAISymbolSuiteVersion7		AIAPI_VERSION(7)
-#define kAISymbolSuiteVersion		kAISymbolSuiteVersion7
+#define kAISymbolSuiteVersion8		AIAPI_VERSION(8)
+#define kAISymbolSuiteVersion		kAISymbolSuiteVersion8
 #define kAISymbolVersion			kAISymbolSuiteVersion
 
 #define kAISymbolPaletteSuite			"AI Symbol Palette Suite"
@@ -236,6 +234,11 @@ typedef struct {
 	AIArtHandle symbolArt;
 } AISymbolInstanceDoubleClickedNotifierData;
 
+enum SymbolDeleteChoice
+{
+	kExpandInstances,
+	kDeleteInstances
+};
 /*******************************************************************************
  **
  **	AISymbol Suite
@@ -982,6 +985,14 @@ typedef struct {
 				\c #AIPathStyleSuite::RetargetForCurrentDoc()
 			*/
 	AIAPI AIErr (*RetargetForCurrentDocumentAsUnlisted) ( AIPatternHandle srcPattern, AIPatternHandle *dstPattern );
+
+	/** Deletes a symbol definition and expands or deletes the instances of symbol as per the choice taken
+	@param symbolPattern The symbol reference. 
+	@param deleteChoice, expand or delete the instance as per the enum SymbolDeleteChoice.
+	@return The error \c #kBadParameterErr if NULL is passed. If symbol is used in effect dictionaries then the artstyle is marked dirty and the next execution is expected to take care of the deleted symbol
+	This api is slower since it involves expansion/delete of instance so use it only if you want exactly this behavior
+	*/
+	AIAPI AIErr(*DeleteSymbolPatternEx) (AIPatternHandle srcPattern, ai::uint32 deleteChoice);
 
 } AISymbolSuite;
 

@@ -23,7 +23,10 @@
 
 #include  "IAIColorSpace.inl"
 
-#ifdef _IAICOLORSPACE_SUITE_INCLUDE_H_
+#if AI_AUTO_SUITE_AVAILABLE
+	#include "AutoSuite.h"
+	use_suite_required(AIColorSpace)
+#elif defined(_IAICOLORSPACE_SUITE_INCLUDE_H_)
     #include _IAICOLORSPACE_SUITE_INCLUDE_H_
 #else
     #ifndef _IAICOLORSPACE_SUITE_USE_C_LINKAGE_

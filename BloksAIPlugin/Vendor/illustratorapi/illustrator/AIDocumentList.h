@@ -51,6 +51,10 @@
 
 #include "AIHeaderBegin.h"
 
+#if defined(ILLUSTRATOR_MINIMAL)
+	#include "AIDocumentBasicTypes.h"
+#endif
+
 /** @file AIDocumentList.h */
 
 /*******************************************************************************
@@ -60,10 +64,10 @@
  **/
 
 #define kAIDocumentListSuite			"AI Document List Suite"
-#define kAIDocumentListSuiteVersion9	AIAPI_VERSION(9)
+#define kAIDocumentListSuiteVersion11	AIAPI_VERSION(11)
 
 // latest version
-#define kAIDocumentListSuiteVersion		kAIDocumentListSuiteVersion9
+#define kAIDocumentListSuiteVersion		kAIDocumentListSuiteVersion11
 #define kAIDocumentListVersion			kAIDocumentListSuiteVersion
 
 
@@ -89,7 +93,7 @@
     (14000x14000 pts or 16383 x 16383 pts) */
 #define kAICantFitArtboardsErr				'CFCE'
 
-
+#if !defined(ILLUSTRATOR_MINIMAL)
 /** The document color model used when creating a new document or opening
 	a document, set in \c #AINewDocumentPreset::docColorMode.*/
 typedef enum
@@ -150,7 +154,9 @@ typedef enum
 	/** Medium resolution, 150 PPI. */
 	kAIRasterResolutionMedium,
 	/** High resolution, 300 PPI. */
-	kAIRasterResolutionHigh
+	kAIRasterResolutionHigh,
+	/** Low resolution, 36 PPI. */
+	kAIRasterResolution36PPI
 } AIRasterResolution;
 
 /** Artboard Layout for placing artboards while creating a new document,
@@ -172,7 +178,7 @@ typedef enum
 	/** Arrange artboards in single row from right to left*/
 	kAIArtboardLayoutRLRow
 }AIArtboardLayout;
-
+#endif
 /**  Parameters for creating a new document with \c #AIDocumentListSuite::New(). */
 typedef struct {
 	/** The title of the new document. An empty string results in the default
@@ -210,6 +216,12 @@ typedef struct {
 	AITransparencyGrid	docTransparencyGrid;
 	/** The raster resolution for the new document, an \c AIRasterResolution value.  */
 	AIRasterResolution	docRasterResolution;
+	/** The bleed settings for the new document*/
+	AIRealRect			docBleedOffset;
+	/**Lock status for bleed settings */
+	AIBoolean			docBleedLinkStatus;
+	/**Custom filepath**/
+	ai::FilePath docCustomFile;
 } AINewDocumentPreset;
 
 
@@ -251,12 +263,12 @@ struct AIDocumentListSuite {
 		*/
 	AIAPI AIErr	(*GetNthDocument)( AIDocumentHandle* document, ai::int32 lIndex );
 
-	/** Creates a new document and makes it the current document, and opens a window
+	/** Creates a new document, makes it the current document, and opens a window
 		for the new document, which becomes the	front most document window.
 			@param preset (New in AICS3) The name of a startup preset to
-				use when creating the new document. If empty or invalid, the function uses the
+				create a new document. If empty or invalid, the function uses the
 				startup template for the color mode specified in the \c parameter overrides.
-				Preset names are those that appear in the New Document dialog.
+				Preset names are those that appear in the New Document dialog,
 				such as "Mobile", "Print", and so on.
 			@param parameter (New in AICS3) The parameters for the new document. These values
 				override those in the preset. When a parameter has a \c NULL value here,
@@ -275,7 +287,7 @@ struct AIDocumentListSuite {
 			@param fileSpec The file.
 			@param colorMode The color mode for the new document.
 			@param dialogStatus An \c #ActionDialogStatus value. When \c #kDialogOn, shows the New
-				dialog to query user for parameters. Otherwise, allows no user interaction.
+				dialog to query user for parameters. Otherwise, does not allow user interaction.
 			@param forceCopy When true, duplicates the file and names the copy "Untitled",
 				regardless of whether it is marked as a template file.
 			@param document [out] A buffer in which to return the document reference.
@@ -290,7 +302,7 @@ struct AIDocumentListSuite {
 	@param fileSpec The file.
 	@param colorMode The color mode for the new document.
 	@param dialogStatus An \c #ActionDialogStatus value. When \c #kDialogOn, shows the New
-	dialog to query user for parameters. Otherwise, allows no user interaction.
+	dialog to query user for parameters. Otherwise, does not allow user interaction.
 	@param forceCopy When true, duplicates the file and names the copy "Untitled",
 	regardless of whether it is marked as a template file.
 	@param document [out] A buffer in which to return the document reference.
@@ -305,7 +317,7 @@ struct AIDocumentListSuite {
 	AIAPI AIErr	(*Save)( AIDocumentHandle document );
 
 	/** Closes a view for a document. If the document has only one open window,
-		this closes the document. If the document has been modified since last saved.
+		this closes the document. If the document has been modified since last saved,
 		prompts the user to save.  Switches the current document
 		to the active document window, regardless of whether it was the current view that
 		was closed.
@@ -331,7 +343,7 @@ struct AIDocumentListSuite {
 		*/
 	AIAPI AIErr	(*Print)( AIDocumentHandle document, ActionDialogStatus dialogStatus );
 
-	// New in Illustrator 13.0
+	// Introduced in Illustrator 13.0
 
 	/** Retrieves the preset settings from one of the startup template documents.
 			@param preset The preset name. Preset names are those that appear in the
@@ -352,7 +364,7 @@ struct AIDocumentListSuite {
 			@param index The 0-based position index of the document in the list.
 			@param document [out] The path of the document.
 		*/
-	AIAPI AIErr (*GetNthRecentDocument)( ai::int32 index, ai::FilePath& document );
+	AIAPI AIErr (*GetNthRecentDocument)( ai::int32 index, ai::UnicodeString& document );
 
 	/** Opens a document in the recent-documents list.
 			@param index The 0-based position index of the document in the list.

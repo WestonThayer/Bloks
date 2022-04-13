@@ -100,7 +100,7 @@
 
 /** @ingroup MenuCommand
 	File:Export/Export For Screens */
-#define kExportForScreensCommandStr                                   "exportForScreens"  
+#define kExportForScreensCommandStr                                  "exportForScreens"  
 
 /** @ingroup MenuCommand
 	File:Scripts:Other Script */
@@ -165,6 +165,10 @@
 /** @ingroup MenuCommand
 	Edit:Paste on All Artboards */
 #define kPasteInAllArtboardCommandStr                                "pasteInAllArtboard"                                           
+
+/** @ingroup MenuCommand
+    Edit:Paste without Formatting */
+#define kPasteWithoutFormattingCommandStr                                "pasteWithoutFormatting"
 
 /** @ingroup MenuCommand
 	Edit:Clear */
@@ -937,6 +941,34 @@
 /** @ingroup MenuCommand
 	Select:Same:Link Block Series */
 #define kFindLinkBlockSeriesMenuItemCommandStr                       "Find Link Block Series menu item"                             
+
+/** @ingroup MenuCommand
+ Select:Same:Text Fill color */
+#define kFindTextFillColorMenuItemCommandStr                        "Find Text Fill Color menu item"       
+
+/** @ingroup MenuCommand
+ Same:Text Stroke color */
+#define kFindTextStrokeColorMenuItemCommandStr                      "Find Text Stroke Color menu item"  
+
+/** @ingroup MenuCommand
+ Same:Text Fill Stroke color */
+#define kFindTextFillStrokeColorMenuItemCommandStr                  "Find Text Fill Stroke Color menu item"  
+
+/** @ingroup MenuCommand
+ Same:Text Font Size*/
+#define kFindTextFontSizeMenuItemCommandStr                         "Find Text Font Size menu item"
+
+/** @ingroup MenuCommand
+ Same:Text Font Family */
+#define kFindTextFontFamilyMenuItemCommandStr                      "Find Text Font Family menu item" 
+
+/** @ingroup MenuCommand
+ Same:Text Font Family Style*/
+#define kFindTextFontFamilyStyleMenuItemCommandStr                 "Find Text Font Family Style menu item" 
+
+/** @ingroup MenuCommand
+ Same:Text Font Family Size Style*/
+#define kFindTextFontFamilyStyleSizeMenuItemCommandStr             "Find Text Font Family Style Size menu item"
 
 /** @ingroup MenuCommand
 	Select:Object:All on Same Layers */
@@ -2052,8 +2084,35 @@
 
 /** @ingroup MenuCommand
 	Other Panel:New Swatch */
-#define kAdobeNewSwatchShortcutMenuCommandStr                        "Adobe New Swatch Shortcut Menu"                               
+#define kAdobeNewSwatchShortcutMenuCommandStr                        "Adobe New Swatch Shortcut Menu"
 
+/** @ingroup MenuCommand
+ Other Panel:Basic Toolbar */
+#define kAdobeBasicToolbarMenuCommandStr                             "Adobe Basic Toolbar Menu"
+
+/** @ingroup MenuCommand
+ Other Panel:Basic Toolbar */
+#define kAdobeAdvancedToolbarMenuCommandStr                          "Adobe Advanced Toolbar Menu"
+
+/** @ingroup MenuCommand
+    Object:Repeat:Make Radial*/
+#define kMakeRadialRepeatCommandStr                                  "Make Radial Repeat"
+
+/** @ingroup MenuCommand
+    Object:Repeat:Make Grid*/
+#define kMakeGridRepeatCommandStr                                    "Make Grid Repeat"
+
+/** @ingroup MenuCommand
+    Object:Repeat:Make Symmetry*/
+#define kMakeSymmetryRepeatCommandStr                                "Make Symmetry Repeat"
+
+/** @ingroup MenuCommand
+    Object:Repeat:Release*/
+#define kReleaseRepeatArtCommandStr                                  "Release Repeat Art"
+
+/** @ingroup MenuCommand
+    Object:Repeat:Repeat Art Options*/
+#define kRepeatArtOptionsCommandStr                                  "Repeat Art Options"
 
 #include "AIHeaderEnd.h"
 

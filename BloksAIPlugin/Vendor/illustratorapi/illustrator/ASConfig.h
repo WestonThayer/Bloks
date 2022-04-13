@@ -79,7 +79,7 @@
  *	Make certain that one and only one of the platform constants is defined.
  */
 
-#if !defined(WIN_ENV) && !defined(MAC_ENV)
+#if !defined(WIN_ENV) && !defined(MAC_ENV) && !defined(LINUX_ENV)
 	#error
 #endif
 
@@ -87,6 +87,17 @@
 	#error
 #endif
 
+#if defined(WIN_ENV) && defined(LINUX_ENV)
+	#error
+#endif
+
+#if defined(MAC_ENV) && defined(LINUX_ENV)
+	#error
+#endif
+
+#if defined(WIN_ENV) && defined(MAC_ENV) && defined(LINUX_ENV)
+	#error
+#endif
 
 /*
  * Processor Type
@@ -109,19 +120,33 @@
  *
  */
 #ifdef MAC_ENV
-	#if defined(__POWERPC__)
+	#if defined(IOS_ENV)
+		#define AS_POWERPC 0
+		#define AS_X86 0
+		#define AS_ARM 1
+		#define AS_ARM_64
+	#elif defined(__POWERPC__)
 		#define AS_POWERPC 1
 		#define AS_X86 0
+		#define AS_ARM 0
 	#elif defined (__i386__)
 		#define AS_POWERPC 0
 		#define AS_X86 1
 		#define AS_X86_32
 		#define AS_MAC_32
+		#define AS_ARM 0
 	#elif defined (__x86_64__)
 		#define AS_POWERPC 0
 		#define AS_X86 1
 		#define AS_X86_64
 		#define AS_MAC_64
+		#define AS_ARM 0
+	#elif defined (__arm64__)
+		#define AS_POWERPC 0
+		#define AS_X86 0
+		#define AS_MAC_64
+		#define AS_ARM 1
+		#define AS_ARM_64
 	#else
 		//We don't care in Rez if we have a processor defined
 		#ifndef rez
@@ -129,12 +154,14 @@
 		#endif
 		#define AS_POWERPC 0
 		#define AS_X86 0
+		#define AS_ARM 0
 	#endif
 #endif
 
 #ifdef WIN_ENV
 	#define AS_POWERPC 0
-	#define AS_X86		1
+	#define AS_X86 1
+	#define AS_ARM 0
 	#if defined(_WIN64)
 		#define AS_X86_64
 		#define AS_WIN_64
@@ -144,6 +171,14 @@
 	#else
 		#error Unknown MSVC Compiler
 	#endif
+#endif
+
+#ifdef LINUX_ENV
+	#define AS_POWERPC 0
+	#define AS_X86 1
+	#define AS_X86_64
+	#define AS_ARM 0
+	#define AS_UNIX_64
 #endif
 
 //check for consistency
@@ -178,10 +213,30 @@
 #endif
 
 #ifdef AS_X86_64
-	#if ((!defined(AS_WIN_64) && !defined(AS_MAC_64)) || (defined(AS_WIN_32) || defined(AS_MAC_32)) )
+	#if ((!defined(AS_WIN_64) && !defined(AS_MAC_64) && !defined(AS_UNIX_64)) || (defined(AS_WIN_32) || defined(AS_MAC_32)) )
 		#error
 	#endif
 #endif
+
+// 32-bit or 64-bit
+#if defined(AS_ARCH_64BIT)
+	#if AS_ARCH_64BIT
+		#if !defined(AS_X86_64) && !defined(AS_ARM_64)
+			#error Mismatched 64-bit macros
+		#endif
+	#else
+		#if defined(AS_X86_64) || defined(AS_ARM_64)
+			#error Mismatched 64-bit macros
+		#endif
+	#endif
+#else
+	#if defined(AS_X86_64) || defined(AS_ARM_64)
+		#define AS_ARCH_64BIT 1
+	#else
+		#define AS_ARCH_64BIT 0
+	#endif
+#endif
+
 /*
  * Endianness
  *
@@ -206,6 +261,10 @@
 #endif
 
 #ifdef WIN_ENV
+	#define AS_IS_LITTLE_ENDIAN 1
+#endif
+
+#ifdef LINUX_ENV
 	#define AS_IS_LITTLE_ENDIAN 1
 #endif
 

@@ -6,7 +6,7 @@
  *     Purpose:	Adobe Illustrator Document View Suite.
  *
  * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2008 Adobe Systems Incorporated.
+ * Copyright 1986-2017 Adobe Systems Incorporated.
  * All rights reserved.
  *
  * NOTICE:  Adobe permits you to use, modify, and distribute this file 
@@ -48,10 +48,10 @@
  **/
 
 #define kAIDocumentViewSuite			"AI Document View Suite"
-#define kAIDocumentViewSuiteVersion13	AIAPI_VERSION(13)
+#define kAIDocumentViewSuiteVersion15	AIAPI_VERSION(15)
 
 // latest version
-#define kAIDocumentViewSuiteVersion		kAIDocumentViewSuiteVersion13
+#define kAIDocumentViewSuiteVersion		kAIDocumentViewSuiteVersion15
 #define kAIDocumentViewVersion			kAIDocumentViewSuiteVersion
 
 /** @ingroup Notifiers
@@ -75,7 +75,13 @@ Sent when the edges visibility on the document is toggled.*/
 /** @ingroup Notifiers
 Sent when title of the active document view is changed.*/
 #define kAIActiveDocViewTitleChangedNotifier "AI Document View Title Changed Notifier"
+/** @Notifiers
+    Sent when the trim view state of a document is toggled. */
+#define kAIDocViewTrimViewStateChangedNotifier "AI Document View Trim View State Changed Notifier"
 
+/** @Notifiers
+    Sent when Document view render mode is changed */
+#define kAIDocViewRenderModeChangedNotifier "AI Document View Render Mode Changed Notifier"
 /*******************************************************************************
  **
  **	Types
@@ -99,10 +105,8 @@ enum AIScreenMode {
 	kFullScreenWithMenuMode,
 	/** A single view takes up the whole screen, the menu is not visible. */
 	kFullScreenNoMenuMode,
-	/** DEPRECATED: This mode behaves exactly like kNormalScreenMode.
-		Only one window on screen, edges flush with top and side panes.
-		Valid only for suite version 9. */
-	kMaximizedWindowMode_deprecated,
+    /** A single artboard takes up the whole screen, annotations are not visible. */
+    kAIPresentationMode,
   	/** Large dummy value ensures enum is 32-bits. */
   	kDummyWindowMode = 0xffffffff
 };
@@ -191,6 +195,14 @@ struct AIDocumentViewSuite {
 			@param center The new center point.
 		*/
 	AIAPI AIErr (*SetDocumentViewCenter) ( AIDocumentViewHandle view, const AIRealPoint *center );
+	
+	/** Retrieves the zoom factor for a view that the user is seeing. This is the zoom value that 
+		the user is seeing on the status bar.
+			@param view The view reference, or \c NULL for the current view.
+			@param zoom [out] A buffer in which to return the zoom factor, a percentage
+				value where 1 is 100% (actual size), 0.5 is 50% and 2 is 200%.
+		*/
+	AIAPI AIErr(*GetDocumentViewUserVisibleZoom) (AIDocumentViewHandle view, AIReal *zoom);
 
 	/** Retrieves the zoom factor for a view. This is the scale factor from artwork
 		coordinates to window coordinates.
@@ -210,6 +222,16 @@ struct AIDocumentViewSuite {
 		*/
 	AIAPI AIErr (*SetDocumentViewZoom) ( AIDocumentViewHandle view, AIReal zoom );
 
+	/** Sets the zoom factor of the view that the user is seeing on the status bar.
+		The scale factor is silently clamped to lie between the minimum and maximum values
+		supported (currently between 1/32 and 64). After adjusting the zoom, the document view
+		center remains unchanged.
+				@param view The view reference, or \c NULL for the current view.
+				@param zoom The new zoom factor, a percentage value where
+				1 is 100% (actual size), 0.5 is 50% and 2 is 200%.
+		*/
+	AIAPI AIErr(*SetDocumentViewUserVisibleZoom) (AIDocumentViewHandle view, AIReal zoom);
+
 	/** Converts a point from artwork coordinates to view (window) coordinates. The resulting
 		view coordinate is rounded to the nearest pixel.
 			@param view The view reference, or \c NULL for the current view.
@@ -225,7 +247,7 @@ struct AIDocumentViewSuite {
 			@param artworkPoint [out] A buffer in which to return the converted point, in artboard coordinates.
 			@see \c #FixedViewPointToArtworkPoint() (takes floating-point coordinate values)
 		 */
-	AIAPI AIErr (*ViewPointToArtworkPoint) ( AIDocumentViewHandle view, const AIPoint *viewPoint, AIRealPoint *artworkPoint );
+	AIAPI AIErr (*ViewPointToArtworkPoint) ( AIDocumentViewHandle view, const AIPoint *viewPoint, AIRealPoint *artworkPoint );    
 
 	/** Gets the number of open views for the current document. Use with
 		\c #GetNthDocumentView() to iterate through views.
@@ -467,11 +489,17 @@ struct AIDocumentViewSuite {
 	*/
 	AIAPI AIErr (*UseArtboardCoordinatesInRuler) ( const AIDocumentViewHandle view, const ASBoolean state );
 
-	/** Returns whether GPU Preview mode is enabled for the view. [WIN Only]
+	/** Returns whether GPU Preview mode is enabled for the view.
 	@param view 		The view reference, or \c NULL for the current view.
 	@return				True if Accelerated Preview mode is ON, false if CPU rendering mode is on.
 	*/
 	AIAPI AIBoolean (*IsGPUPreviewModeOn)(const AIDocumentViewHandle view);
+
+	/** Returns whether GPU Rendering is enabled for the view.
+	@param view 		The view reference, or \c NULL for the current view.
+	@return				True if GPU Rendering is ON, false if CPU rendering mode is on.
+	*/
+	AIAPI AIBoolean(*IsGPURenderingOn)(const AIDocumentViewHandle view);
 
 	/** Returns color value of location inside document window.
 	If location or window does not correspond to any document window of AI which is in GPU preview mode, bad parameter error is returned
@@ -484,7 +512,125 @@ struct AIDocumentViewSuite {
 		@param bounds [out] A buffer in which to return the bounding box.
 	*/
 	AIAPI AIErr (*GetDocumentViewVisibleArea)(AIDocumentViewHandle view, AIRealRect *bounds);
+    
+    /**
+     Sets whether view should clip objects to Artboards.
+     */
+    AIAPI AIErr (*SetClipViewToArtboards) (AIDocumentViewHandle view, AIBoolean clipToActiveArtboard);
+    
+    /**
+     Returns whether the view is clipped to artboards.
+     */
+    AIAPI AIErr(*GetClipViewToArtboards)(AIDocumentViewHandle view, AIBoolean& clipToActiveArtboard);
+    
+	/** Captures the contents of the view window (excluding scrollbars, etc.) to
+	a PNG file.
+	@param view			The view reference.
+	@param saveFilePath	Full path along with name of PNG file to create.
+	*/
+    AIAPI AIErr (*ScreenShot)(AIDocumentViewHandle view, const ai::UnicodeString &saveFilePath);
 
+	/** Rotates document view, will send kAIDocumentViewChangedNotifier.
+	@param view			The view reference.
+	@param rotationPoint	Point of rotation in artwork coordinates.
+	@param rotationAngle    Angle of rotation in degree(angle should be w.r.t horizontal axis)
+	*/
+	AIAPI AIErr(*SetDocumentViewRotation)(AIDocumentViewHandle view, const AIRealPoint& rotationPoint, AIReal rotationAngle);
+
+	/** Get document view rotation properties.
+	@param view			The view reference.
+	@param rotationPoint	Point of rotation in artwork coordinates.
+	@param rotationAngle    Angle of rotation in degree(angle will be w.r.t horizontal axis)
+	*/
+	AIAPI AIErr(*GetDocumentViewRotation)(AIDocumentViewHandle view, AIRealPoint& rotationPoint, AIReal& rotationAngle);
+    
+    /** Resets document view rotation to 0 degree.
+    @param view            The view reference.
+    */
+    AIAPI AIErr(*ResetDocumentViewRotation)(AIDocumentViewHandle view);
+
+    /** Converts a point from artwork coordinates to view (window) coordinates without taking into account the view rotation.
+        The resulting view coordinate is rounded to the nearest pixel.
+            @param view The view reference, or \c NULL for the current view.
+            @param artworkPoint The point to convert, in artwork coordinates.
+            @param viewPoint [out] A buffer in which to return the converted point, in window coordinates.
+        */
+    AIAPI AIErr (*ArtworkPointToViewPointUnrotated) ( AIDocumentViewHandle view, const AIRealPoint *artworkPoint, AIPoint *viewPoint );
+    
+    /** Converts a point from view coordinates to artwork coordinates without taking into account the view rotation.
+            @param view The view reference, or \c NULL for the current view.
+            @param viewPoint The point to convert, in window pixel coordinates.
+            @param artworkPoint [out] A buffer in which to return the converted point, in artboard coordinates.
+         */
+    AIAPI AIErr (*ViewPointToArtworkPointUnrotated) ( AIDocumentViewHandle view, const AIPoint *viewPoint, AIRealPoint *artworkPoint );
+    
+    /** Converts a rect from artwork coordinates to view (window) coordinates with rotation. The resulting
+        view coordinate is rounded to the nearest pixel.
+            @param view The view reference, or \c NULL for the current view.
+            @param artworkRect The rect to convert, in artwork coordinates.
+            @param viewRect [out] A buffer in which to return the converted rect, in window coordinates. This will be bounding box rect of points after rotation
+        @see \c #FixedArtworkRectToViewRectUnrotated() (does not round)
+        */
+    AIAPI AIErr (*ArtworkRectToViewRect) ( AIDocumentViewHandle view, const AIRealRect *artworkRect, AIRect *viewRect );
+    
+    /** Converts a Rect from view coordinates to artwork coordinates with inverse rotation.
+       @param view The view reference, or \c NULL for the current view.
+       @param viewRect The point to convert, in window pixel coordinates.
+       @param artworkRect [out] A buffer in which to return the converted point, in artboard coordinates. . This will be bounding box rect of points after inverse rotation
+       @see \c #FixedViewRectToArtworkRectUnrotated() (takes floating-point coordinate values)
+    */
+    AIAPI AIErr (*ViewRectToArtworkRect) ( AIDocumentViewHandle view, const AIRect *viewRect, AIRealRect *artworkRect );
+    
+    /** Converts a rect from artwork coordinates to view (window) coordinates. The resulting
+        view coordinate is rounded to the nearest pixel.
+            @param view The view reference, or \c NULL for the current view.
+            @param artworkRect The rect to convert, in artwork coordinates.
+            @param viewRect [out] A buffer in which to return the converted rect, in window coordinates.
+        @see \c #FixedArtworkRectToViewRectUnrotated() (does not round)
+        */
+    AIAPI AIErr (*ArtworkRectToViewRectUnrotated) ( AIDocumentViewHandle view, const AIRealRect *artworkRect, AIRect *viewRect );
+
+    /** Converts a Rect from view coordinates to artwork coordinates.
+            @param view The view reference, or \c NULL for the current view.
+            @param viewRect The point to convert, in window pixel coordinates.
+            @param artworkRect [out] A buffer in which to return the converted point, in artboard coordinates.
+            @see \c #FixedViewRectToArtworkRectUnrotated() (takes floating-point coordinate values)
+         */
+    AIAPI AIErr (*ViewRectToArtworkRectUnrotated) ( AIDocumentViewHandle view, const AIRect *viewRect, AIRealRect *artworkRect );
+    /** Converts a point from artwork coordinates to view (window) coordinates without considering canvas rotation. Does \e not round
+        the result.
+            @param view The view reference, or \c NULL for the current view.
+             @param artworkPoint The point to convert, in artwork coordinates.
+             @param viewPoint [out] A buffer in which to return the converted point, in window coordinates.
+            @see \c #ArtworkPointToViewPointUnrotated() (rounds result to nearest pixel)
+        */
+    AIAPI AIErr (*FixedArtworkPointToViewPointUnrotated) ( AIDocumentViewHandle view, const AIRealPoint *artworkPoint, AIRealPoint *viewPoint );
+
+    /** Converts a point from view coordinates to artwork coordinates without considering canvas rotation. Does \e not round
+		the result.
+            @param view The view reference, or \c NULL for the current view.
+            @param viewPoint The point to convert, in window floating-point coordinates.
+            @param artworkPoint [out] A buffer in which to return the converted point, in artboard coordinates.
+            @see \c #ViewPointToArtworkPointUnrotated() (takes pixel coordinate values)
+        */
+    AIAPI AIErr (*FixedViewPointToArtworkPointUnrotated) ( AIDocumentViewHandle view, const AIRealPoint *viewPoint, AIRealPoint *artworkPoint );
+
+	/** Converts a Rect from view coordinates to artwork coordinates.
+			@param view The view reference, or \c NULL for the current view.
+			@param viewRect The point to convert, in window floating-point coordinates.
+			@param artworkRect [out] A buffer in which to return the converted point, in artboard coordinates.
+			@see \c #ViewRectToArtworkRectUnrotated() (takes pixel coordinate values)
+		*/
+	AIAPI AIErr (*FixedViewRectToArtworkRectUnrotated) ( AIDocumentViewHandle view, const AIRealRect *viewRect, AIRealRect *artworkRect );
+    
+    /** Converts a rect from artwork coordinates to view (window) coordinates. Does \e not round
+        the result.
+            @param view The view reference, or \c NULL for the current view.
+             @param artworkRect The point to convert, in artwork coordinates.
+             @param viewRect [out] A buffer in which to return the converted point, in window coordinates.
+            @see \c #ArtworkRectToViewRectUnrotated() (rounds result to nearest pixel)
+        */
+    AIAPI AIErr (*FixedArtworkRectToViewRectUnrotated) ( AIDocumentViewHandle view, const AIRealRect *artworkRect, AIRealRect *viewRect );
 };
 
 

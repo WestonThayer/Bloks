@@ -1,23 +1,20 @@
-#ifndef __AIUndo__
-#define __AIUndo__
+#pragma once
 
-/*
- *        Name:	AIUndo.h
- *      Author:
- *        Date:
- *     Purpose:	Adobe Illustrator Undo Suite.
- *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2016 Adobe Systems Incorporated.
- * All rights reserved.
- *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file
- * in accordance with the terms of the Adobe license agreement
- * accompanying it. If you have received this file from a source other
- * than Adobe, then your use, modification, or distribution of it
- * requires the prior written permission of Adobe.
- *
- */
+/*************************************************************************
+*
+* ADOBE CONFIDENTIAL
+*
+* Copyright 1986 Adobe
+*
+* All Rights Reserved.
+*
+* NOTICE: Adobe permits you to use, modify, and distribute this file in
+* accordance with the terms of the Adobe license agreement accompanying
+* it. If you have received this file from a source other than Adobe,
+* then your use, modification, or distribution of it requires the prior
+* written permission of Adobe.
+*
+**************************************************************************/
 
 
 /*******************************************************************************
@@ -41,7 +38,7 @@
  **/
 
 #define kAIUndoSuite			"AI Undo Suite"
-#define kAIUndoSuiteVersion		AIAPI_VERSION(8)
+#define kAIUndoSuiteVersion		AIAPI_VERSION(9)
 #define kAIUndoVersion			kAIUndoSuiteVersion
 
 
@@ -127,8 +124,11 @@ typedef struct {
 		to the Action palette  since the undo context of the plug-in was created.  */
 	AIAPI AIErr (*SetActionPaletteUndo) ( void );
 
-	/** @deprecated Obsolete, do not use. */
-	AIAPI AIErr (*PurgeAllUndos) ( void );
+	/**	Undoes and forgets the last transaction.
+		Any redos available at this point are also forgotten.
+		This decreases the available undo transactions by one.
+		Changes made in the last transaction are no longer available for redo.	*/
+	AIAPI AIErr (*RevertAndForgetLastTransaction) ( void );
 
 	/** Marks or unmarks the current API context as being silent for undo purposes.
 		See @ref UndoContext.
@@ -206,10 +206,20 @@ typedef struct {
 	 */
     AIAPI AIErr (*IsRecordingSuspended) ( AIBoolean* outIsSuspended );
 
+#if defined(ILLUSTRATOR_MINIMAL)
+    /** For internal use only.
+     Begin silent changes
+    */
+    AIAPI AIErr (*BeginSilentChanges) ( void );
+    
+    /** For internal use only.
+     End silent changes
+    */
+    AIAPI AIErr (*EndSilentChanges) ( void );
+
+#endif
+
 } AIUndoSuite;
 
 
 #include "AIHeaderEnd.h"
-
-
-#endif

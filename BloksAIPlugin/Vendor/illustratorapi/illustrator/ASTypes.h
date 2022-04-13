@@ -84,8 +84,6 @@ extern "C" {
 #define kCantHappenErr			'CANT'
 
 
-// NULL and nil
-
 #ifndef NULL
 
 #ifdef MAC_ENV
@@ -106,14 +104,6 @@ extern "C" {
 
 #endif
 
-// dhearst 8/11/99 - we now specifically prefer NULL, so nil
-// is obsolete. We no longer provide it, but can't enforce this
-// policy because platform headers often provide nil.
-#ifndef nil
-#define nil NULL
-#endif
-
-
 // AMPAPI  Adobe Standard Plugin API calling convention.
 
 #ifndef AMPAPI
@@ -121,6 +111,9 @@ extern "C" {
 #define ASAPI
 #endif
 #ifdef WIN_ENV
+#define ASAPI
+#endif
+#ifdef LINUX_ENV
 #define ASAPI
 #endif
 #endif
@@ -247,6 +240,13 @@ typedef short ASSize;
 /** Mac OS only. the same as Mac OS \c Boolean.	 */
 typedef unsigned char ASBoolean;
 #endif
+
+#ifdef LINUX_ENV
+typedef short ASSize;
+
+typedef unsigned char ASBoolean;
+#endif
+
 
 #ifdef WIN_ENV
 /** Windows only. the same as  Windows \c BOOL. */

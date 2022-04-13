@@ -1,8 +1,8 @@
 //========================================================================================
 //  
-//  $File: //ai_stream/rel_20_0/devtech/sdk/public/samplecode/common/source/Suites.cpp $
+//  $File$
 //
-//  $Revision: #1 $
+//  $Revision$
 //
 //  Copyright 1987 Adobe Systems Incorporated. All rights reserved.
 //  
@@ -59,12 +59,12 @@ Suites::Suites()
 {
 	fError = AcquireSuites();
 	ASUInt16 i = 0;
-	while( (gImportSuites[i++].name != nil)) 
+	while( (gImportSuites[i++].name != nullptr)) 
 	{ ++fRequiredSuitesCount; } // Skip all required suites.
 
 	if(gImportSuites[i - 1].version == kStartOptionalSuites)
 	{
-		while(gImportSuites[i++].name != nil) 
+		while(gImportSuites[i++].name != nullptr)
 		{
 			++fOptionalSuitesTotalCount;
 		}
@@ -91,7 +91,7 @@ ASErr Suites::AcquireSuites()
 			if (result)
 				goto error;	
 		}
-		for (i = 0; gImportSuites[i].name != nil; ++i)
+		for (i = 0; gImportSuites[i].name != nullptr; ++i)
 		{
 			result = AcquireSuite(gImportSuites+i);
 			if (result)
@@ -108,7 +108,7 @@ ASErr Suites::AcquireSuite(ImportSuite *suite)
 {
 	ASErr result = kNoErr;
 
-	if (suite->suite != nil) {
+	if (suite->suite != nullptr) {
 		result = sSPBasic->AcquireSuite(suite->name, 
 									suite->version, 
 									(const void **)suite->suite);
@@ -131,7 +131,7 @@ ASErr Suites::ReleaseSuites()
 			if ( result )
 				goto error;
 		}
-		for (i = 0; gImportSuites[i].name != nil; ++i)
+		for (i = 0; gImportSuites[i].name != nullptr; ++i)
 		{
 			result = ReleaseSuite(gImportSuites+i);
 			if (result)
@@ -139,7 +139,7 @@ ASErr Suites::ReleaseSuites()
 		}
 		if(gImportSuites[i++].version == kStartOptionalSuites)
 		{
-			for (; fOptionalSuitesAcquiredCount && (gImportSuites[i].name != nil); ++i)
+			for (; fOptionalSuitesAcquiredCount && (gImportSuites[i].name != nullptr); ++i)
 			{
 				result = ReleaseSuite(gImportSuites+i);
 				if (result)
@@ -158,11 +158,11 @@ ASErr Suites::ReleaseSuite(ImportSuite *suite)
 {
 	ASErr result = kNoErr;
 
-	if (suite->suite != nil) {
+	if (suite->suite != nullptr) {
 		void **s = (void **) suite->suite;
-		if (*s != nil) {
+		if (*s != nullptr) {
 			result = sSPBasic->ReleaseSuite(suite->name, suite->version);
-			*s = nil;
+			*s = nullptr;
 		}
 	}
 	return result;
@@ -176,7 +176,7 @@ void Suites::acquire_Optional_Suites()
 		for(ASUInt16 i = 0; (i < fOptionalSuitesTotalCount) && optionalSuites->suite; ++i)
 		{
 			int** suitePtr = static_cast<int**>(optionalSuites->suite);
-			if( *suitePtr == nil)
+			if( *suitePtr == nullptr)
 			{
 				if( kNoErr == AcquireSuite(optionalSuites))
 					++fOptionalSuitesAcquiredCount;

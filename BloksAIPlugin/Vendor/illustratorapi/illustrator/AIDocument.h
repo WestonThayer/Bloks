@@ -1,24 +1,21 @@
+/*************************************************************************
+*
+* ADOBE CONFIDENTIAL
+*
+* Copyright 1986 Adobe
+*
+* All Rights Reserved.
+*
+* NOTICE: Adobe permits you to use, modify, and distribute this file in
+* accordance with the terms of the Adobe license agreement accompanying
+* it. If you have received this file from a source other than Adobe,
+* then your use, modification, or distribution of it requires the prior
+* written permission of Adobe.
+*
+**************************************************************************/
+
 #ifndef __AIDocument__
 #define __AIDocument__
-
-/*
- *        Name:	AIDocument.h
- *   $Revision: 25 $
- *      Author:
- *        Date:
- *     Purpose:	Adobe Illustrator Document Suite.
- *
- * ADOBE SYSTEMS INCORPORATED
- * Copyright 1986-2014 Adobe Systems Incorporated.
- * All rights reserved.
- *
- * NOTICE:  Adobe permits you to use, modify, and distribute this file 
- * in accordance with the terms of the Adobe license agreement 
- * accompanying it. If you have received this file from a source other 
- * than Adobe, then your use, modification, or distribution of it 
- * requires the prior written permission of Adobe.
- *
- */
 
 
 /*******************************************************************************
@@ -51,6 +48,9 @@ using ATE::DocumentTextResourcesRef;
 #endif
 
 #include "AIHeaderBegin.h"
+#if defined(ILLUSTRATOR_MINIMAL)
+	#include "AIDocumentBasicTypes.h"
+#endif
 
 /** @file AIDocument.h */
 
@@ -61,15 +61,18 @@ using ATE::DocumentTextResourcesRef;
  **/
 
 #define kAIDocumentSuite				"AI Document Suite"
-#define kAIDocumentSuiteVersion16		AIAPI_VERSION(16)
+#define kAIDocumentSuiteVersion19		AIAPI_VERSION(19)
 
 // latest version
-#define kAIDocumentSuiteVersion			kAIDocumentSuiteVersion16
+#define kAIDocumentSuiteVersion			kAIDocumentSuiteVersion19
 #define kAIDocumentVersion				kAIDocumentSuiteVersion
 
 /** @ingroup Notifiers
 	Sent when the contents of a document have changed. */
 #define kAIDocumentChangedNotifier		"AI Document Changed Notifier"
+/** @ingroup Notifiers
+	Sent when the active document window is about to be changed. */
+#define kAIActiveDocumentWindowAboutToBeChangedNotifier		"AI Active Document Window About To be Changed Notifier"
 /** @ingroup Notifiers
 	Sent right before the last document window of the artwork is about to be closed. */
 #define kAIDocumentAboutToCloseNotifier	"AI Document About To Close Notifier"
@@ -80,8 +83,17 @@ using ATE::DocumentTextResourcesRef;
 	Sent when a document has been opened. */
 #define kAIDocumentOpenedNotifier		"AI Document Opened Notifier"
 /** @ingroup Notifiers
-	Sent when a document has been saved. */
+	Sent when serialization part of saving process is done. This notifier will be followed
+	by \c #kAIDocumentWriteOnDiskCompleteNotifier or \c #kAIDocumentWriteOnDiskFailedNotifier*/
 #define kAIDocumentSavedNotifier		"AI Document Saved Notifier"
+/** @ingroup Notifiers
+	Sent when a document has been written to the disk successfully. See \c #AIDocumentWriteOnDiskCompleteNotifyData 
+	\c #kAIDocumentSavedNotifier*/
+#define kAIDocumentWriteOnDiskCompleteNotifier	"AI Document Write On Disk Complete Notifier"
+/** @ingroup Notifiers
+	Sent when a document writing to the disk get failed. See \c #AIDocumentWriteOnDiskFailedNotifyData
+	\c #kAIDocumentSavedNotifier*/
+#define kAIDocumentWriteOnDiskFailedNotifier	"AI Document Write On Disk Failed Notifier"
 /** @ingroup Notifiers
 	Sent when a new document has been created. */
 #define kAIDocumentNewNotifier			"AI Document New Notifier"
@@ -123,6 +135,49 @@ Sent when the document bleed values have been changed. See \c #AIDocumentSuite. 
 Sent when the transparency grid is toggled.*/
 #define kAIDocumentTransparencyGridNotifier "AI Document Transparency Grid Notifier"
 
+/**
+ * Data passed in kAIDocumentScaleConvertedNotifier and kAIActiveDocumentScaleChangedNotifier
+ */
+struct AIDocumentScaleNotifyData
+{
+	/** Old document Scale */
+	AIReal oldScale{ kAIRealOne };
+
+	/** New Document Scale */
+	AIReal newScale{ kAIRealOne };
+};
+
+/** @ingroup Notifiers
+	Sent when we start the document scale conversion to a new scale. See \c #AIDocumentScaleNotifyData,
+	\c #kAIDocumentScaleConvertedNotifier and \c #kAIActiveDocumentScaleChangedNotifier
+	@Notify data is a pointer to AIDocumentScaleNotifyData
+*/
+#define kAIDocumentScaleConversionStartedNotifier		"AI Document Scale Conversion Started Notifier"
+
+/** @ingroup Notifiers
+	Sent when current document scale is converted to a new scale. 
+	Plug-ins are required to change objects etc, which are not part of art tree and/or is not converted by app.
+	@Notify data is a pointer to AIDocumentScaleNotifyData
+*/
+#define kAIDocumentScaleConvertedNotifier		"AI Document Scale Converted Notifier"
+
+/** @ingroup Notifiers
+	Sent when a document become active which has a different document scale then the last active document.
+	Plug-ins are required to change globals/preferences etc. to match the new document scale of active document.
+	@note: Plug-ins should NOT change any art object in this notification, they should be changed in kAIDocumentScaleConvertedNotifier,
+		   as this notification is sent on just switching the active document.
+	@Notify data is a pointer to AIDocumentScaleNotifyData
+*/
+#define kAIActiveDocumentScaleChangedNotifier		"AI Active Document Scale Changed Notifier"
+
+
+/**
+ * @ingroup Errors
+ * Sent when the document scale passed in SetDocument Scale is out of range.
+ */
+#define kAIDocumentScaleOutOfRangeErr 'DSOR'
+
+#if !defined(ILLUSTRATOR_MINIMAL)
 /** Ruler unit values, see \c #AIDocumentSuite::GetDocumentRulerUnits() */
 enum AIDocumentRulerUnitValue {
 	kUnknownUnits = 0,
@@ -139,7 +194,17 @@ enum AIDocumentRulerUnitValue {
 	/** pixels */
 	kPixelsUnits,
 	/** Q units */
-	kQUnits
+	kQUnits,
+	/** feet-inch */
+	kFeetInchesUnits,
+	/** meters */
+	kMetersUnits,
+	/** yards */
+	kYardsUnits,
+	/** feet */
+	kFeetsUnits,
+	/**last */
+	kLastUnit = kFeetsUnits
 };
 
 /** Color models that can be used to specify artwork colors
@@ -182,6 +247,32 @@ enum AISpotColorMode {
 		using Lab.*/
 	kAIStandardSpotColorMode = 1,
 	kAIDummySpotColorMode = 0xFFFFFFFF
+};
+#endif
+/** Export can be triggered from Export as, Export for screens and Save for web.
+ We have maintained different default settings for each export.
+ GetLastExportedFilePath()
+ SetLastExportedFilePath()
+ require this parameter of type AIExportTriggeredFrom to know which export was used
+ */
+enum AIExportTriggeredFrom : ai::uint8
+{
+    kAIExportAs,
+    kAIExportForScreen,
+    kAISaveForWeb
+};
+
+/** Struct for notification data of <b>kAIDocumentWriteOnDiskCompleteNotifier</b>*/
+struct AIDocumentWriteOnDiskCompleteNotifyData
+{
+	ai::FilePath documentFilepath;
+};
+
+/** Struct for notification data of <b>kAIDocumentWriteOnDiskFailedNotifier</b>*/
+struct AIDocumentWriteOnDiskFailedNotifyData
+{
+	AIErr error = kCantHappenErr;
+	ai::FilePath documentFilepath;
 };
 
 /*******************************************************************************
@@ -232,6 +323,32 @@ typedef enum {
 	kJapaneseCropStyle
 } AICropMarkStyle;
 
+/** Types of libraries. */
+enum class AILibraryType : ai::uint8 {
+	kAIBrushLibraryType,
+	kAIStyleLibraryType,
+	kAISwatchLibraryType,
+	kAISymbolLibraryType,
+};
+
+/** It supposed to be used as value for dictionary key #kAIPDFDictKeyInsertPagesIndex.*/
+enum InsertPagesIndex : ai::int32
+{
+	kAIPDFInsertBeforeFirstPage = -1,
+	kAIPDFInsertAfterLastPage = -2
+};
+
+/** Dictionary keys supposed to be used while saving the PDF file via API 
+	#WriteDocumentWithOptions for parameter additionalOptionsDict*/
+
+/** This key should have a boolean value. On setting it true, all the
+	Artboards being saved will be inserted as new pages in the existing PDF.*/
+#define kAIPDFDictKeyInsertPages "AIPDFDictKeyInsertPages"
+
+/** This key should have used if #kAIPDFDictKeyInsertPages is true. Integer 
+	value passed corresponding to this key should be less than the number of 
+	pages in the existing PDF. See #InsertPagesIndex*/
+#define kAIPDFDictKeyInsertPagesIndex "AIPDFDictKeyInsertPagesIndex"
 
 /** Not supported. */
 typedef void *AIDocumentPlatformPrintRecord;
@@ -262,8 +379,6 @@ typedef struct
 /** Opaque reference to a file format's parameters. */
 typedef void *AIDocumentFileFormatParameters;
 
-/** Opaque reference to a document. */
-typedef struct _t_AIDocument *AIDocumentHandle;
 
 /*******************************************************************************
  **
@@ -287,6 +402,12 @@ struct AIDocumentSuite {
 			@param file [out] A buffer in which to return the file specification.
 		*/
 	AIAPI AIErr (*GetDocumentFileSpecification) ( ai::FilePath &file );
+    
+    /** Retrieves the file specification  associated with the given document.
+            @param document The document reference.
+            @param file [out] A buffer in which to return the file specification.
+     */
+	AIAPI AIErr(*GetDocumentFileSpecificationFromHandle) (AIDocumentHandle document, ai::FilePath &file);
 
 	/** Retrieves the coordinates of the lower left corner of the imageable
 		page, specified relative to the ruler origin.
@@ -422,7 +543,7 @@ struct AIDocumentSuite {
 			@param askForParms When true, show a dialog to query user for file-format parameters.
 				If no format parameters are available, the function queries the user even if this
 				value is false.
-	 		@see \c #WriteDocumentWithOptions()
+	 		@see \c #WriteDocumentWithOptions() and \c #WriteDocumentAsLibrary()
 	 	*/
 	AIAPI AIErr (*WriteDocument) ( const ai::FilePath &file, const char *fileFormatName, AIBoolean askForParms);
 
@@ -557,6 +678,20 @@ struct AIDocumentSuite {
 		*/
 	AIAPI AIErr (*GetNonRecordedDictionary) ( struct _AIDictionary** dictionary );
 
+	/** Retrieves the non-recorded dictionary associated with the document passed as input.
+		Changes to this dictionary and its contents are not recorded in the undo
+		history.
+
+		Dictionaries are reference counted. You must call \c #AIDictionarySuite::Release()
+		when you no longer need the reference.
+			@param document The document reference whose non-recorded dictionary is being asked for.
+			@param dictionary [out] A buffer in which to return a pointer to
+				the dictionary reference.
+			@see \c #GetNonRecordedDictionary()
+	*/
+
+	AIAPI AIErr(*GetNonRecordedDictionaryForDocument)(AIDocumentHandle document, struct _AIDictionary** dictionary);
+
 	/** Retrieves the version of the Illustrator file format in which
 		the current document was last saved. (Note that this function returns
 		a constant value, not an error code.)
@@ -583,7 +718,8 @@ struct AIDocumentSuite {
 
 	// New for AI 10
 
-	/** Retrieves asset management information. Pass \c null for any parameter whose
+	/** @deprecated 
+		Retrieves asset management information. Pass \c null for any parameter whose
 		state you do not want to retrieve.
 		 	@param managed [out] A buffer in which to return true if the file has an associated server URL.
 			@param pNAlternates [out] A buffer in which to return the number
@@ -599,7 +735,8 @@ struct AIDocumentSuite {
 		*/
 	AIAPI AIErr (*GetDocumentAssetMgmtInfo) (AIBoolean *managed, ai::int32* pNAlternates, AIBoolean *checkedOut, const char **URL, AIBoolean *canEdit, char *fileType);
 
-	/** Sets asset management information. Pass \c null for any parameter whose
+	/** @deprecated 
+	Sets asset management information. Pass \c null for any parameter whose
 		state you do not want to set.
 		 	@param managed When true, the file has an associated server URL.
 			@param checkedOut Deprecated, pass \c null.
@@ -732,10 +869,18 @@ sAIDocument->GetTextSelection(&selectionRef);
 			@param askForParms When true, show a dialog to query user for file-format parameters.
 						If no format parameters are available, the function queries the user
 						even if this value is false.
-	 		@see \c #WriteDocument()
+	 		@see \c #WriteDocument() and \c #WriteDocumentAsLibrary()
 		*/
 	AIAPI AIErr (*WriteDocumentWithOptions) (const ai::FilePath &file, const char *fileFormatName,
 		ai::int32 fileFormatOptions, AIDictionaryRef additionalOptionsDict, AIBoolean askForParms);
+
+	/** Writes the current document to a file as a library of specified type without modifying the document
+		or changing its modification status.
+			@param file The file specification.
+			@param libraryType The library type. See \c #AILibraryType for possible values.
+			@see \c #WriteDocument() and \c #WriteDocumentWithOptions()
+		*/
+	AIAPI AIErr (*WriteDocumentAsLibrary) (const ai::FilePath &file, AILibraryType libraryType);
 
 	/** Reports whether rendering the current document according to its current
 		view settings requires painting any overprinted objects.
@@ -744,7 +889,8 @@ sAIDocument->GetTextSelection(&selectionRef);
 		*/
 	AIAPI AIErr (*DocumentHasOverprint)(AIBoolean *hasOverprint);
 
-	/** Reports whether a document contains any managed links.
+	/** @deprecated
+		Reports whether a document contains any managed links.
 		A managed link is a URL to an Adobe Workgroup Server where
 		one can share and keep versions of the linked document.
 			@param document The document reference.
@@ -856,6 +1002,64 @@ sAIDocument->GetTextSelection(&selectionRef);
 	*/
 
 	AIAPI AIErr(*GetAutoAssignUIDOnArtCreation)(ai::int16 artType, AIBoolean &outAutoAssignUIDOnArtCreation);
+    
+    /** returns scale factor applied on the document
+     It considers os scale factor as well as app scale factor
+     returns always integral scale factor.
+     */
+    AIAPI AIReal (*GetEffectiveScaleFactor)();
+
+	/**
+	 * With each document there is a scale factor associated with it,
+	 * So for a document with document scale factor X, each object's dimension have to multiplied by X to get the 
+	 * correct dimensions of the object in UI
+	 * For example, if document scale factor is X, then  a 10x10 rectangle will actually will be displayed as 
+	 * (10*X)x(10*X) rectangle in UI 	
+	 */
+	AIAPI AIErr(*GetDocumentScale)(AIReal& docScale);
+
+	/** 
+		Reports whether the current document is a Cloud AI document.
+		(Note that this function returns a constant value, not an error code.)
+		@return true if the current document is a Cloud AI document, else false.
+	*/
+	AIAPI AIBoolean(*IsCloudAIDocument)();
+    
+	/**
+	 * Retrieves the file name associated with the current document.
+	 @param fileName [out]: A buffer in which to return the file name.
+	 */
+	AIAPI AIErr(*GetDocumentFileName)(ai::UnicodeString &fileName);
+
+	/**
+	* Retrieves the file name associated with the current document without extension
+	@param fileName [out]: A buffer in which to return the file name without extension
+	*/
+	AIAPI AIErr(*GetDocumentFileNameNoExt)(ai::UnicodeString &fileName);
+
+	/** Retrieves the file name  associated with the given document.
+	@param document The document reference.
+	@param fileName [out] A buffer in which to return the file name.
+	*/
+	AIAPI AIErr(*GetDocumentFileNameFromHandle)(AIDocumentHandle document, ai::UnicodeString &fileName);
+
+	/** Retrieves the file name  associated with the given document without extension
+	@param document The document reference.
+	@param fileName [out] A buffer in which to return the file name without extension
+	*/
+	AIAPI AIErr(*GetDocumentFileNameNoExtFromHandle)(AIDocumentHandle document, ai::UnicodeString &fileName);
+    
+    /** Retrieves the file path that was used for last export operation for current file
+    @param file [in]  option to know whether export was triggered from Export As, Export for screens or Save for Web.
+    @param file [out] A buffer in which to return the file path.
+     */
+    AIAPI AIErr (*GetLastExportedFilePath) ( const AIExportTriggeredFrom option, ai::FilePath &file);
+    
+    /** Set file path that was used for last export operation for current file
+    @param file [in]  option to know whether export was triggered from Export As, Export for screens or Save for Web.
+    @param file [in]  file path used for last export.
+     */
+    AIAPI AIErr (*SetLastExportedFilePath) ( const AIExportTriggeredFrom option, ai::FilePath file);
 };
 
 

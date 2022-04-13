@@ -53,6 +53,10 @@
 #define kMaxWSStringLength			(64)
 
 
+/** @ingroup Notifiers
+    Sent as a last step when the workspace has been restored. */
+#define kAIWorkspaceRestoreFinishNotifier   "AI Workspace Restore Finish Notifier"
+
 /** @ingroup Callers
 	Sent to plug-ins from the workspace manager.  See \c #AIWorkspaceSuite. */
 #define kAIWorkspaceCaller					"Workspace Manager"

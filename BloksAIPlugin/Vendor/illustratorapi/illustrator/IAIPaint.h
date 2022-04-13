@@ -225,7 +225,6 @@ inline bool PartialPaint::IsFullyDefined () const
 
 			case kPattern:
 				result = fMap.c.p.pattern &&
-						fMap.c.p.pattern &&
 						fMap.c.p.shiftDist &&
 						fMap.c.p.shiftAngle &&
 						fMap.c.p.scale &&
@@ -239,7 +238,6 @@ inline bool PartialPaint::IsFullyDefined () const
 
 			case kGradient:
 				result = fMap.c.b.gradient &&
-						fMap.c.b.gradient &&
 						fMap.c.b.gradientOrigin &&
 						fMap.c.b.gradientAngle &&
 						fMap.c.b.gradientLength &&

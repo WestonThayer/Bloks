@@ -64,15 +64,14 @@
 #define kAIDrawArtSuiteVersion		kAIDrawArtSuiteVersion11
 #define kAIDrawArtVersion			kAIDrawArtSuiteVersion
 
-
 /** Flag bits for \c #AIDrawArtFlags. */
 enum AIDrawArtFlagBitPos {
-	/** When set, draws for preview mode, otherwise draws in outline mode. */
+	/** When set, draws in the preview mode, otherwise draws in the outline mode. */
 	kAIDrawArtPreviewBit						= 0,
 	/** Obsolete. */
 	kAIDrawArtPreviewImagesBit					= 1,
 	/** When set, draws dimmed images if \c #kAIDrawArtPreviewBit is set.
-		Dimmed images have colors shifted toward white. */
+		Dimmed images have colors shifted towards white. */
 	kAIDrawArtPreviewDimmedImagesBit			= 2,
 	/** Obsolete. */
 	kAIDrawArtPreviewPatternsBit				= 3,
@@ -115,7 +114,7 @@ enum AIDrawArtFlagBitPos {
 	kAIDrawArtIgnoreTopLevelTransparency		= 13,
 	/** When set, modifies the color as if the image were printed
 		on colored paper. The paper color is specified in the transparency
-		panel of the document setup dialog. In that panel there are two color
+		panel of the document setup dialog. In that panel, there are two color
 		swatches that normally define the colors for the transparency grid.
 		The topmost swatch also defines the color that is used when simulating
 		colored paper. 	 */
@@ -131,11 +130,11 @@ enum AIDrawArtFlagBitPos {
 	/** When set, color conversion uses a faster but possibly less accurate
 		algorithm. Use for interactive display but not for rasterization. */
 	kAIDrawArtFastColorTransform				= 17,
-	/** When set, disposes of cached patterns and regenerates them when rendering.
+	/** When set, disposes off cached patterns and regenerates them when rendering.
 		Converting patterns into a renderable form for display takes time, so
 		Illustrator normally caches the converted results. However, the results
 		of conversion can depend on current application or document settings, such as
-		the color settings and document profile.  */
+		color settings and document profile.  */
 	kAIDrawArtDontCachePatterns					= 18,
 	/** When set, draws the specified object regardless of whether it is hidden.  */
 	kAIDrawArtIgnoreTopLevelInvisibility		= 19,
@@ -157,7 +156,7 @@ enum AIDrawArtFlagBitPos {
 	/** When set, draws to OPP port, simulating the appearance of spot colors.
 		As with #kAIDrawArtIsolate, this isolates any blending modes
 		from the backdrop.
-		If the objects drawn should not be isolated from one another.
+		If the objects drawn should not be isolated from one another,
 		and if multiple calls to \c #AIDrawArtSuite::DrawArt() are required,
 		use \c #AIDrawArtSuite::BeginDrawArt().
 		The spot plates needed are determined from the artwork
@@ -166,7 +165,19 @@ enum AIDrawArtFlagBitPos {
 	/** When set, ingnores overprint attribute applied to white objects.
 		This works only for process colors and document model CMYK.
 	*/
-	kAISuppressWhiteOP							= 25
+	kAISuppressWhiteOP							= 25,
+	/** When set, text characters over which any SVG font is applied 
+		will be drawn as outline
+	*/
+	kAIDrawSVGTextAsOutline						= 26,
+	/** When set, text characters over which any color font is applied
+		will be drawn as Image, this will be used for color fonts other
+		than SVG color fonts 
+	*/
+	kAIDrawColorTextAsImage						= 27,
+    /** When set, fill path and stroke with black color and ignore transparency
+    */
+    kAIDrawArtShadow                            = 28
 };
 
 /** Flag masks for #AIDrawArtFlags. See #AIDrawArtFlagBitPos. */
@@ -197,7 +208,10 @@ enum AIDrawArtFlagsValue {
 	kAIDrawArtPreviewCannotContinueMask			= (1 << kAIDrawArtPreviewCannotContinue),
 	kAIDrawArtClipOnlyMask						= (1 << kAIDrawArtClipOnly),
 	kAIDrawArtOPPMask							= (1 << kAIDrawArtOPP),
-	kAISuppressWhiteOPMask						= (1 << kAISuppressWhiteOP)
+	kAISuppressWhiteOPMask						= (1 << kAISuppressWhiteOP),
+	kAIDrawSVGTextAsOutlineMask					= (1 << kAIDrawSVGTextAsOutline),
+	kAIDrawColorTextAsImageMask					= (1 << kAIDrawColorTextAsImage),
+    kAIDrawArtShadowMask                        = (1 << kAIDrawArtShadow),
 };
 
 
@@ -228,9 +242,9 @@ enum AIDrawColorStyleValue {
 
 /** Values for #AIDrawColorOptions */
 enum AIDrawColorOptionsValue {
-	/** Draw gradients as linear, even if they are radial. */
+	/** Draws gradients as linear, even if they are radial. */
 	kAIDrawArtGradientForceLinear				= (1 << 0),
-	/** Do not convert colors to the document color model prior to drawing them.
+	/** Does not convert colors to the document color model prior to drawing them.
 		This allows drawing of out of gamut RGB colors when the current document
 		color space is CMYK. */
 	kAIDrawColorNoDocCsConversion				= (1 << 1)
@@ -285,7 +299,7 @@ typedef union {
 } AIDrawArtOutputUnion;
 
 /** Drawing data, defines an art object to be drawn, the object it is
-	to be drawn into and parameters affecting how it is to be
+	to be drawn into, and parameters affecting how it is to be
 	drawn. See \c #AIDrawArtSuite::DrawArt(), \c #AIDrawArtSuite::BeginDrawArt() */
 typedef struct AIDrawArtData {
 	/** The version of \c #AIDrawArtSuite in use, a \c #kAIDrawArtVersion value. */
@@ -319,13 +333,13 @@ typedef struct AIDrawArtData {
 	AIExtendedRGBColorRec selectionColor;
 	/** The port that is the destination for the draw operation.*/
 	AIDrawArtOutputUnion output;
-	/** When true, draw only art overlapping \c #srcClipRect on the port */
+	/** When true, draws only art overlapping \c #srcClipRect on the port */
 	AIBoolean doSrcClip;
-	/** If doSrcClip is true. Draw only art having an overlap between srcClipRect
+	/** If doSrcClip is true, draws only art having an overlap between srcClipRect
 		and visual bound of the art.*/
 	AIRealRect srcClipRect;
 public:
-	/** Default constructor. It initialize only doSrcClip.Rest of the initialization to be done by client*/
+	/** Default constructor. It initializes only doSrcClip. Rest of the initialization to be done by client*/
 	AIDrawArtData():doSrcClip(false) // This ensures no porting effort for the change
 	{
 	}
@@ -337,7 +351,7 @@ typedef ai::int32 AIDrawColorStyle;
 /** See #AIDrawColorOptionsValue for possible values. */
 typedef ai::int32 AIDrawColorOptions;
 
-/** Structure defining a color to be drawn, the object it is
+/** Structure defining a color to draw the object, it is
 	to be drawn into and parameters affecting how it is to be
 	drawn. */
 typedef struct AIDrawColorData {
@@ -368,11 +382,11 @@ typedef struct AIDrawColorData {
 	(drawing surface). The port can be a screen window, or it can be
 	an offscreen drawing surface used to rasterize artwork.
 
-	The many drawing options are controlled by values in an \c #AIDrawArtData
+	The drawing options are controlled by values in an \c #AIDrawArtData
 	structure and related option structures \c #AIColorConvertOptions and
 	\c #AIDrawArtFlags.
 
-	When drawing to a port whose color space does  not match the
+	When drawing to a port whose color space does not match the
 	document color space, bracket a sequence of calls
 	to \c #DrawArt() with calls to.\c #BeginDrawArt() and \c #EndDrawArt().
 	Examples are drawing a CMYK document to an RGB window,
